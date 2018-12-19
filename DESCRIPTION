@@ -1,0 +1,58 @@
+Package: BSL
+Type: Package
+Title: Bayesian Synthetic Likelihood
+Version: 1.0.0
+Date: 2018-12-04
+Authors@R: c(person("Ziwen","An",role=c("aut","cre"),email="ziwen.an@hdr.qut.edu.au",comment = c(ORCID = "0000-0002-9947-5182")),
+            person("Christopher C.","Drovandi",role=c("aut"),email="c.drovandi@qut.edu.au",comment = c(ORCID = "0000-0001-9222-8763")),
+            person("Leah F.","South",role=c("aut"),email="leah.south@hdr.qut.edu.au",comment = c(ORCID = "0000-0002-5646-2963")))
+Description: Bayesian synthetic likelihood (BSL, Price et al. (2018) <doi:10.1080/10618600.2017.1302882>)
+    is an alternative to standard, non-parametric approximate Bayesian 
+	computation (ABC). BSL assumes a multivariate normal distribution 
+	for the summary statistic likelihood and it is suitable when the 
+	distribution of the model summary statistics is sufficiently regular. 
+	This package provides a Metropolis Hastings Markov chain Monte Carlo 
+	implementation of BSL, BSLasso and semiBSL. BSL with graphical lasso 
+	(BSLasso, An et al. (2018) <https://eprints.qut.edu.au/102263/>) is 
+    computationally more efficient when the dimension of the summary statistic 
+	is high. A semi-parametric version of BSL (semiBSL, An et al. (2018) 
+	<https://arxiv.org/abs/1809.05800>) is more robust to non-normal summary 
+	statistics. Extensions to this package are planned.
+License: GPL (>= 2)
+LazyLoad: yes
+Imports: 
+    glasso,
+    ggplot2,
+    MASS,
+    mvtnorm,
+    copula,
+    graphics,
+    gridExtra,
+    foreach,
+    coda,
+    Rcpp
+Suggests:
+    elliplot
+LinkingTo: Rcpp, RcppArmadillo
+LazyData: true
+RoxygenNote: 6.1.1
+Encoding: UTF-8
+Collate: 
+    'BSL_package.R'
+    'RcppExports.R'
+    'S3_penbsl.R'
+    'S4Functions.R'
+    'S4.R'
+    'bsl.R'
+    'cell.R'
+    'combinePlotBSL.R'
+    'covWarton.R'
+    'gaussianSynLike.R'
+    'glasso_cv.R'
+    'imports.R'
+    'kernelCDF.R'
+    'logitTransform.R'
+    'ma2.R'
+    'multignk.R'
+    'selectPenalty.R'
+    'semiparaKernelEstimate.R'
