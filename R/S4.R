@@ -27,9 +27,15 @@ setValidity("bsl", check.bsl)
 setMethod('show', signature(object = 'bsl'), show.bsl)
 
 #' Summary method for class "bsl"
+#' @export
+#' @docType methods
+#' @rdname summary-methods
 setGeneric('summary')
 setMethod('summary', 'bsl', summary.bsl)
 
 #' Plot method for class "bsl"
+#' @export
+#' @docType methods
+#' @rdname plot-methods
 setGeneric('plot')
 setMethod('plot', signature = c(x = 'bsl', y = 'missing'), plot.bsl)
