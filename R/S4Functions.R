@@ -76,7 +76,6 @@ check.bsl <- function(object) {
 #' Show method for class "bsl". Display the basic information of a bsl object.
 #' @description Display the basic information of a bsl object.
 #' @param object   A "bsl" class object to be displayed.
-#' @export
 show.bsl <- function(object) {
     digits = max(3L, getOption("digits") - 3L)
     cat("\nCall:\n", paste(deparse(object@call), sep = "\n", collapse = "\n"),
