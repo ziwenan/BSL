@@ -22,7 +22,7 @@ if the shrinkage method is 'Warton'.}
 
 \item{standardise}{A logical argument that determines whether to standardise the summary statistics before applying
 the graphical lasso. This is only valid if shrinkage is 'glasso' and penalty is not \code{NULL}. The diagonal
-elements will not be penalised if the shinkage method is 'glasso'. The default is \code{FALSE}.}
+elements will not be penalised if the shrinkage method is 'glasso'. The default is \code{FALSE}.}
 
 \item{log}{A logical argument indicating if the log of likelihood is given as the result.
 The default is \code{TRUE}.}
@@ -55,7 +55,8 @@ for(i in 1:300) x[i, ] <- simulate_ma2(theta_true)
 
 # the standard Gaussian synthetic likelihood (the likelihood estimator used in BSL)
 gaussianSynLike(y, x)
-# the Gaussian synthetic likelihood with glasso shrinkage estimation (the likelihood estimator used in BSLasso)
+# the Gaussian synthetic likelihood with glasso shrinkage estimation
+# (the likelihood estimator used in BSLasso)
 gaussianSynLike(y, x, shrinkage = 'glasso', penalty = 0.1)
 
 }
@@ -64,9 +65,12 @@ Price, L. F., Drovandi, C. C., Lee, A., & Nott, D. J. (2018).
 Bayesian synthetic likelihood. Journal of Computational and Graphical Statistics.
 \url{https://doi.org/10.1080/10618600.2017.1302882}
 
-An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic 
+An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic
 likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
 \url{https://doi.org/10.1080/10618600.2018.1537928}
+
+Friedman, J., Hastie, T., Tibshirani, R. (2008). Sparse inverse covariance estimation with
+the graphical lasso. Biostatistics. \url{https://doi.org/10.1093/biostatistics/kxm045}
 
 Warton, D. I. (2008). Penalized Normal Likelihood and Ridge Regularization of Correlation and
 Covariance Matrices, Journal of the American Statistical Association.

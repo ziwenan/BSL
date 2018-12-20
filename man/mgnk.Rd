@@ -14,14 +14,13 @@ mgnk_sum(y)
 \arguments{
 \item{theta_tilde}{A vector with 15 elements for the proposed model parameters.}
 
-\item{y}{A \code{T} \eqn{x} \code{J} matrix of data.}
+\item{T}{The number of observations in the data.}
 
-\item{sim_options}{A list of options for simulating data from the model. For this example, the list contains
-\itemize{
-\item \code{T}: The number of observations in the data.
-\item \code{J}: The number of variables in the data.
-\item \code{bound}: A matrix of boundaries for the uniform prior.
-}}
+\item{J}{The number of variables in the data.}
+
+\item{bound}{A matrix of boundaries for the uniform prior.}
+
+\item{y}{A \code{T} \eqn{x} \code{J} matrix of data.}
 }
 \description{
 Here we provide the data and tuning parameters required to reproduce
@@ -60,10 +59,10 @@ data(mgnk)
 cl <- makeCluster(detectCores() - 1)
 registerDoParallel(cl)
 resultMgnkBSL <- bsl(mgnk$data, n = 60, M = 80000, theta0 = mgnk$start, covRandWalk = mgnk$cov,
-                     fnSim = mgnk_sim, fnSum = mgnk_sum, simArgs = mgnk$sim_options, 
-                     parallel = TRUE, parallelArgs = list(.packages = c('BSL', 'MASS'), .export = 'ninenum'),
-                     thetaNames = expression(a[1],b[1],g[1],k[1],a[2],b[2],g[2],k[2],a[3],b[3],g[3],k[3],
-                                             delta[12],delta[13],delta[23]), verbose = TRUE)
+    fnSim = mgnk_sim, fnSum = mgnk_sum, simArgs = mgnk$sim_options,
+    parallel = TRUE, parallelArgs = list(.packages = c('BSL', 'MASS'), .export = 'ninenum'),
+    thetaNames = expression(a[1],b[1],g[1],k[1],a[2],b[2],g[2],k[2],a[3],b[3],g[3],k[3],
+        delta[12],delta[13],delta[23]), verbose = TRUE)
 stopCluster(cl)
 registerDoSEQ()
 show(resultMgnkBSL)
@@ -71,17 +70,17 @@ summary(resultMgnkBSL)
 plot(resultMgnkBSL, which = 2, thin = 20)
 
 # Performing tuning for BSLasso
-lambda_all <- list(exp(seq(-2.5,0.5,length.out=20)), exp(seq(-2.5,0.5,length.out=20)), 
+lambda_all <- list(exp(seq(-2.5,0.5,length.out=20)), exp(seq(-2.5,0.5,length.out=20)),
                    exp(seq(-4,-0.5,length.out=20)), exp(seq(-5,-2,length.out=20)))
 
 # Opening up the parallel pools using doParallel
 cl <- makeCluster(detectCores() - 1)
 registerDoParallel(cl)
 sp_mgnk <- selectPenalty(ssy = mgnk_sum(mgnk$data), n = c(15, 20, 30, 50), lambda_all,
-                         theta = mgnk$start, M = 100, sigma = 1.5, fnSim = mgnk_sim, 
-                         fnSum = mgnk_sum, simArgs = mgnk$sim_options, standardise = TRUE, 
-                         parallelSim = TRUE, parallelSimArgs = list(.packages = c('BSL', 'MASS'), .export = 'ninenum'),
-                         parallelMain = TRUE)
+    theta = mgnk$start, M = 100, sigma = 1.5, fnSim = mgnk_sim,
+    fnSum = mgnk_sum, simArgs = mgnk$sim_options, standardise = TRUE,
+    parallelSim = TRUE, parallelSimArgs = list(.packages = c('BSL', 'MASS'), .export = 'ninenum'),
+    parallelMain = TRUE)
 stopCluster(cl)
 registerDoSEQ()
 sp_mgnk
@@ -92,11 +91,11 @@ plot(sp_mgnk)
 cl <- makeCluster(detectCores() - 1)
 registerDoParallel(cl)
 resultMgnkBSLasso <- bsl(mgnk$data, n = 20, M = 80000, theta0 = mgnk$start, covRandWalk = mgnk$cov,
-                         fnSim = mgnk_sim, fnSum = mgnk_sum, simArgs = mgnk$sim_options,
-                         penalty = 0.3, standardise = TRUE, parallel = TRUE,
-                         parallelArgs = list(.packages = c('BSL', 'MASS'), .export = 'ninenum'), 
-                         thetaNames = expression(a[1],b[1],g[1],k[1],a[2],b[2],g[2],k[2],a[3],b[3],g[3],k[3],
-                                                 delta[12],delta[13],delta[23]), verbose = TRUE)
+     fnSim = mgnk_sim, fnSum = mgnk_sum, simArgs = mgnk$sim_options,
+     penalty = 0.3, standardise = TRUE, parallel = TRUE,
+     parallelArgs = list(.packages = c('BSL', 'MASS'), .export = 'ninenum'),
+     thetaNames = expression(a[1],b[1],g[1],k[1],a[2],b[2],g[2],k[2],a[3],b[3],g[3],k[3],
+         delta[12],delta[13],delta[23]), verbose = TRUE)
 stopCluster(cl)
 registerDoSEQ()
 show(resultMgnkBSLasso)
@@ -109,10 +108,10 @@ plot(resultMgnkBSLasso, which = 2, thin = 20)
 cl <- makeCluster(detectCores() - 1)
 registerDoParallel(cl)
 resultMgnkSemiBSL <- bsl(mgnk$data, n = 60, M = 80000, theta0 = mgnk$start, covRandWalk = mgnk$cov,
-                         fnSim = mgnk_sim, fnSum = mgnk_sum, simArgs = mgnk$sim_options, method = 'semiBSL', 
-                         parallel = TRUE, parallelArgs = list(.packages = c('BSL', 'MASS'), .export = 'ninenum'),
-                         thetaNames = expression(a[1],b[1],g[1],k[1],a[2],b[2],g[2],k[2],a[3],b[3],g[3],k[3],
-                                                 delta[12],delta[13],delta[23]), verbose = TRUE)
+    fnSim = mgnk_sim, fnSum = mgnk_sum, simArgs = mgnk$sim_options, method = 'semiBSL',
+    parallel = TRUE, parallelArgs = list(.packages = c('BSL', 'MASS'), .export = 'ninenum'),
+    thetaNames = expression(a[1],b[1],g[1],k[1],a[2],b[2],g[2],k[2],a[3],b[3],g[3],k[3],
+        delta[12],delta[13],delta[23]), verbose = TRUE)
 stopCluster(cl)
 registerDoSEQ()
 show(resultMgnkSemiBSL)
@@ -123,20 +122,20 @@ plot(resultMgnkSemiBSL, which = 2, thin = 20)
 # plot using the R default plot function
 par(mar = c(4, 4, 1, 1), oma = c(0, 1, 2, 0))
 combinePlotsBSL(list(resultMgnkBSL, resultMgnkBSLasso, resultMgnkSemiBSL), which = 1, thin = 20,
-                label = c('bsl', 'bslasso', 'semiBSL'), col = c('red', 'blue', 'green'), lty = 2:4, lwd = 1)
+    label = c('bsl', 'bslasso', 'semiBSL'), col = c('red', 'blue', 'green'), lty = 2:4, lwd = 1)
 mtext('Approximate Univariate Posteriors', outer = TRUE, line = 0.75, cex = 1.2)
 
 # plot using the ggplot2 package
 combinePlotsBSL(list(resultMgnkBSL, resultMgnkBSLasso, resultMgnkSemiBSL), which = 2, thin = 20,
-                label = c('bsl   ', 'bslasso   ', 'semiBSL'), options.color = list(values=c('red', 'blue', 'green')),
-                options.linetype = list(values = 2:4), options.size = list(values = rep(1, 3)),
-                options.theme = list(plot.margin = unit(rep(0.03,4), "npc"), axis.title = element_text(size = 12),
-                                     axis.text = element_text(size = 8), legend.text = element_text(size = 12)))
+    label=c('bsl   ','bslasso   ','semiBSL'), options.color=list(values=c('red','blue','green')),
+    options.linetype = list(values = 2:4), options.size = list(values = rep(1, 3)),
+    options.theme = list(plot.margin = unit(rep(0.03,4),"npc"), axis.title = element_text(size=12),
+        axis.text = element_text(size = 8), legend.text = element_text(size = 12)))
 }
 
 }
 \references{
-An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic 
+An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic
 likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
 \url{https://doi.org/10.1080/10618600.2018.1537928}
 

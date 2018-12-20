@@ -19,9 +19,12 @@
 #' Bayesian synthetic likelihood. Journal of Computational and Graphical Statistics.
 #' \url{https://doi.org/10.1080/10618600.2017.1302882}
 #'
-#' An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic 
+#' An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic
 #' likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
 #' \url{https://doi.org/10.1080/10618600.2018.1537928}
+#'
+#' Friedman, J., Hastie, T., Tibshirani, R. (2008). Sparse inverse covariance estimation with
+#' the graphical lasso. Biostatistics. \url{https://doi.org/10.1093/biostatistics/kxm045}
 #'
 #' Warton, D. I. (2008). Penalized Normal Likelihood and Ridge Regularization of Correlation and
 #' Covariance Matrices, Journal of the American Statistical Association.
@@ -45,7 +48,8 @@
 #'
 #' # the standard Gaussian synthetic likelihood (the likelihood estimator used in BSL)
 #' gaussianSynLike(y, x)
-#' # the Gaussian synthetic likelihood with glasso shrinkage estimation (the likelihood estimator used in BSLasso)
+#' # the Gaussian synthetic likelihood with glasso shrinkage estimation
+#' # (the likelihood estimator used in BSLasso)
 #' gaussianSynLike(y, x, shrinkage = 'glasso', penalty = 0.1)
 #'
 #' @export

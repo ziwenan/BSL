@@ -13,19 +13,19 @@ bsl(y, n, M, theta0, covRandWalk, fnSim, fnSum, method = c("BSL",
 \arguments{
 \item{y}{The observed data - note this should be the raw dataset NOT the set of summary statistics.}
 
-\item{n}{The number of simulations from the model per MCMC iteration.}
+\item{n}{The number of simulations from the model per MCMC iteration for estimating the synthetic likelihood.}
 
 \item{M}{The number of MCMC iterations.}
 
-\item{theta0}{Initial guess of the parameter value.}
+\item{theta0}{Initial guess of the parameter value, which is used as the starting value for MCMC..}
 
 \item{covRandWalk}{A covariance matrix to be used in multivariate normal random walk proposals.}
 
 \item{fnSim}{A function that simulates data for a given parameter value. The first argument should be the
-vector of tuning parameters. Other necessary arguments (optional) can be specified with \code{simArgs}.}
+parameters. Other necessary arguments (optional) can be specified with \code{simArgs}.}
 
-\item{fnSum}{A function for computing summary statistics of data. The first should be the vector of tuning
-parameters. Other necessary arguments (optional) can be specified with \code{sumArgs}.}
+\item{fnSum}{A function for computing summary statistics of data. The first argument should be the observed
+or simulated dataset. Other necessary arguments (optional) can be specified with \code{sumArgs}.}
 
 \item{method}{A character argument indicating the method to be used. The default, 'BSL', runs standard BSL or
 BSLasso if \code{shrinkage} is used. 'semiBSL' runs the semi-parametric BSL algorithm and is more robust to
@@ -39,8 +39,8 @@ ridge regularisation method of Warton (2008).}
 if the shrinkage method is 'Warton'.}
 
 \item{fnPrior}{A function that computes the prior density for a parameter. The default is \code{NULL}, which
-is an improper flat prior over the real line for each parameter. The function must have a single input: the vector
-of proposed parameters.}
+is an improper flat prior over the real line for each parameter. The function must have a single input: a vector
+of parameter values.}
 
 \item{simArgs}{A list of additional arguments to pass into the simulation function. Only use when the input
 \code{fnSim} requires additional arguments. The default is \code{NULL}.}
@@ -48,15 +48,15 @@ of proposed parameters.}
 \item{sumArgs}{A list of additional arguments to pass into the summary statistics function. Only use when the
 input \code{fnSum} requires additional arguments. The default is \code{NULL}.}
 
-\item{logitTransformBound}{A p by 2 numeric matrix indicating the bound parameters if a logit transformation is used
-on the parameter space, where p is the number of parameters. The default is \code{NULL}, which means no logit
-transformation is used. It is also possible to define other transformations with \code{fnSim} and \code{fnPrior}.
-The first column contains the lower bound of each parameter and the second column contains the upper bound.
-Infinite lower or upper bound is also supported, eg. \code{matrix(c(1,Inf,0,10,-Inf,0.5),3,2,byrow=TRUE)}.}
+\item{logitTransformBound}{A p by 2 numeric matrix indicating the upper and lower bound of parameters if a logit
+transformation is used on the parameter space, where p is the number of parameters. The default is \code{NULL},
+which means no logit transformation is used. It is also possible to define other transformations with \code{fnSim}
+and \code{fnPrior}. The first column contains the lower bound of each parameter and the second column contains the
+upper bound. Infinite lower or upper bound is also supported, eg. \code{matrix(c(1,Inf,0,10,-Inf,0.5),3,2,byrow=TRUE)}.}
 
 \item{standardise}{A logical argument that determines whether to standardise the summary statistics before applying
 the graphical lasso. This is only valid if shrinkage is 'glasso' and penalty is not \code{NULL}. The diagonal
-elements will not be penalised if the shinkage method is 'glasso'. The default is \code{FALSE}.}
+elements will not be penalised if the shrinkage method is 'glasso'. The default is \code{FALSE}.}
 
 \item{parallel}{A logical value indicating whether parallel computing should be used for simulation and summary
 statistic evaluation. The default is \code{FALSE}. Note parallel computing is not always prefered typically if the
@@ -65,11 +65,11 @@ model simulating is straightforward so the communication overhead between worker
 \item{parallelArgs}{A list of additional arguments to pass into the \code{foreach} function. Only used when parallel
 computing is enabled, default is \code{NULL}.}
 
-\item{thetaNames}{A character vector of parameter names, which must has the same length as the parameter vector.
+\item{thetaNames}{A character vector of parameter names, which must have the same length as the parameter vector.
 The default is \code{NULL}.}
 
-\item{plotOnTheFly}{A logical argument indicating wheter an univariate posterior plot will be shown every 1000
-iterations. The default is \code{FALSE}.}
+\item{plotOnTheFly}{A logical argument. If \code{TRUE}, a plot of approximate univariate posteriors based on the
+current accepted samples will be shown every 1000 iterations. The default is \code{FALSE}.}
 
 \item{verbose}{A logical argument indicating whether the iteration numbers (\code{1:M}) and accepted proposal
 flags should be printed to track progress. The default is \code{FALSE}.}
@@ -79,7 +79,6 @@ An object of class \code{bsl} is returned, containing the following components:
 \itemize{
 \item \code{theta}: MCMC samples from the joint approximate posterior distribution of the parameters.
 \item \code{loglike}: Accepted MCMC samples of the estimated log-likelihood values.
-\item \code{loglikeAll}: All MCMC samples of the estimated log-likelihood values.
 \item \code{acceptanceRate}: The acceptance rate of the MCMC algorithm.
 \item \code{earlyRejectionRate}: The early rejection rate of the algorithm (early rejection may occur when using
 bounded prior distributions).
@@ -131,5 +130,5 @@ Covariance Matrices, Journal of the American Statistical Association.
 and \code{\link{plot}} for functions related to visualisation.
 }
 \author{
-Ziwen An, Christopher C. Drovandi and Leah F. South
+Ziwen An, Leah F. South and Christopher C. Drovandi
 }

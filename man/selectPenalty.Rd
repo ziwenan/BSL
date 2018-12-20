@@ -12,7 +12,7 @@ selectPenalty(ssy, n, lambda_all, theta, M, sigma, fnSim, fnSum,
 \arguments{
 \item{ssy}{A summary statistic vector for the observed data.}
 
-\item{n}{A vector of possible values of \code{n}, the number of simulations from the model per MCMC iteration, to test.}
+\item{n}{A vector of possible values of \code{n}, the number of simulations from the model per MCMC iteration for estimating the synthetic likelihood.}
 
 \item{lambda_all}{A list, with each entry containing the vector of penalty values to test for the corresponding choice of \code{n}.}
 
@@ -20,13 +20,13 @@ selectPenalty(ssy, n, lambda_all, theta, M, sigma, fnSim, fnSum,
 
 \item{M}{The number of repeats to use in estimating the standard deviation of the estimated log synthetic likelihood.}
 
-\item{sigma}{The standard deviation of the log synthetic likelihood to aim for.}
+\item{sigma}{The standard deviation of the log synthetic likelihood estimator to aim for.}
 
 \item{fnSim}{A function that simulates data for a given parameter value. The first argument should be the
-vector of tuning parameters. Other necessary arguments (optional) can be specified with \code{simArgs}.}
+parameters. Other necessary arguments (optional) can be specified with \code{simArgs}.}
 
-\item{fnSum}{A function for computing summary statistics of data. The first should be the vector of tuning
-parameters. Other necessary arguments (optional) can be specified with \code{sumArgs}.}
+\item{fnSum}{A function for computing summary statistics of data. The first argument should be the observed
+or simulated dataset. Other necessary arguments (optional) can be specified with \code{sumArgs}.}
 
 \item{simArgs}{A list of additional arguments to pass into the simulation function. Only use when the input
 \code{fnSim} requires additional arguments. The default is \code{NULL}.}
@@ -36,7 +36,7 @@ input \code{fnSum} requires additional arguments. The default is \code{NULL}.}
 
 \item{standardise}{A logical argument that determines whether to standardise the summary statistics before applying
 the graphical lasso. This is only valid if shrinkage is 'glasso' and penalty is not \code{NULL}. The diagonal
-elements will not be penalised if the shinkage method is 'glasso'. The default is \code{FALSE}.}
+elements will not be penalised if the shrinkage method is 'glasso'. The default is \code{FALSE}.}
 
 \item{parallelSim}{A logical value indicating whether parallel computing should be used for simulation and summary statistic evaluation. Default is \code{FALSE}.}
 
@@ -53,7 +53,7 @@ An object of class \code{penbsl} is returned, containing the following component
    \itemize{
    \item \code{n}: The choices of \code{n} that were specified.
    \item \code{penalty}: The choices of the penalty that were specified.
-   \item \code{sigma}: The standard deviation of the log synthetic likelihood under the above choices.
+   \item \code{sigma}: The standard deviation of the log synthetic likelihood estimator under the above choices.
    \item \code{sigmaOpt}: An indicator of whether it was the closest \code{sigma} to the desired one for each choice of \code{n}.
    }
 \item \code{call}: The original code that was used to call the method.
@@ -61,17 +61,17 @@ An object of class \code{penbsl} is returned, containing the following component
 The functions print() and plot() are both available for types of class \code{penbsl}.
 }
 \description{
-This is the main function for selecting the penalty for BSLasso based on a point estimate of the parameters. 
+This is the main function for selecting the penalty for BSLasso based on a point estimate of the parameters.
 Parallel computing is supported with the R package \code{foreach}.
 }
 \references{
-An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic 
+An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic
 likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
 \url{https://doi.org/10.1080/10618600.2018.1537928}
 }
 \seealso{
 \code{\link{bsl}} for a function to run BSLasso after selecting the tuning parameter
-and \code{\link{plot}} for functions related to visualisation.
+and \code{\link{penbsl}} for functions related to visualisation.
 }
 \author{
 Ziwen An, Christopher C. Drovandi and Leah F. South

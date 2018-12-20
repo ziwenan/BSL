@@ -5,20 +5,15 @@
 #' cell spreading. We provide the data and tuning parameters required to
 #' reproduce the results in An et al. (2018).
 #'
-#' @param theta		    A vector of proposed model parameters, \eqn{Pm} and \eqn{Pp}.
-#' @param Y          A \code{rows} \eqn{x} \code{cols} \eqn{x} \code{num_obs} array of the cell presences at times \code{1:num_obs} (not time 0).
-#' @param sim_options	A list of options for simulating data from the model. For this example, the list contains
-#' \itemize{
-#' \item \code{Yinit}: The initial matrix of cell presences of size \code{rows} \eqn{x} \code{cols}.
-#' \item \code{rows}: The number of rows in the lattice (rows in the cell location matrix).
-#' \item \code{cols}: The number of columns in the lattice (columns in the cell location matrix).
-#' \item \code{sim_iters}: The number of discretisation steps to get to when an observation is
+#' @param theta	   A vector of proposed model parameters, \eqn{Pm} and \eqn{Pp}.
+#' @param Y        A \code{rows} \eqn{x} \code{cols} \eqn{x} \code{num_obs} array of the cell presences at times \code{1:num_obs} (not time 0).
+#' @param Yinit    The initial matrix of cell presences of size \code{rows} \eqn{x} \code{cols}.
+#' @param rows     The number of rows in the lattice (rows in the cell location matrix).
+#' @param cols     The number of columns in the lattice (columns in the cell location matrix).
+#' @param sim_iters The number of discretisation steps to get to when an observation is
 #' actually taken. For example, if observations are taken every 5 minutes but the discretisation level is 2.5 minutes,
 #' then \code{sim_iters} would be 2. Larger values of \code{sim_iters} lead to more "accurate" simulations from the model, but they also increase the simulation time.
-#' \item \code{num_obs}: The total number of images taken after initialisation.
-#' }
-#' @param sum_options A list of options for simulating data from the model.
-#' For this example, the list just contains \code{Yinit}, the same \code{rows} \eqn{x} \code{cols} matrix as in \code{sim_options}.
+#' @param num_obs  The total number of images taken after initialisation.
 #
 #' @details
 #' Cell motility (movement) and proliferation (reproduction) cause
@@ -126,11 +121,12 @@
 #' # Opening up the parallel pools using doParallel
 #' cl <- makeCluster(detectCores() - 1)
 #' registerDoParallel(cl)
-#' resultCellSemiBSL <- bsl(cell$data, n = 5000, M = 10000, theta0 = cell$start, covRandWalk = cell$cov,
-#'                      fnSim = cell_sim, fnSum = cell_sum, method = 'semiBSL', fnPrior = cell_prior,
-#'                      simArgs = cell$sim_options, sumArgs = cell$sum_options,
-#'                      parallel = TRUE, parallelArgs = list(.packages = 'BSL'),
-#'                      thetaNames = expression(P[m], P[p]), verbose = TRUE)
+#' resultCellSemiBSL <- bsl(cell$data, n = 5000, M = 10000, theta0 = cell$start,
+#'                          covRandWalk = cell$cov, fnSim = cell_sim, fnSum = cell_sum,
+#'                          method = 'semiBSL', fnPrior = cell_prior,
+#'                          simArgs = cell$sim_options, sumArgs = cell$sum_options,
+#'                          parallel = TRUE, parallelArgs = list(.packages = 'BSL'),
+#'                          thetaNames = expression(P[m], P[p]), verbose = TRUE)
 #' stopCluster(cl)
 #' registerDoSEQ()
 #' show(resultCellSemiBSL)
@@ -140,16 +136,18 @@
 #' # Plotting the results together for comparison
 #' # plot using the R default plot function
 #' par(mar = c(5, 4, 1, 2), oma = c(0, 1, 2, 0))
-#' combinePlotsBSL(list(resultCellBSL, resultCellBSLasso, resultCellSemiBSL), which = 1, thetaTrue = true_cell, thin = 20,
-#'                 label = c('bsl', 'bslasso', 'semiBSL'), col = c('red', 'blue', 'green'), lty = 2:4, lwd = 1)
+#' combinePlotsBSL(list(resultCellBSL, resultCellBSLasso, resultCellSemiBSL),
+#'     which = 1, thetaTrue = true_cell, thin = 20, label = c('bsl', 'bslasso', 'semiBSL'),
+#'     col = c('red', 'blue', 'green'), lty = 2:4, lwd = 1)
 #' mtext('Approximate Univariate Posteriors', outer = TRUE, cex = 1.5)
 #'
 #' # plot using the ggplot2 package
-#' combinePlotsBSL(list(resultCellBSL, resultCellBSLasso, resultCellSemiBSL), which = 2, thetaTrue = true_cell, thin = 20,
-#'                 label = c('bsl   ', 'bslasso   ', 'semiBSL'), options.color = list(values=c('red', 'blue', 'green')),
-#'                 options.linetype = list(values = 2:4), options.size = list(values = rep(1, 3)),
-#'                 options.theme = list(plot.margin = unit(rep(0.03,4), "npc"), axis.title = element_text(size = 12),
-#'                                      axis.text = element_text(size = 8), legend.text = element_text(size = 12)))
+#' combinePlotsBSL(list(resultCellBSL, resultCellBSLasso, resultCellSemiBSL),
+#'     which = 2, thetaTrue = true_cell, thin = 20, label = c('bsl   ', 'bslasso   ', 'semiBSL'),
+#'     options.color = list(values=c('red', 'blue', 'green')),
+#'     options.linetype = list(values = 2:4), options.size = list(values = rep(1, 3)),
+#'     options.theme = list(plot.margin = unit(rep(0.03,4),"npc"), axis.title = element_text(size=12),
+#'         axis.text = element_text(size = 8), legend.text = element_text(size = 12)))
 #'
 #' }
 #'

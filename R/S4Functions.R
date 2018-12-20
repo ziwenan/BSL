@@ -76,6 +76,7 @@ check.bsl <- function(object) {
 #' Show method for class "bsl". Display the basic information of a bsl object.
 #' @description Display the basic information of a bsl object.
 #' @param object   A "bsl" class object to be displayed.
+#' @export
 show.bsl <- function(object) {
     digits = max(3L, getOption("digits") - 3L)
     cat("\nCall:\n", paste(deparse(object@call), sep = "\n", collapse = "\n"),
@@ -109,7 +110,6 @@ show.bsl <- function(object) {
     else cat("No early rejection rate\n")
     cat("\n")
 }
-
 
 
 #' Summary method for class "bsl"
@@ -155,7 +155,7 @@ summary.bsl <- function(object, thetaNames = NULL, scale = 1000000) {
 #' @param x           A "bsl" class object to plot.
 #' @param which       An integer argument indicating which plot function to be used. The default, \code{1L}, uses
 #' the plain \code{plot} to visualise the result. \code{2L} uses ggplot2 to generate an aesthetically nicer figure.
-#' @param thin        A numeric argument indicating the gap between samples to be taken when thinning the MCMC 
+#' @param thin        A numeric argument indicating the gap between samples to be taken when thinning the MCMC
 #' draws. The default is \code{1L}, which means no thinning is used.
 #' @param thetaTrue   A set of values to be included on the plots as a reference line. The default is \code{NULL}.
 #' @param options.plot  A list of additional arguments to pass into the \code{plot} function. Only use when
@@ -167,21 +167,29 @@ summary.bsl <- function(object, thetaNames = NULL, scale = 1000000) {
 #' when \code{which} is \code{2L}.
 #'
 #' @examples
+#' \dontrun{
+#' # pretend we had a bsl result
+#' result <- new('bsl')
+#' result@theta <- MASS::mvrnorm(10000, c(0.6, 0.2), diag(c(1, 1)))
+#' result@M <- 10000
+#'
 #' # plot using the R default plot function
 #' par(mar = c(5, 4, 1, 2), oma = c(0, 1, 3, 0))
 #' plot(result, which = 1, thin = 10, thetaTrue = c(0.6, 0.2),
 #'      options.plot = list(cex.main = 1, col = 'red', lty = 2, lwd = 2, main = NA))
 #' mtext('Approximate Univariate Posteriors', outer = TRUE, cex = 1.5)
-#' 
+#'
 #' # plot using the ggplot2 package
 #' plot(result, which = 2, thin = 10, thetaTrue = c(0.6, 0.2),
 #'      options.density = list(colour = 'darkblue', fill = 'grey80', size = 1),
-#'      options.theme = list(plot.margin = unit(rep(0.05,4), "npc"), 
+#'      options.theme = list(plot.margin = unit(rep(0.05,4), "npc"),
 #'                           axis.text = ggplot2::element_text(size = 10)))
-#' 
-#' @seealso 							\code{\link{combinePlotBSL}} for a function to plot multiple BSL densities.
+#' }
+#'
+#' @seealso 							\code{\link[BSL:combinePlotsBSL]{combinePlotBSL}} for a function to plot multiple BSL densities.
 #' @author 								Ziwen An, Christopher C. Drovandi and Leah F. South
 #' @name plot
+#' @aliases plot
 plot.bsl <- function(x, which = 1L, thin = 1, thetaTrue = NULL, options.plot = NULL,
                      top = 'Approximate Univariate Posteriors', options.density = list(), options.theme = list()) {
     if (which == 1L) {
@@ -202,19 +210,19 @@ plot.bsl <- function(x, which = 1L, thin = 1, thetaTrue = NULL, options.plot = N
 
 #' Plot the univariate marginal posterior plot of a bsl class object using the R default plot function.
 #' @rdname plot
-marginalPostDefault <- function(object, thin = 1, thetaTrue = NULL, options.plot = NULL) {
-    n <- nrow(object@theta)
-    p <- ncol(object@theta)
+marginalPostDefault <- function(x, thin = 1, thetaTrue = NULL, options.plot = NULL) {
+    n <- nrow(x@theta)
+    p <- ncol(x@theta)
     a <- floor(sqrt(p))
     b <- ceiling(p / a)
     if (!is.null(thetaTrue) & length(thetaTrue) != p) {
         stop('Length of thetaTrue does not match the number of parameters.')
     }
-    thetaNames <- object@thetaNames
+    thetaNames <- x@thetaNames
     par(mfrow = c(a, b))
     for(k in 1:p) {
         idx <- seq(1, n, thin)
-        d <- density(object@theta[idx, k])
+        d <- density(x@theta[idx, k])
         if ('main' %in% names(options.plot)) {
             do.call(plot, c(list(d, xlab = thetaNames[k]), options.plot))
         } else {
@@ -230,16 +238,16 @@ marginalPostDefault <- function(object, thin = 1, thetaTrue = NULL, options.plot
 
 #' Plot the univariate marginal posterior plot of a bsl class object using the ggplot2 package.
 #' @rdname plot
-marginalPostGgplot <- function(object, thin = 1, thetaTrue = NULL, top = 'Approximate Univariate Posteriors', options.density = list(), options.theme = list()) {
-    n <- nrow(object@theta)
-    p <- ncol(object@theta)
+marginalPostGgplot <- function(x, thin = 1, thetaTrue = NULL, top = 'Approximate Univariate Posteriors', options.density = list(), options.theme = list()) {
+    n <- nrow(x@theta)
+    p <- ncol(x@theta)
     a <- floor(sqrt(p))
     b <- ceiling(p / a)
     if (!is.null(thetaTrue) & length(thetaTrue) != p) {
         stop('Length of thetaTrue does not match the number of parameters.')
     }
-    samples <- data.frame(object@theta[seq(1, n, by = thin), ])
-    thetaNames <- object@thetaNames
+    samples <- data.frame(x@theta[seq(1, n, by = thin), ])
+    thetaNames <- x@thetaNames
     plist <- list()
     for (i in 1 : p) {
         plist[[i]] <- ggplot(samples, aes_string(x = colnames(samples)[i])) +

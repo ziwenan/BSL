@@ -13,6 +13,8 @@ plot.penbsl(x, logscale = TRUE)
 \arguments{
 \item{x}{A "penbsl" class object, typically the output of function \code{\link{selectPenalty}}.}
 
+\item{digits}{The number of digits to print.}
+
 \item{logscale}{A logical indicator whether the x-axis (penalty) should be log transformed. The
 default is \code{TRUE}.}
 }

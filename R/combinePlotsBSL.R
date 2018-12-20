@@ -2,32 +2,32 @@
 #' @description The function \code{combinePlotsBSL} can be used to plot multiple BSL densities together, optionally
 #' with the true values for the parameters.
 #' @param objectList     A list of "bsl" class objects.
-#' @param label          A character vector indicating the labels to be shown in the plot legend. The default is 
+#' @param label          A character vector indicating the labels to be shown in the plot legend. The default is
 #' \code{NULL}, which uses the names from \code{objectList}.
 #' @param legendPosition One of the three character argument, "auto" or "right" or "bottom", indicating the legend
-#' position. The default is "auto", which automatically choose from "right" and "bottom". Only used when 
+#' position. The default is "auto", which automatically choose from "right" and "bottom". Only used when
 #' \code{which} is \code{1L}.
-#' @param legendNCol     A integer argument indicating the number of columns of the legend. The default,
-#' \code{NULL}, put all legends in the same row or column depending on \code{legendPosition}. Only used when 
+#' @param legendNcol     A integer argument indicating the number of columns of the legend. The default,
+#' \code{NULL}, put all legends in the same row or column depending on \code{legendPosition}. Only used when
 #' \code{which} is \code{1L}.
-#' @param col            A vector argument containing the plotting color for each density curve. Each element of 
+#' @param col            A vector argument containing the plotting color for each density curve. Each element of
 #' the vector will be passed into \code{lines}. Only used when \code{which} is \code{1L}.
-#' @param lty            A vector argument containing the line type for each density curve. Each element of 
+#' @param lty            A vector argument containing the line type for each density curve. Each element of
 #' the vector will be passed into \code{lines}. Only used when \code{which} is \code{1L}.
-#' @param lwd            A vector argument containing the line width for each density curve. Each element of 
+#' @param lwd            A vector argument containing the line width for each density curve. Each element of
 #' the vector will be passed into \code{lines}. Only used when \code{which} is \code{1L}.
-#' @param cex.lab        The magnification to be used for x and y labels relative to the current setting of cex. 
+#' @param cex.lab        The magnification to be used for x and y labels relative to the current setting of cex.
 #' To be passed into \code{plot}. Only used when \code{which} is \code{1L}.
-#' @param cex.axis       The magnification to be used for axis annotation relative to the current setting of cex. 
+#' @param cex.axis       The magnification to be used for axis annotation relative to the current setting of cex.
 #' To be passed into \code{plot}. Only used when \code{which} is \code{1L}.
-#' @param cex.legend     The magnification to be used for legend annotation relative to the current setting of cex. 
+#' @param cex.legend     The magnification to be used for legend annotation relative to the current setting of cex.
 #' Only used when \code{which} is \code{1L}.
 #' @param top            A character argument of the combined plot title. Only used when \code{which} is \code{2L}.
-#' @param options.color  A list of additional arguments to pass into function \code{ggplot2::scale_color_manual}. 
+#' @param options.color  A list of additional arguments to pass into function \code{ggplot2::scale_color_manual}.
 #' Only used when \code{which} is \code{2L}.
-#' @param options.linetype A list of additional arguments to pass into function \code{ggplot2::scale_linetype_manual}. 
+#' @param options.linetype A list of additional arguments to pass into function \code{ggplot2::scale_linetype_manual}.
 #' Only used when \code{which} is \code{2L}.
-#' @param options.size A list of additional arguments to pass into function \code{ggplot2::scale_size_manual}. 
+#' @param options.size A list of additional arguments to pass into function \code{ggplot2::scale_size_manual}.
 #' Only used when \code{which} is \code{2L}.
 #' @inheritParams plot
 #'

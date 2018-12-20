@@ -18,11 +18,9 @@ ma2_prior(theta)
 \arguments{
 \item{theta}{A vector of proposed model parameters, \eqn{\theta_1} and \eqn{\theta_2}}
 
-\item{T}{The length of the MA(2) to be simulated.}
+\item{T}{The number of observations.}
 
 \item{x}{Observed or simulated data in the format of a vector of length \eqn{T}.}
-
-\item{options}{A list of options for simulating data from the model. For this example, the list contains only \eqn{T}, the number of observations.}
 }
 \description{
 In this example we wish to estimate the parameters of a simple MA(2) time series model.
@@ -58,14 +56,15 @@ BSLasso can be found in An et al. (2018).
 }
 
 \examples{
+\donttest{
 # Loading the data for this example
 data(ma2)
 true_ma2 <- c(0.6,0.2)
 
 # Performing BSL (reduce the number of iterations M if desired)
 resultMa2BSL <- bsl(y = ma2$data, n = 500, M = 300000, theta0 = ma2$start, covRandWalk = ma2$cov,
-                    fnSim = ma2_sim, fnSum = ma2_sum, fnPrior = ma2_prior, simArgs = ma2$sim_options,
-                    thetaNames = expression(theta[1], theta[2]), verbose = TRUE)
+    fnSim = ma2_sim, fnSum = ma2_sum, fnPrior = ma2_prior, simArgs = ma2$sim_options,
+    thetaNames = expression(theta[1], theta[2]), verbose = TRUE)
 show(resultMa2BSL)
 summary(resultMa2BSL)
 plot(resultMa2BSL, which = 1, thetaTrue = true_ma2, thin = 20)
@@ -80,16 +79,15 @@ sp_ma2
 plot(sp_ma2)
 
 # Performing BSLasso with a fixed penalty (reduce the number of iterations M if desired)
-resultMa2BSLasso <- bsl(y = ma2$data, n = 300, M = 250000, theta0 = ma2$start, covRandWalk = ma2$cov,
-                        fnSim = ma2_sim, fnSum = ma2_sum, shrinkage = 'glasso', penalty = 0.027,
-                        fnPrior = ma2_prior, simArgs = ma2$sim_options,
-                        thetaNames = expression(theta[1], theta[2]), verbose = TRUE)
+resultMa2BSLasso <- bsl(y = ma2$data, n = 300, M = 250000, theta0 = ma2$start, covRandWalk=ma2$cov,
+    fnSim = ma2_sim, fnSum = ma2_sum, shrinkage = 'glasso', penalty = 0.027, fnPrior = ma2_prior,
+    simArgs = ma2$sim_options, thetaNames = expression(theta[1], theta[2]), verbose = TRUE)
 show(resultMa2BSLasso)
 summary(resultMa2BSLasso)
 plot(resultMa2BSLasso, which = 1, thetaTrue = true_ma2, thin = 20)
 
 # Performing semiBSL (reduce the number of iterations M if desired)
-resultMa2SemiBSL <- bsl(y = ma2$data, n = 500, M = 300000, theta0 = ma2$start, covRandWalk = ma2$cov,
+resultMa2SemiBSL <- bsl(y = ma2$data, n = 500, M = 300000, theta0 = ma2$start, covRandWalk=ma2$cov,
                         fnSim = ma2_sim, fnSum = ma2_sum, method = 'semiBSL', fnPrior = ma2_prior,
                         simArgs = ma2$sim_options, thetaNames = expression(theta[1], theta[2]),
                         verbose = TRUE)
@@ -100,16 +98,19 @@ plot(resultMa2SemiBSL, which = 1, thetaTrue = true_ma2, thin = 20)
 # Plotting the results together for comparison
 # plot using the R default plot function
 par(mar = c(5, 4, 1, 2), oma = c(0, 1, 2, 0))
-combinePlotsBSL(list(resultMa2BSL, resultMa2BSLasso, resultMa2SemiBSL), which = 1, thetaTrue = true_ma2, thin = 20,
-                label = c('bsl', 'bslasso', 'semiBSL'), col = c('red', 'blue', 'green'), lty = 2:4, lwd = 1)
+combinePlotsBSL(list(resultMa2BSL, resultMa2BSLasso, resultMa2SemiBSL), which = 1,
+    thetaTrue = true_ma2, thin = 20, label = c('bsl', 'bslasso', 'semiBSL'),
+    col = c('red', 'blue', 'green'), lty = 2:4, lwd = 1)
 mtext('Approximate Univariate Posteriors', outer = TRUE, cex = 1.5)
 
 # plot using the ggplot2 package
-combinePlotsBSL(list(resultMa2BSL, resultMa2BSLasso, resultMa2SemiBSL), which = 2, thetaTrue = true_ma2, thin = 20,
-                label = c('bsl   ', 'bslasso   ', 'semiBSL'), options.color = list(values=c('red', 'blue', 'green')),
-                options.linetype = list(values = 2:4), options.size = list(values = rep(1, 3)),
-                options.theme = list(plot.margin = unit(rep(0.03,4), "npc"), axis.title = element_text(size = 12),
-                                     axis.text = element_text(size = 8), legend.text = element_text(size = 12)))
+combinePlotsBSL(list(resultMa2BSL, resultMa2BSLasso, resultMa2SemiBSL), which = 2,
+    thetaTrue = true_ma2, thin = 20, label = c('bsl   ', 'bslasso   ', 'semiBSL'),
+    options.color = list(values=c('red', 'blue', 'green')),
+    options.linetype = list(values = 2:4), options.size = list(values = rep(1, 3)),
+    options.theme = list(plot.margin = unit(rep(0.03,4), "npc"), axis.title = element_text(size=12),
+        axis.text = element_text(size = 8), legend.text = element_text(size = 12)))
+}
 
 }
 \references{

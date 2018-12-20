@@ -26,13 +26,16 @@ Imports:
     MASS,
     mvtnorm,
     copula,
+    cvTools,
     graphics,
     gridExtra,
     foreach,
     coda,
-    Rcpp
+    Rcpp,
+    methods
 Suggests:
-    elliplot
+    elliplot,
+    doParallel
 LinkingTo: Rcpp, RcppArmadillo
 LazyData: true
 RoxygenNote: 6.1.1
@@ -45,7 +48,7 @@ Collate:
     'S4.R'
     'bsl.R'
     'cell.R'
-    'combinePlotBSL.R'
+    'combinePlotsBSL.R'
     'covWarton.R'
     'gaussianSynLike.R'
     'glasso_cv.R'
