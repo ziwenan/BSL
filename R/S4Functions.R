@@ -112,12 +112,11 @@ show.bsl <- function(object) {
 
 
 #' Summary method for class "bsl"
-#' @description Summarise a bsl class object. The effective sample size is scaled with the total number of simulations.
+#' @description Summarise a bsl class object.
 #' @param object     A "bsl" class object to be summarised.
 #' @param thetaNames Parameter names to be shown in the summary table. Parameter names of the bsl object will be used by default.
-#' @param scale      A constant value to scale up the effective sample size. Default is 1 million.
 #' @return A vector of the number of simulations per iteration, acceptance rate of the Markov chain annd scaled effective sample size for each parameter.
-summary.bsl <- function(object, thetaNames = NULL, scale = 1000000) {
+summary.bsl <- function(object, thetaNames = NULL) {
     theta <- object@theta
     n <- object@n
     M <- nrow(theta)
@@ -141,7 +140,8 @@ summary.bsl <- function(object, thetaNames = NULL, scale = 1000000) {
     else {
         accRate = mean(diff(theta[, 1]) !=0)
     }
-    ess <- round(effectiveSize(theta) / n / M * scale, 0)
+    ess <- round(effectiveSize(theta), 0)
+	# ess <- round(effectiveSize(theta) / n / M * 1000000, 0)
     summ <- c(n, accRate*100, ess)
     names(summ) <- c('n', 'acc. rate (\\%)', paste('EES', thetaNames))
     return(summ)
