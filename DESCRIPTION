@@ -1,7 +1,7 @@
 Package: BSL
 Type: Package
 Title: Bayesian Synthetic Likelihood
-Version: 1.0.0
+Version: 2.0.0
 Date: 2018-12-04
 Authors@R: c(person("Ziwen","An",role=c("aut","cre"),email="ziwen.an@hdr.qut.edu.au",comment = c(ORCID = "0000-0002-9947-5182")),
             person("Christopher C.","Drovandi",role=c("aut"),email="c.drovandi@qut.edu.au",comment = c(ORCID = "0000-0001-9222-8763")),

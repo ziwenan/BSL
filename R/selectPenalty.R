@@ -10,7 +10,7 @@
 #' @param M                     The number of repeats to use in estimating the standard deviation of the estimated log synthetic likelihood.
 #' @param sigma                 The standard deviation of the log synthetic likelihood estimator to aim for.
 #' @param parallelSim           A logical value indicating whether parallel computing should be used for simulation and summary statistic evaluation. Default is \code{FALSE}.
-#' @param parallelSimArgs       A character vector of package names to pass into the \code{foreach} function as argument '.package'. Only used when \code{parallel_sim} is \code{TRUE}, default is \code{NULL}.
+#' @param parallelSimArgs       A string vector of package names to pass into the \code{foreach} function as argument '.package'. Only used when \code{parallel_sim} is \code{TRUE}, default is \code{NULL}.
 #' @param parallelMain          A logical value indicating whether parallel computing should be used to computing the graphical lasso function. Default is \code{FALSE}.
 #' @param verbose               A logical argument indicating whether the iteration numbers (\code{1:M}) should be printed to track progress. The default is \code{FALSE}.
 #' @inheritParams bsl
