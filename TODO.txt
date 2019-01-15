@@ -1,1 +1,6 @@
-It would be nice to allow functionality for users to have the option of write their own function to produce the n model simulations (rather than 1).  there are some more simple models where the n simulations can be generated say using vectorised code (eg g-and-k example), which would be much faster than (parallel or serial) for loop.
+- It would be nice to allow functionality for users to have the option of write their own function
+to produce the n model simulations (rather than 1). There are some simpler models where the n
+simulations can be generated say using vectorised code (eg g-and-k example), which would be much
+faster than a (parallel or serial) for loop.
+
+- Adjust code so that the fnPrior function returns the log value.
