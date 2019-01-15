@@ -119,5 +119,5 @@ likelihood with the graphical lasso. Journal of Computational and Graphical Stat
 \url{https://doi.org/10.1080/10618600.2018.1537928}
 }
 \author{
-Ziwen An, Christopher C. Drovandi and Leah F. South
+Ziwen An, Leah F. South and Christopher C. Drovandi
 }

@@ -143,5 +143,5 @@ Drovandi, C. C. and Pettitt, A. N. (2011). Likelihood-free Bayesian estimation o
 quantile distributions. Computational Statistics and Data Analysis, 55(9):2541-2556.
 }
 \author{
-Ziwen An, Christopher C. Drovandi and Leah F. South
+Ziwen An, Leah F. South and Christopher C. Drovandi
 }

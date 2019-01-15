@@ -107,6 +107,7 @@
 #' mtext('Approximate Univariate Posteriors', outer = TRUE, line = 0.75, cex = 1.2)
 #'
 #' # plot using the ggplot2 package
+#' library("grid") # use function "unit" from package "grid" to fix margins, remove if wanted
 #' combinePlotsBSL(list(resultMgnkBSL, resultMgnkBSLasso, resultMgnkSemiBSL), which = 2, thin = 20,
 #'     label=c('bsl   ','bslasso   ','semiBSL'), options.color=list(values=c('red','blue','green')),
 #'     options.linetype = list(values = 2:4), options.size = list(values = rep(1, 3)),
@@ -122,7 +123,7 @@
 #' Drovandi, C. C. and Pettitt, A. N. (2011). Likelihood-free Bayesian estimation of multivariate
 #' quantile distributions. Computational Statistics and Data Analysis, 55(9):2541-2556.
 #'
-#' @author 								Ziwen An, Christopher C. Drovandi and Leah F. South
+#' @author 								Ziwen An, Leah F. South and Christopher C. Drovandi
 #'
 #' @name mgnk
 #' @docType data

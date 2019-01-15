@@ -33,12 +33,6 @@ check.bsl <- function(object) {
             error <- c(errors, msg)
         }
 
-        temp <- length(object@loglikeAll)
-        if (temp != 0 && temp != M) {
-            msg <- paste('The number of iterations M', M, 'does not match the length of loglikeAll', temp)
-            error <- c(errors, msg)
-        }
-
         temp <- length(object@theta0)
         if (temp != 0 && temp != p) {
             msg <- paste('The length of theta0', temp, 'does not match the number of parameters', p)
@@ -186,9 +180,9 @@ summary.bsl <- function(object, thetaNames = NULL) {
 #' }
 #'
 #' @seealso 							\code{\link[BSL:combinePlotsBSL]{combinePlotBSL}} for a function to plot multiple BSL densities.
-#' @author 								Ziwen An, Christopher C. Drovandi and Leah F. South
-#' @name plot
-#' @aliases plot
+#' @author 								Ziwen An, Leah F. South and Christopher C. Drovandi
+#' @name plot.bsl
+#' @aliases plot.bsl
 plot.bsl <- function(x, which = 1L, thin = 1, thetaTrue = NULL, options.plot = NULL,
                      top = 'Approximate Univariate Posteriors', options.density = list(), options.theme = list()) {
     if (which == 1L) {
@@ -208,7 +202,7 @@ plot.bsl <- function(x, which = 1L, thin = 1, thetaTrue = NULL, options.plot = N
 
 
 #' Plot the univariate marginal posterior plot of a bsl class object using the R default plot function.
-#' @rdname plot
+#' @rdname plot.bsl
 marginalPostDefault <- function(x, thin = 1, thetaTrue = NULL, options.plot = NULL) {
     n <- nrow(x@theta)
     p <- ncol(x@theta)
@@ -236,7 +230,7 @@ marginalPostDefault <- function(x, thin = 1, thetaTrue = NULL, options.plot = NU
 
 
 #' Plot the univariate marginal posterior plot of a bsl class object using the ggplot2 package.
-#' @rdname plot
+#' @rdname plot.bsl
 marginalPostGgplot <- function(x, thin = 1, thetaTrue = NULL, top = 'Approximate Univariate Posteriors', options.density = list(), options.theme = list()) {
     n <- nrow(x@theta)
     p <- ncol(x@theta)

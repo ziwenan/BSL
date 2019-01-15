@@ -96,12 +96,12 @@ bounded prior distributions).
 \item \code{fnPrior}: The input function that computes the prior density for a parameter.
 \item \code{simArgs}: The input list of additional arguments to pass into the simulation function.
 \item \code{sumArgs}: The input list of additional arguments to pass into the summary statistics function.
-\item \code{logitTransform}: A logical argument indicating whether a logit transformation is used in the algorithm.
+\item \code{logitTransform}: The logical argument indicating whether a logit transformation is used in the algorithm.
 \item \code{logitTransformBound}: The input matrix of logitTransformBound.
 \item \code{standardise}: The input logical argument that determines whether to standardise the summary statistics.
 \item \code{parallel}: The input logical value indicating whether parallel computing is used in the process.
 \item \code{parallelArgs}: The input list of additional arguments to pass into the \code{foreach} function.
-\item \code{thetaNames}: A character vector of parameter names.
+\item \code{thetaNames}: The character vector of parameter names.
 \item \code{time}: The running time of class \code{difftime}.
 }
 }

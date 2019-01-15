@@ -6,14 +6,17 @@
 \alias{plot.penbsl}
 \title{S3 reference class of the result from tuning to select the optimal penalty for BSLasso}
 \usage{
-\method{print}{penbsl}(x, digits = max(3L, getOption("digits") - 4L))
+\method{print}{penbsl}(x, digits = max(3L, getOption("digits") - 4L),
+  ...)
 
-plot.penbsl(x, logscale = TRUE)
+\method{plot}{penbsl}(x, logscale = TRUE, ...)
 }
 \arguments{
 \item{x}{A "penbsl" class object, typically the output of function \code{\link{selectPenalty}}.}
 
 \item{digits}{The number of digits to print.}
+
+\item{...}{Other arguments.}
 
 \item{logscale}{A logical indicator whether the x-axis (penalty) should be log transformed. The
 default is \code{TRUE}.}
@@ -22,5 +25,5 @@ default is \code{TRUE}.}
 Two functions (print and plot) are provided for class "penbsl".
 }
 \author{
-Ziwen An, Christopher C. Drovandi and Leah F. South
+Ziwen An, Leah F. South and Christopher C. Drovandi
 }

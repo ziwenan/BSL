@@ -142,6 +142,7 @@
 #' mtext('Approximate Univariate Posteriors', outer = TRUE, cex = 1.5)
 #'
 #' # plot using the ggplot2 package
+#' library("grid") # use function "unit" from package "grid" to fix margins, remove if wanted
 #' combinePlotsBSL(list(resultCellBSL, resultCellBSLasso, resultCellSemiBSL),
 #'     which = 2, thetaTrue = true_cell, thin = 20, label = c('bsl   ', 'bslasso   ', 'semiBSL'),
 #'     options.color = list(values=c('red', 'blue', 'green')),
@@ -164,7 +165,7 @@
 #' Bayesian synthetic likelihood. Journal of Computational and Graphical Statistics.
 #' \url{https://doi.org/10.1080/10618600.2017.1302882}
 #'
-#' @author 								Ziwen An, Christopher C. Drovandi and Leah F. South
+#' @author 								Ziwen An, Leah F. South and Christopher C. Drovandi
 #' @name cell
 NULL
 

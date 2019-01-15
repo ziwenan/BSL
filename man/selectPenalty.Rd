@@ -74,5 +74,5 @@ likelihood with the graphical lasso. Journal of Computational and Graphical Stat
 and \code{\link{penbsl}} for functions related to visualisation.
 }
 \author{
-Ziwen An, Christopher C. Drovandi and Leah F. South
+Ziwen An, Leah F. South and Christopher C. Drovandi
 }

@@ -49,5 +49,5 @@ An, Z., Nott, D. J. &  Drovandi, C. (2018b). Robust Bayesian Synthetic Likelihoo
 a Semi-Parametric Approach. ArXiv Preprint \url{https://arxiv.org/abs/1809.05800}
 }
 \author{
-Ziwen An, Christopher C. Drovandi and Leah F. South
+Ziwen An, Leah F. South and Christopher C. Drovandi
 }

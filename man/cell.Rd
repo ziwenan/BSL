@@ -189,5 +189,5 @@ Bayesian synthetic likelihood. Journal of Computational and Graphical Statistics
 \url{https://doi.org/10.1080/10618600.2017.1302882}
 }
 \author{
-Ziwen An, Christopher C. Drovandi and Leah F. South
+Ziwen An, Leah F. South and Christopher C. Drovandi
 }

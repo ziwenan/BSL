@@ -3,7 +3,129 @@
 \docType{class}
 \name{bsl-class}
 \alias{bsl-class}
-\title{An S4 class to represent a bsl result.}
-\description{
-An S4 class to represent a bsl result.
+\alias{show,bsl-method}
+\alias{bsl,bsl-method}
+\alias{summary}
+\alias{summary,bsl-method}
+\alias{plot}
+\alias{plot,bsl,missing-method}
+\title{S4 class \code{"bsl"}.}
+\usage{
+\S4method{show}{bsl}(object)
+
+summary(object, ...)
+
+\S4method{summary}{bsl}(object, thetaNames = NULL)
+
+plot(x, y, ...)
+
+\S4method{plot}{bsl,missing}(x, which = 1L, thin = 1,
+  thetaTrue = NULL, options.plot = NULL,
+  top = "Approximate Univariate Posteriors", options.density = list(),
+  options.theme = list())
 }
+\arguments{
+\item{object}{A "bsl" class object to be displayed.}
+
+\item{...}{Other arguments.}
+
+\item{thetaNames}{Parameter names to be shown in the summary table. Parameter names of the bsl object will be used by default.}
+
+\item{x}{A "bsl" class object to plot.}
+
+\item{y}{Ignore.}
+
+\item{which}{An integer argument indicating which plot function to be used. The default, \code{1L}, uses
+the plain \code{plot} to visualise the result. \code{2L} uses ggplot2 to generate an aesthetically nicer figure.}
+
+\item{thin}{A numeric argument indicating the gap between samples to be taken when thinning the MCMC
+draws. The default is \code{1L}, which means no thinning is used.}
+
+\item{thetaTrue}{A set of values to be included on the plots as a reference line. The default is \code{NULL}.}
+
+\item{options.plot}{A list of additional arguments to pass into the \code{plot} function. Only use when
+\code{which} is \code{1L}.}
+
+\item{top}{A character argument of the combined plot title if \code{which} is \code{2L}.}
+
+\item{options.density}{A list of additional arguments to pass into the \code{geom_density} function. Only use
+when \code{which} is \code{2L}.}
+
+\item{options.theme}{A list of additional arguments to pass into the \code{theme} function. Only use
+when \code{which} is \code{2L}.}
+}
+\value{
+A vector of the number of simulations per iteration, acceptance rate of the Markov chain annd scaled effective sample size for each parameter.
+}
+\description{
+S4 class \code{"bsl"} for Results of \code{bsl} Function.
+
+Summarise a bsl class object.
+
+Plot the univariate marginal posterior plot of a bsl class object.
+}
+\section{Methods (by generic)}{
+\itemize{
+\item \code{show}: Display the basic information of a bsl object. See \code{\link{show.bsl}}.
+
+\item \code{summary}: Summarise a bsl class object. See \code{\link{summary.bsl}}.
+
+\item \code{plot}: Plot the univariate marginal posterior plot of a bsl class object. See \code{\link{plot.bsl}}.
+}}
+
+\section{Slots}{
+
+\describe{
+\item{\code{theta}}{Object of class \code{"matrix"}. MCMC samples from the joint approximate posterior distribution of the parameters.}
+
+\item{\code{loglike}}{Object of class \code{"numeric"}. Accepted MCMC samples of the estimated log-likelihood values.}
+
+\item{\code{acceptanceRate}}{Object of class \code{"numeric"}. The acceptance rate of the MCMC algorithm.}
+
+\item{\code{earlyRejectionRate}}{Object of class \code{"numeric"}. The early rejection rate of the algorithm (early rejection may occur when using
+bounded prior distributions).}
+
+\item{\code{call}}{Object of class \code{"call"}. The original code that was used to call the method.}
+
+\item{\code{y}}{Object of class \code{"ANY"}. The observed data.}
+
+\item{\code{n}}{Object of class \code{"numeric"}. The number of simulations from the model per MCMC iteration.}
+
+\item{\code{M}}{Object of class \code{"numeric"}. The number of MCMC iterations.}
+
+\item{\code{theta0}}{Object of class \code{"numeric"}. The initial guess of the parameter value.}
+
+\item{\code{covRandWalk}}{Object of class \code{"matrix"}. The covariance matrix used in multivariate normal random walk proposals.}
+
+\item{\code{fnSim}}{Object of class \code{"function"}. The data simulation function.}
+
+\item{\code{fnSum}}{Object of class \code{"function"}. The function for computing summary statistics of data.}
+
+\item{\code{method}}{Object of class \code{"character"}. The character argument indicating the used method.}
+
+\item{\code{shrinkage}}{Object of class \code{"characterOrNULL"}. The character argument indicating the shrinkage method.}
+
+\item{\code{penalty}}{Object of class \code{"numericOrNULL"}. The penalty value.}
+
+\item{\code{fnPrior}}{Object of class \code{"functionOrNULL"}. The function that computes the prior density for a parameter.}
+
+\item{\code{simArgs}}{Object of class \code{"listOrNULL"}. The list of additional arguments to pass into the simulation function.}
+
+\item{\code{sumArgs}}{Object of class \code{"listOrNULL"}. The list of additional arguments to pass into the summary statistics function.}
+
+\item{\code{logitTransform}}{Object of class \code{"logical"}. The logical argument indicating whether a logit transformation is used in the algorithm.}
+
+\item{\code{logitTransformBound}}{Object of class \code{"matrixOrNULL"}. The matrix of logitTransformBound.}
+
+\item{\code{standardise}}{Object of class \code{"logical"}. The logical argument that determines whether to standardise the summary statistics.}
+
+\item{\code{parallel}}{Object of class \code{"logical"}. The logical value indicating whether parallel computing is used in the process.}
+
+\item{\code{parallelArgs}}{Object of class \code{"listOrNULL"}. The list of additional arguments to pass into the \code{foreach} function.}
+
+\item{\code{thetaNames}}{Object of class \code{"expression"}. The character vector of parameter names.}
+
+\item{\code{time}}{Object of class \code{"difftime"}. The running time.}
+}}
+
+\Rdversion{1.1}

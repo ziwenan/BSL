@@ -84,6 +84,7 @@
 #' mtext('Approximate Univariate Posteriors', outer = TRUE, cex = 1.5)
 #'
 #' # plot using the ggplot2 package
+#' library("grid") # use function "unit" from package "grid" to fix margins, remove if wanted
 #' combinePlotsBSL(list(resultMa2BSL, resultMa2BSLasso, resultMa2SemiBSL), which = 2,
 #'     thetaTrue = true_ma2, thin = 20, label = c('bsl   ', 'bslasso   ', 'semiBSL'),
 #'     options.color = list(values=c('red', 'blue', 'green')),
@@ -97,7 +98,7 @@
 #' likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
 #' \url{https://doi.org/10.1080/10618600.2018.1537928}
 #'
-#' @author Ziwen An, Christopher C. Drovandi and Leah F. South
+#' @author Ziwen An, Leah F. South and Christopher C. Drovandi
 #'
 #' @name ma2
 #' @usage data(ma2)

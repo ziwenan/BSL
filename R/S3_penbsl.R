@@ -6,9 +6,10 @@
 #' @param logscale  A logical indicator whether the x-axis (penalty) should be log transformed. The
 #' default is \code{TRUE}.
 #' @param digits    The number of digits to print.
+#' @param ...       Other arguments.
 #' @inheritParams show.bsl
 #'
-#' @author 								Ziwen An, Christopher C. Drovandi and Leah F. South
+#' @author 								Ziwen An, Leah F. South and Christopher C. Drovandi
 #'
 #' @name penbsl
 #' @aliases penbsl
@@ -16,7 +17,10 @@ NULL
 
 #' print a "penbsl" class result
 #' @rdname penbsl
-print.penbsl <- function(x, digits = max(3L, getOption("digits") - 4L)) {
+#' @method print penbsl
+#' @export
+##' @rawNamespace S3method(print,penbsl)
+print.penbsl <- function(x, digits = max(3L, getOption("digits") - 4L), ...) {
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
         "\n\n", sep = "")
     if (length(x$resultsDF)) {
@@ -31,7 +35,9 @@ print.penbsl <- function(x, digits = max(3L, getOption("digits") - 4L)) {
 
 #' The function \code{plot.penbsl} can be used to plot the results from tuning to select the optimal penalty for BSLasso.
 #' @rdname penbsl
-plot.penbsl <- function(x, logscale = TRUE) {
+#' @method plot penbsl
+#' @export
+plot.penbsl <- function(x, logscale = TRUE, ...) {
     sigma <- sigmaOpt <- penalty <- logPenalty <- NULL # to satisfy R CMD check
     x <- x$resultsDF
     a <- floor(sqrt(length(unique(x$n))))

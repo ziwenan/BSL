@@ -33,7 +33,7 @@
 #' likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
 #' \url{https://doi.org/10.1080/10618600.2018.1537928}
 #'
-#' @author 								Ziwen An, Christopher C. Drovandi and Leah F. South
+#' @author 								Ziwen An, Leah F. South and Christopher C. Drovandi
 #' @seealso 							\code{\link{bsl}} for a function to run BSLasso after selecting the tuning parameter
 #' and \code{\link{penbsl}} for functions related to visualisation.
 #' @export
