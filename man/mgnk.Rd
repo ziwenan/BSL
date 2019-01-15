@@ -127,10 +127,12 @@ mtext('Approximate Univariate Posteriors', outer = TRUE, line = 0.75, cex = 1.2)
 
 # plot using the ggplot2 package
 combinePlotsBSL(list(resultMgnkBSL, resultMgnkBSLasso, resultMgnkSemiBSL), which = 2, thin = 20,
-    label=c('bsl   ','bslasso   ','semiBSL'), options.color=list(values=c('red','blue','green')),
+    label=c('bsl   ','bslasso   ','semiBSL'),
+    options.color=list(values=c('red','blue','green')),
     options.linetype = list(values = 2:4), options.size = list(values = rep(1, 3)),
-    options.theme = list(plot.margin = grid::unit(rep(0.03,4),"npc"), axis.title = ggplot2::element_text(size=12),
-        axis.text = ggplot2::element_text(size = 8), legend.text = ggplot2::element_text(size = 12)))
+    options.theme = list(plot.margin = grid::unit(rep(0.03,4),"npc"),
+    axis.title = ggplot2::element_text(size=12), axis.text = ggplot2::element_text(size = 8),
+    legend.text = ggplot2::element_text(size = 12)))
 }
 
 }
