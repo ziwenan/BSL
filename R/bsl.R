@@ -37,7 +37,7 @@
 #' elements will not be penalised if the shrinkage method is 'glasso'. The default is \code{FALSE}.
 #' @param parallel		A logical value indicating whether parallel computing should be used for simulation and summary
 #' statistic evaluation. The default is \code{FALSE}. When model simulation is fast, it may be preferable to perform
-#' serial computations to avoid the communication overhead in transferring data between workers.
+#' serial computations to avoid significant communication overhead between workers.
 #' @param parallelArgs	A list of additional arguments to pass into the \code{foreach} function. Only used when parallel
 #' computing is enabled, default is \code{NULL}.
 #' @param thetaNames	A string vector of parameter names, which must have the same length as the parameter vector.
@@ -217,7 +217,7 @@ bsl <- function(y, n, M, theta0, covRandWalk, fnSim, fnSum, method = c("BSL",
         # early rejection if the proposed theta falls outside of prior coverage
         # / feasible region
         if (!is.null(fnPrior)) {
-            p1 <- fnPrior(thetaProp)/fnPrior(thetaCurr)
+            p1 <- fnPrior(thetaProp)/fnPrior(thetaCurr) # We may want to change this to log prior in a future release for stability
             if (p1 == 0) {
                 if (verbose) {
                   cat("*** early rejection ***\n")
