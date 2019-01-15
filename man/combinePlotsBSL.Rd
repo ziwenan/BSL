@@ -23,10 +23,10 @@ draws. The default is \code{1L}, which means no thinning is used.}
 
 \item{thetaTrue}{A set of values to be included on the plots as a reference line. The default is \code{NULL}.}
 
-\item{label}{A character vector indicating the labels to be shown in the plot legend. The default is
+\item{label}{A string vector indicating the labels to be shown in the plot legend. The default is
 \code{NULL}, which uses the names from \code{objectList}.}
 
-\item{legendPosition}{One of the three character argument, "auto" or "right" or "bottom", indicating the legend
+\item{legendPosition}{One of the three string arguments, "auto", "right" or "bottom", indicating the legend
 position. The default is "auto", which automatically choose from "right" and "bottom". Only used when
 \code{which} is \code{1L}.}
 
@@ -52,7 +52,7 @@ To be passed into \code{plot}. Only used when \code{which} is \code{1L}.}
 \item{cex.legend}{The magnification to be used for legend annotation relative to the current setting of cex.
 Only used when \code{which} is \code{1L}.}
 
-\item{top}{A character argument of the combined plot title. Only used when \code{which} is \code{2L}.}
+\item{top}{A string argument of the combined plot title. Only used when \code{which} is \code{2L}.}
 
 \item{options.color}{A list of additional arguments to pass into function \code{ggplot2::scale_color_manual}.
 Only used when \code{which} is \code{2L}.}

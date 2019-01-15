@@ -7,9 +7,9 @@
 #' statistics is sufficiently regular.
 #' 
 #' In this package, a Metropolis Hastings Markov chain Monte Carlo (MH-MCMC) implementation of BSL is available.
-#' We also include an implementation of BSLasso (An et al., 2018a) which is computationally more efficient when the
-#' dimension of the summary statistic is high, and semiBSL (An et al. 2018b) which relaxes the normality assumption
-#' to an extent and maintain the computational advantages of BSL without any tuning. 
+#' We also include an implementation of BSLasso (An et al., 2018a), which is computationally more efficient when the
+#' dimension of the summary statistic is high, and semiBSL (An et al. 2018b), which relaxes the normality assumption
+#' to an extent and maintains the computational advantages of BSL without any tuning. 
 #'
 #' Parallel computing is supported through the \code{foreach} package and users can specify their own parallel
 #' backend by using packages like \code{doParallel} or \code{doMC}.

@@ -153,7 +153,7 @@ summary.bsl <- function(object, thetaNames = NULL) {
 #' @param thetaTrue   A set of values to be included on the plots as a reference line. The default is \code{NULL}.
 #' @param options.plot  A list of additional arguments to pass into the \code{plot} function. Only use when
 #' \code{which} is \code{1L}.
-#' @param top         A character argument of the combined plot title if \code{which} is \code{2L}.
+#' @param top         A string argument of the combined plot title if \code{which} is \code{2L}.
 #' @param options.density  A list of additional arguments to pass into the \code{geom_density} function. Only use
 #' when \code{which} is \code{2L}.
 #' @param options.theme  A list of additional arguments to pass into the \code{theme} function. Only use

@@ -8,16 +8,16 @@ semiparaKernelEstimate(ssy, ssx, kernel = "gaussian", shrinkage = NULL,
   penalty = NULL, log = TRUE)
 }
 \arguments{
-\item{ssy}{The observed summary statisic.}
+\item{ssy}{The observed summary statistic.}
 
 \item{ssx}{A matrix of the simulated summary statistics. The number of rows is the same
 as the number of simulations per iteration.}
 
-\item{kernel}{A character argument indicating the smoothing kernel to pass into
+\item{kernel}{A string argument indicating the smoothing kernel to pass into
 \code{density} for estimating the marginal distribution of each summary statistic. Only "gaussian"
 and "epanechnikov" are available. The default is "gaussian".}
 
-\item{shrinkage}{A character argument indicating which shrinkage method to be used on the
+\item{shrinkage}{A string argument indicating which shrinkage method to be used on the
 correlation matrix of the Gaussian copula. The default is \code{NULL}, which means no shrinkage
 is used. Current options are 'glasso' for graphical lasso and 'Warton' for the ridge
 regularisation method of Warton (2008).}
@@ -25,7 +25,7 @@ regularisation method of Warton (2008).}
 \item{penalty}{The penalty value to be used for the specified shrinkage method. Must be between zero and one
 if the shrinkage method is 'Warton'.}
 
-\item{log}{A logical argument indicating if the log of likelihood is given as the result.
+\item{log}{A logical argument indicating if the log of the likelihood is given as the result.
 The default is \code{TRUE}.}
 }
 \value{

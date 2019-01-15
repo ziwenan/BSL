@@ -1,8 +1,8 @@
 Package: BSL
 Type: Package
 Title: Bayesian Synthetic Likelihood
-Version: 1.0.0
-Date: 2018-12-04
+Version: 2.0.0
+Date: 2019-01-15
 Authors@R: c(person("Ziwen","An",role=c("aut","cre"),email="ziwen.an@hdr.qut.edu.au",comment = c(ORCID = "0000-0002-9947-5182")),
             person("Leah F.","South",role=c("aut"),email="leah.south@hdr.qut.edu.au",comment = c(ORCID = "0000-0002-5646-2963")),
             person("Christopher C.","Drovandi",role=c("aut"),email="c.drovandi@qut.edu.au",comment = c(ORCID = "0000-0001-9222-8763")))
@@ -16,7 +16,7 @@ Description: Bayesian synthetic likelihood (BSL, Price et al. (2018) <doi:10.108
 	(BSLasso, An et al. (2018) <https://eprints.qut.edu.au/102263/>) is 
     computationally more efficient when the dimension of the summary statistic 
 	is high. A semi-parametric version of BSL (semiBSL, An et al. (2018) 
-	<https://arxiv.org/abs/1809.05800>) is more robust to non-normal summary 
+	<arXiv:1809.05800>) is more robust to non-normal summary 
 	statistics. Extensions to this package are planned.
 Depends: R (>= 3.5.0)
 License: GPL (>= 2)
