@@ -4,18 +4,16 @@
 \alias{summary.bsl}
 \title{Summary method for class "bsl"}
 \usage{
-summary.bsl(object, thetaNames = NULL, scale = 1e+06)
+summary.bsl(object, thetaNames = NULL)
 }
 \arguments{
 \item{object}{A "bsl" class object to be summarised.}
 
 \item{thetaNames}{Parameter names to be shown in the summary table. Parameter names of the bsl object will be used by default.}
-
-\item{scale}{A constant value to scale up the effective sample size. Default is 1 million.}
 }
 \value{
 A vector of the number of simulations per iteration, acceptance rate of the Markov chain annd scaled effective sample size for each parameter.
 }
 \description{
-Summarise a bsl class object. The effective sample size is scaled with the total number of simulations.
+Summarise a bsl class object.
 }
