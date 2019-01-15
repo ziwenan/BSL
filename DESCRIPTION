@@ -18,7 +18,7 @@ Description: Bayesian synthetic likelihood (BSL, Price et al. (2018) <doi:10.108
 	is high. A semi-parametric version of BSL (semiBSL, An et al. (2018) 
 	<arXiv:1809.05800>) is more robust to non-normal summary 
 	statistics. Extensions to this package are planned.
-Depends: R (>= 3.5.0)
+Depends: R (>= 3.4.4)
 License: GPL (>= 2)
 LazyLoad: yes
 Imports: 

@@ -175,7 +175,7 @@ summary.bsl <- function(object, thetaNames = NULL) {
 #' # plot using the ggplot2 package
 #' plot(result, which = 2, thin = 10, thetaTrue = c(0.6, 0.2),
 #'      options.density = list(colour = 'darkblue', fill = 'grey80', size = 1),
-#'      options.theme = list(plot.margin = unit(rep(0.05,4), "npc"),
+#'      options.theme = list(plot.margin = grid::unit(rep(0.05,4), "npc"),
 #'                           axis.text = ggplot2::element_text(size = 10)))
 #' }
 #'
