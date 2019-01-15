@@ -13,7 +13,7 @@ gaussianSynLike(ssy, ssx, shrinkage = NULL, penalty = NULL,
 \item{ssx}{A matrix of the simulated summary statistics. The number of rows is the same
 as the number of simulations per iteration.}
 
-\item{shrinkage}{A character argument indicating which shrinkage method to be used. The default is \code{NULL},
+\item{shrinkage}{A string argument indicating which shrinkage method to be used. The default is \code{NULL},
 which means no shrinkage is used. Current options are 'glasso' for graphical lasso and 'Warton' for the
 ridge regularisation method of Warton (2008).}
 

@@ -4,18 +4,18 @@
 #' Kernel density estimates are used for modelling each univariate marginal distribution, and the
 #' dependence structure between summaries are captured using a Gaussian copula.
 #'
-#' @param ssy          The observed summary statisic.
+#' @param ssy          The observed summary statistic.
 #' @param ssx          A matrix of the simulated summary statistics. The number of rows is the same
 #' as the number of simulations per iteration.
-#' @param kernel       A character argument indicating the smoothing kernel to pass into
+#' @param kernel       A string argument indicating the smoothing kernel to pass into
 #' \code{density} for estimating the marginal distribution of each summary statistic. Only "gaussian"
 #' and "epanechnikov" are available. The default is "gaussian".
-#' @param shrinkage     A character argument indicating which shrinkage method to be used on the
+#' @param shrinkage     A string argument indicating which shrinkage method to be used on the
 #' correlation matrix of the Gaussian copula. The default is \code{NULL}, which means no shrinkage
 #' is used. Current options are 'glasso' for graphical lasso and 'Warton' for the ridge
 #' regularisation method of Warton (2008).
 #' @inheritParams bsl
-#' @param log          A logical argument indicating if the log of likelihood is given as the result.
+#' @param log          A logical argument indicating if the log of the likelihood is given as the result.
 #' The default is \code{TRUE}.
 #'
 #' @return             The estimated (log) likelihood value.

@@ -17,7 +17,7 @@ bsl(y, n, M, theta0, covRandWalk, fnSim, fnSum, method = c("BSL",
 
 \item{M}{The number of MCMC iterations.}
 
-\item{theta0}{Initial guess of the parameter value, which is used as the starting value for MCMC..}
+\item{theta0}{Initial guess of the parameter value, which is used as the starting value for MCMC.}
 
 \item{covRandWalk}{A covariance matrix to be used in multivariate normal random walk proposals.}
 
@@ -27,11 +27,11 @@ parameters. Other necessary arguments (optional) can be specified with \code{sim
 \item{fnSum}{A function for computing summary statistics of data. The first argument should be the observed
 or simulated dataset. Other necessary arguments (optional) can be specified with \code{sumArgs}.}
 
-\item{method}{A character argument indicating the method to be used. The default, 'BSL', runs standard BSL or
+\item{method}{A string argument indicating the method to be used. The default, 'BSL', runs standard BSL or
 BSLasso if \code{shrinkage} is used. 'semiBSL' runs the semi-parametric BSL algorithm and is more robust to
 non-normal summary statistics.}
 
-\item{shrinkage}{A character argument indicating which shrinkage method to be used. The default is \code{NULL},
+\item{shrinkage}{A string argument indicating which shrinkage method to be used. The default is \code{NULL},
 which means no shrinkage is used. Current options are 'glasso' for graphical lasso and 'Warton' for the
 ridge regularisation method of Warton (2008).}
 
@@ -48,8 +48,8 @@ of parameter values.}
 \item{sumArgs}{A list of additional arguments to pass into the summary statistics function. Only use when the
 input \code{fnSum} requires additional arguments. The default is \code{NULL}.}
 
-\item{logitTransformBound}{A p by 2 numeric matrix indicating the upper and lower bound of parameters if a logit
-transformation is used on the parameter space, where p is the number of parameters. The default is \code{NULL},
+\item{logitTransformBound}{A \eqn{p} by \eqn{2} numeric matrix indicating the upper and lower bound of parameters if a logit
+transformation is used on the parameter space, where \eqn{p} is the number of parameters. The default is \code{NULL},
 which means no logit transformation is used. It is also possible to define other transformations with \code{fnSim}
 and \code{fnPrior}. The first column contains the lower bound of each parameter and the second column contains the
 upper bound. Infinite lower or upper bound is also supported, eg. \code{matrix(c(1,Inf,0,10,-Inf,0.5),3,2,byrow=TRUE)}.}
@@ -59,13 +59,13 @@ the graphical lasso. This is only valid if shrinkage is 'glasso' and penalty is 
 elements will not be penalised if the shrinkage method is 'glasso'. The default is \code{FALSE}.}
 
 \item{parallel}{A logical value indicating whether parallel computing should be used for simulation and summary
-statistic evaluation. The default is \code{FALSE}. Note parallel computing is not always prefered typically if the
-model simulating is straightforward so the communication overhead between workers is significant.}
+statistic evaluation. The default is \code{FALSE}. When model simulation is fast, it may be preferable to perform
+serial computations to avoid significant communication overhead between workers.}
 
 \item{parallelArgs}{A list of additional arguments to pass into the \code{foreach} function. Only used when parallel
 computing is enabled, default is \code{NULL}.}
 
-\item{thetaNames}{A character vector of parameter names, which must have the same length as the parameter vector.
+\item{thetaNames}{A string vector of parameter names, which must have the same length as the parameter vector.
 The default is \code{NULL}.}
 
 \item{plotOnTheFly}{A logical argument. If \code{TRUE}, a plot of approximate univariate posteriors based on the
@@ -90,8 +90,8 @@ bounded prior distributions).
 \item \code{covRandWalk}: The input covariance matrix used in multivariate normal random walk proposals.
 \item \code{fnSim}: The input data simulation function.
 \item \code{fnSum}: The input function for computing summary statistics of data.
-\item \code{method}: The input character argument indicating the used method.
-\item \code{shrinkage}: The input character argument indicating the shrinkage method.
+\item \code{method}: The input string argument indicating the used method.
+\item \code{shrinkage}: The input string argument indicating the shrinkage method.
 \item \code{penalty}: The input penalty value.
 \item \code{fnPrior}: The input function that computes the prior density for a parameter.
 \item \code{simArgs}: The input list of additional arguments to pass into the simulation function.
@@ -101,7 +101,7 @@ bounded prior distributions).
 \item \code{standardise}: The input logical argument that determines whether to standardise the summary statistics.
 \item \code{parallel}: The input logical value indicating whether parallel computing is used in the process.
 \item \code{parallelArgs}: The input list of additional arguments to pass into the \code{foreach} function.
-\item \code{thetaNames}: A character vector of parameter names.
+\item \code{thetaNames}: A string vector of parameter names.
 \item \code{time}: The running time of class \code{difftime}.
 }
 }

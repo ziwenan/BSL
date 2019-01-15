@@ -40,7 +40,7 @@ elements will not be penalised if the shrinkage method is 'glasso'. The default 
 
 \item{parallelSim}{A logical value indicating whether parallel computing should be used for simulation and summary statistic evaluation. Default is \code{FALSE}.}
 
-\item{parallelSimArgs}{A character vector of package names to pass into the \code{foreach} function as argument '.package'. Only used when \code{parallel_sim} is \code{TRUE}, default is \code{NULL}.}
+\item{parallelSimArgs}{A string vector of package names to pass into the \code{foreach} function as argument '.package'. Only used when \code{parallel_sim} is \code{TRUE}, default is \code{NULL}.}
 
 \item{parallelMain}{A logical value indicating whether parallel computing should be used to computing the graphical lasso function. Default is \code{FALSE}.}
 
