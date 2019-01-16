@@ -73,11 +73,7 @@
 #' \item \code{standardise}: The input logical argument that determines whether to standardise the summary statistics.
 #' \item \code{parallel}: The input logical value indicating whether parallel computing is used in the process.
 #' \item \code{parallelArgs}: The input list of additional arguments to pass into the \code{foreach} function.
-<<<<<<< HEAD
-#' \item \code{thetaNames}: The character vector of parameter names.
-=======
-#' \item \code{thetaNames}: A string vector of parameter names.
->>>>>>> c05a589e2012cf5ea524f46111f3ead1ef61b19c
+#' \item \code{thetaNames}: The string vector of parameter names.
 #' \item \code{time}: The running time of class \code{difftime}.
 #' }
 #'

@@ -108,8 +108,9 @@ combinePlotsBSL(list(resultMa2BSL, resultMa2BSLasso, resultMa2SemiBSL), which = 
     thetaTrue = true_ma2, thin = 20, label = c('bsl   ', 'bslasso   ', 'semiBSL'),
     options.color = list(values=c('red', 'blue', 'green')),
     options.linetype = list(values = 2:4), options.size = list(values = rep(1, 3)),
-    options.theme = list(plot.margin = unit(rep(0.03,4), "npc"), axis.title = element_text(size=12),
-        axis.text = element_text(size = 8), legend.text = element_text(size = 12)))
+    options.theme = list(plot.margin = grid::unit(rep(0.03,4), "npc"),
+    axis.title = ggplot2::element_text(size=12), axis.text = ggplot2::element_text(size = 8),
+    legend.text = ggplot2::element_text(size = 12)))
 }
 
 }
