@@ -142,10 +142,6 @@
 #' mtext('Approximate Univariate Posteriors', outer = TRUE, cex = 1.5)
 #'
 #' # plot using the ggplot2 package
-<<<<<<< HEAD
-#' require("grid") # use function "unit" from package "grid" to fix margins, remove if wanted
-=======
->>>>>>> 785599706960ecdcac29f80c6b7f444b32050336
 #' combinePlotsBSL(list(resultCellBSL, resultCellBSLasso, resultCellSemiBSL),
 #'     which = 2, thetaTrue = true_cell, thin = 20, label = c('bsl   ', 'bslasso   ', 'semiBSL'),
 #'     options.color = list(values=c('red', 'blue', 'green')),

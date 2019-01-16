@@ -107,10 +107,6 @@
 #' mtext('Approximate Univariate Posteriors', outer = TRUE, line = 0.75, cex = 1.2)
 #'
 #' # plot using the ggplot2 package
-<<<<<<< HEAD
-#' require("grid") # use function "unit" from package "grid" to fix margins, remove if wanted
-=======
->>>>>>> 785599706960ecdcac29f80c6b7f444b32050336
 #' combinePlotsBSL(list(resultMgnkBSL, resultMgnkBSLasso, resultMgnkSemiBSL), which = 2, thin = 20,
 #'     label=c('bsl   ','bslasso   ','semiBSL'),
 #'     options.color=list(values=c('red','blue','green')),
