@@ -84,13 +84,17 @@
 #' mtext('Approximate Univariate Posteriors', outer = TRUE, cex = 1.5)
 #'
 #' # plot using the ggplot2 package
+<<<<<<< HEAD
 #' require("grid") # use function "unit" from package "grid" to fix margins, remove if wanted
+=======
+>>>>>>> 785599706960ecdcac29f80c6b7f444b32050336
 #' combinePlotsBSL(list(resultMa2BSL, resultMa2BSLasso, resultMa2SemiBSL), which = 2,
 #'     thetaTrue = true_ma2, thin = 20, label = c('bsl   ', 'bslasso   ', 'semiBSL'),
 #'     options.color = list(values=c('red', 'blue', 'green')),
 #'     options.linetype = list(values = 2:4), options.size = list(values = rep(1, 3)),
-#'     options.theme = list(plot.margin = unit(rep(0.03,4), "npc"), axis.title = element_text(size=12),
-#'         axis.text = element_text(size = 8), legend.text = element_text(size = 12)))
+#'     options.theme = list(plot.margin = grid::unit(rep(0.03,4), "npc"),
+#'     axis.title = ggplot2::element_text(size=12), axis.text = ggplot2::element_text(size = 8),
+#'     legend.text = ggplot2::element_text(size = 12)))
 #' }
 #'
 #' @references
