@@ -12,7 +12,7 @@
 \method{plot}{penbsl}(x, logscale = TRUE, ...)
 }
 \arguments{
-\item{x}{A "penbsl" class object, typically the output of function \code{\link{selectPenalty}}.}
+\item{x}{A ``penbsl" class object, typically the output of function \code{\link{selectPenalty}}.}
 
 \item{digits}{The number of digits to print.}
 
@@ -22,7 +22,7 @@
 default is \code{TRUE}.}
 }
 \description{
-Two functions (print and plot) are provided for class "penbsl".
+Two functions (print and plot) are provided for class ``penbsl".
 }
 \author{
 Ziwen An, Leah F. South and Christopher C. Drovandi

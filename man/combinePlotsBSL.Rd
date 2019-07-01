@@ -2,7 +2,7 @@
 % Please edit documentation in R/combinePlotsBSL.R
 \name{combinePlotsBSL}
 \alias{combinePlotsBSL}
-\title{Plot the densities of multiple "bsl" class objects.}
+\title{Plot the densities of multiple ``bsl'' class objects.}
 \usage{
 combinePlotsBSL(objectList, which = 1L, thin = 1, thetaTrue = NULL,
   label = NULL, legendPosition = c("auto", "right", "bottom")[1],
@@ -13,21 +13,21 @@ combinePlotsBSL(objectList, which = 1L, thin = 1, thetaTrue = NULL,
   options.theme = list())
 }
 \arguments{
-\item{objectList}{A list of "bsl" class objects.}
+\item{objectList}{A list of ``bsl'' class objects.}
 
 \item{which}{An integer argument indicating which plot function to be used. The default, \code{1L}, uses
-the plain \code{plot} to visualise the result. \code{2L} uses ggplot2 to generate an aesthetically nicer figure.}
+the plain \code{plot} to visualise the result. \code{2L} uses ggplot2 to draw the plot.}
 
 \item{thin}{A numeric argument indicating the gap between samples to be taken when thinning the MCMC
-draws. The default is \code{1L}, which means no thinning is used.}
+draws. The default is \code{1}, which means no thinning is used.}
 
 \item{thetaTrue}{A set of values to be included on the plots as a reference line. The default is \code{NULL}.}
 
 \item{label}{A string vector indicating the labels to be shown in the plot legend. The default is
 \code{NULL}, which uses the names from \code{objectList}.}
 
-\item{legendPosition}{One of the three string arguments, "auto", "right" or "bottom", indicating the legend
-position. The default is "auto", which automatically choose from "right" and "bottom". Only used when
+\item{legendPosition}{One of the three string arguments, ``auto'', ``right'' or ``bottom'', indicating the legend
+position. The default is ``auto'', which automatically choose from ``right'' and ``bottom''. Only used when
 \code{which} is \code{1L}.}
 
 \item{legendNcol}{A integer argument indicating the number of columns of the legend. The default,

@@ -4,49 +4,57 @@
 \alias{bsl}
 \title{Performing BSL, BSLasso and semiBSL}
 \usage{
-bsl(y, n, M, theta0, covRandWalk, fnSim, fnSum, method = c("BSL",
-  "semiBSL")[1], shrinkage = NULL, penalty = NULL, fnPrior = NULL,
-  simArgs = NULL, sumArgs = NULL, logitTransformBound = NULL,
-  standardise = FALSE, parallel = FALSE, parallelArgs = NULL,
-  thetaNames = NULL, plotOnTheFly = FALSE, verbose = FALSE)
+bsl(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("BSL",
+  "uBSL", "semiBSL")[1], shrinkage = NULL, penalty = NULL,
+  fnPrior = NULL, simArgs = NULL, sumArgs = NULL,
+  logitTransformBound = NULL, standardise = FALSE, GRC = FALSE,
+  parallel = FALSE, parallelArgs = NULL, thetaNames = NULL,
+  plotOnTheFly = FALSE, verbose = FALSE)
 }
 \arguments{
-\item{y}{The observed data - note this should be the raw dataset NOT the set of summary statistics.}
+\item{y}{The observed data. Note this should be the raw dataset NOT the set of summary statistics.}
 
 \item{n}{The number of simulations from the model per MCMC iteration for estimating the synthetic likelihood.}
 
 \item{M}{The number of MCMC iterations.}
 
-\item{theta0}{Initial guess of the parameter value, which is used as the starting value for MCMC.}
+\item{model}{A ``BSLMODEL'' object generated with function \code{BSLModel}. See \code{\link{BSLModel}}.}
 
-\item{covRandWalk}{A covariance matrix to be used in multivariate normal random walk proposals.}
+\item{covRandWalk}{The covariance matrix of a multivariate normal random walk proposal distribution used in the MCMC.}
 
-\item{fnSim}{A function that simulates data for a given parameter value. The first argument should be the
-parameters. Other necessary arguments (optional) can be specified with \code{simArgs}.}
+\item{theta0}{Deprecated, will be removed in the future, use \code{model} instead. Initial guess of the parameter 
+value, which is used as the starting value for MCMC.}
 
-\item{fnSum}{A function for computing summary statistics of data. The first argument should be the observed
-or simulated dataset. Other necessary arguments (optional) can be specified with \code{sumArgs}.}
+\item{fnSim}{Deprecated, will be removed in the future, use \code{model} instead. A function that simulates data 
+for a given parameter value. The first argument should be the parameters. Other necessary arguments (optional) can be 
+specified with \code{simArgs}.}
 
-\item{method}{A string argument indicating the method to be used. The default, 'BSL', runs standard BSL or
-BSLasso if \code{shrinkage} is used. 'semiBSL' runs the semi-parametric BSL algorithm and is more robust to
-non-normal summary statistics.}
+\item{fnSum}{Deprecated, will be removed in the future, use \code{model} instead. A function for computing summary 
+statistics of data. The first argument should be the observed or simulated dataset. Other necessary arguments (optional) 
+can be specified with \code{sumArgs}.}
+
+\item{method}{A string argument indicating the method to be used. The default, ``BSL'', runs standard BSL.
+``uBSL'' uses the unbiased estimator of a normal density of Ghurye and Olkin (1969). 
+``semiBSL'' runs the semi-parametric BSL algorithm and is more robust to non-normal summary statistics.}
 
 \item{shrinkage}{A string argument indicating which shrinkage method to be used. The default is \code{NULL},
-which means no shrinkage is used. Current options are 'glasso' for graphical lasso and 'Warton' for the
-ridge regularisation method of Warton (2008).}
+which means no shrinkage is used. Shrinkage estimation is only available for method ``BSL'' and ``semiBSL''. Current options 
+are ``glasso'' for the graphical lasso method of Friedman et al (2008) and ``Warton'' for the ridge regularisation method 
+of Warton (2008).}
 
 \item{penalty}{The penalty value to be used for the specified shrinkage method. Must be between zero and one
-if the shrinkage method is 'Warton'.}
+if the shrinkage method is ``Warton''.}
 
-\item{fnPrior}{A function that computes the prior density for a parameter. The default is \code{NULL}, which
-is an improper flat prior over the real line for each parameter. The function must have a single input: a vector
-of parameter values.}
+\item{fnPrior}{Deprecated, will be removed in the future, use \code{model} instead. A function that computes the 
+log of prior density for a parameter. The default is \code{NULL}, which uses an improper flat prior over the real line 
+for each parameter. The function must have a single input: a vector of parameter values.}
 
-\item{simArgs}{A list of additional arguments to pass into the simulation function. Only use when the input
-\code{fnSim} requires additional arguments. The default is \code{NULL}.}
+\item{simArgs}{Deprecated, will be removed in the future, use \code{model} instead. A list of additional arguments 
+to pass into the simulation function. Only use when the input \code{fnSim} requires additional arguments. The default is 
+\code{NULL}.}
 
-\item{sumArgs}{A list of additional arguments to pass into the summary statistics function. Only use when the
-input \code{fnSum} requires additional arguments. The default is \code{NULL}.}
+\item{sumArgs}{Deprecated, will be removed in the future, use \code{model} instead. A list of additional arguments 
+to pass into the summary statistics function. Only use when the input \code{fnSum} requires additional arguments. The}
 
 \item{logitTransformBound}{A \eqn{p} by \eqn{2} numeric matrix indicating the upper and lower bound of parameters if a logit
 transformation is used on the parameter space, where \eqn{p} is the number of parameters. The default is \code{NULL},
@@ -55,8 +63,12 @@ and \code{fnPrior}. The first column contains the lower bound of each parameter 
 upper bound. Infinite lower or upper bound is also supported, eg. \code{matrix(c(1,Inf,0,10,-Inf,0.5),3,2,byrow=TRUE)}.}
 
 \item{standardise}{A logical argument that determines whether to standardise the summary statistics before applying
-the graphical lasso. This is only valid if shrinkage is 'glasso' and penalty is not \code{NULL}. The diagonal
-elements will not be penalised if the shrinkage method is 'glasso'. The default is \code{FALSE}.}
+the graphical lasso. This is only valid if method is ``BSL'', shrinkage is ``glasso'' and penalty is not \code{NULL}. The 
+diagonal elements will not be penalised if the shrinkage method is ``glasso''. The default is \code{FALSE}.}
+
+\item{GRC}{A logical argument indicating whether the Gaussian rank correlation matrix (Boudt et al., 2012) 
+should be used to estimate the covariance matrix in ``BSL'' method. The default is \code{FALSE}, which uses the 
+sample covariance by default.}
 
 \item{parallel}{A logical value indicating whether parallel computing should be used for simulation and summary
 statistic evaluation. The default is \code{FALSE}. When model simulation is fast, it may be preferable to perform
@@ -65,11 +77,12 @@ serial computations to avoid significant communication overhead between workers.
 \item{parallelArgs}{A list of additional arguments to pass into the \code{foreach} function. Only used when parallel
 computing is enabled, default is \code{NULL}.}
 
-\item{thetaNames}{A string vector of parameter names, which must have the same length as the parameter vector.
-The default is \code{NULL}.}
+\item{thetaNames}{Deprecated, will be removed in the future, use \code{model} instead. A string vector of parameter 
+names, which must have the same length as the parameter vector. The default is \code{NULL}.}
 
-\item{plotOnTheFly}{A logical argument. If \code{TRUE}, a plot of approximate univariate posteriors based on the
-current accepted samples will be shown every 1000 iterations. The default is \code{FALSE}.}
+\item{plotOnTheFly}{A logical or numeric argument defining whether or by how many iterations a posterior figure will 
+be plotted during running. If \code{TRUE}, a plot of approximate univariate posteriors based on the current accepted 
+samples will be shown by every one thousand iterations. The default is \code{FALSE}.}
 
 \item{verbose}{A logical argument indicating whether the iteration numbers (\code{1:M}) and accepted proposal
 flags should be printed to track progress. The default is \code{FALSE}.}
@@ -79,53 +92,63 @@ An object of class \code{bsl} is returned, containing the following components:
 \itemize{
 \item \code{theta}: MCMC samples from the joint approximate posterior distribution of the parameters.
 \item \code{loglike}: Accepted MCMC samples of the estimated log-likelihood values.
+\item \code{call}: The original code that was used to call the method.
+\item \code{model}: The ``BSLMODEL'' object.
 \item \code{acceptanceRate}: The acceptance rate of the MCMC algorithm.
 \item \code{earlyRejectionRate}: The early rejection rate of the algorithm (early rejection may occur when using
 bounded prior distributions).
-\item \code{call}: The original code that was used to call the method.
+\item \code{errorRate}: The error rate. If any infinite summary statistic or positive infinite loglike occurs during 
+the process, it is marked as an error and the proposed parameter will be rejected.
 \item \code{y}: The input observed data.
-\item \code{n}: The input number of simulations from the model per MCMC iteration.
-\item \code{M}: The input number of MCMC iterations.
-\item \code{theta0}: The input initial guess of the parameter value.
-\item \code{covRandWalk}: The input covariance matrix used in multivariate normal random walk proposals.
-\item \code{fnSim}: The input data simulation function.
-\item \code{fnSum}: The input function for computing summary statistics of data.
-\item \code{method}: The input string argument indicating the used method.
-\item \code{shrinkage}: The input string argument indicating the shrinkage method.
-\item \code{penalty}: The input penalty value.
-\item \code{fnPrior}: The input function that computes the prior density for a parameter.
-\item \code{simArgs}: The input list of additional arguments to pass into the simulation function.
-\item \code{sumArgs}: The input list of additional arguments to pass into the summary statistics function.
-\item \code{logitTransform}: The logical argument indicating whether a logit transformation is used in the algorithm.
-\item \code{logitTransformBound}: The input matrix of logitTransformBound.
-\item \code{standardise}: The input logical argument that determines whether to standardise the summary statistics.
-\item \code{parallel}: The input logical value indicating whether parallel computing is used in the process.
-\item \code{parallelArgs}: The input list of additional arguments to pass into the \code{foreach} function.
-\item \code{thetaNames}: The string vector of parameter names.
+\item \code{n}: The number of simulations from the model per MCMC iteration.
+\item \code{M}: The number of MCMC iterations.
+\item \code{covRandWalk}: The covariance matrix used in multivariate normal random walk proposals.
+\item \code{method}: The string argument indicating the used method.
+\item \code{shrinkage}: The string argument indicating the shrinkage method.
+\item \code{penalty}: The penalty value.
+\item \code{standardise}: Logical, whether to standardise the summary statistics.
+\item \code{GRC}: Logical, if Gaussian rank correlation matrix is used.
+\item \code{logitTransform}: Logical, whether a logit transformation is used in the algorithm.
+\item \code{logitTransformBound}: The matrix of logitTransformBound.
+\item \code{parallel}: Logical, whether parallel computing is used in the process.
+\item \code{parallelArgs}: The list of additional arguments to pass into the \code{foreach} function.
 \item \code{time}: The running time of class \code{difftime}.
 }
 }
 \description{
-This is the main function for performing MCMC BSL, MCMC BSLasso and MCMC semiBSL.
-Parallel computing is supported with the R package \code{foreach}.
+This is the main function for performing MCMC BSL, MCMC uBSL, MCMC BSLasso and MCMC semiBSL.
+Parallel computing is supported with the R package \code{foreach}. Several input arguments in 2.0.0 or earlier versions
+are replaced by \code{model} in the new update and will be deprecated in a future release.
 }
 \references{
 Price, L. F., Drovandi, C. C., Lee, A., & Nott, D. J. (2018).
 Bayesian synthetic likelihood. Journal of Computational and Graphical Statistics.
 \url{https://doi.org/10.1080/10618600.2017.1302882}
 
-An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018a). Accelerating Bayesian synthetic
+An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2019). Accelerating Bayesian synthetic
 likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
 \url{https://doi.org/10.1080/10618600.2018.1537928}
 
-An, Z., Nott, D. J. &  Drovandi, C. (2018b). Robust Bayesian Synthetic Likelihood via
+An, Z., Nott, D. J. &  Drovandi, C. (2018). Robust Bayesian Synthetic Likelihood via
 a Semi-Parametric Approach. ArXiv Preprint \url{https://arxiv.org/abs/1809.05800}
+
+Friedman J, Hastie T, & Tibshirani R. (2008). Sparse inverse covariance estimation with the 
+graphical lasso. Biostatistics.
+\url{https://doi.org/10.1093/biostatistics/kxm045}
 
 Warton, D. I. (2008). Penalized Normal Likelihood and Ridge Regularization of Correlation and
 Covariance Matrices, Journal of the American Statistical Association.
 \url{https://doi.org/10.1198/016214508000000021}
+
+Ghurye, S. G., & Olkin, I. (1969).
+Unbiased estimation of some multivariate probability densities and related functions.
+The Annals of Mathematical Statistics. \url{https://projecteuclid.org/euclid.aoms/1177697501}
+
+Boudt, K., Cornelissen, J., and Croux, C. (2012). The Gaussian rank correlation estimator: 
+robustness properties. Statistics and Computing, 22(2):471-483.
 }
 \seealso{
+\code{\link{ma2}}, \code{\link{cell}} and \code{\link{mgnk}} for examples. 
 \code{\link{selectPenalty}} for a function to tune the BSLasso tuning parameter
 and \code{\link{plot}} for functions related to visualisation.
 }

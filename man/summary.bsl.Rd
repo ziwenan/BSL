@@ -2,17 +2,17 @@
 % Please edit documentation in R/S4Functions.R
 \name{summary.bsl}
 \alias{summary.bsl}
-\title{Summary method for class "bsl"}
+\title{Summary method for class ``bsl''}
 \usage{
 summary.bsl(object, thetaNames = NULL)
 }
 \arguments{
-\item{object}{A "bsl" class object to be summarised.}
+\item{object}{A ``bsl'' class object to be summarised.}
 
 \item{thetaNames}{Parameter names to be shown in the summary table. Parameter names of the bsl object will be used by default.}
 }
 \value{
-A vector of the number of simulations per iteration, acceptance rate of the Markov chain annd scaled effective sample size for each parameter.
+A vector of the number of simulations per iteration, acceptance rate of the Markov chain and effective sample size for each parameter.
 }
 \description{
 Summarise a bsl class object.

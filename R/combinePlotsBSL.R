@@ -1,11 +1,11 @@
-#' Plot the densities of multiple "bsl" class objects.
+#' Plot the densities of multiple ``bsl'' class objects.
 #' @description The function \code{combinePlotsBSL} can be used to plot multiple BSL densities together, optionally
 #' with the true values for the parameters.
-#' @param objectList     A list of "bsl" class objects.
+#' @param objectList     A list of ``bsl'' class objects.
 #' @param label          A string vector indicating the labels to be shown in the plot legend. The default is
 #' \code{NULL}, which uses the names from \code{objectList}.
-#' @param legendPosition One of the three string arguments, "auto", "right" or "bottom", indicating the legend
-#' position. The default is "auto", which automatically choose from "right" and "bottom". Only used when
+#' @param legendPosition One of the three string arguments, ``auto'', ``right'' or ``bottom'', indicating the legend
+#' position. The default is ``auto'', which automatically choose from ``right'' and ``bottom''. Only used when
 #' \code{which} is \code{1L}.
 #' @param legendNcol     A integer argument indicating the number of columns of the legend. The default,
 #' \code{NULL}, put all legends in the same row or column depending on \code{legendPosition}. Only used when
@@ -78,7 +78,7 @@ multiPlotDefault <- function(objectList, thin = 1, thetaTrue = NULL, label = NUL
         }
     }
 
-    thetaNames <- objectList[[1]]@thetaNames
+    thetaNames <- objectList[[1]]@model@thetaNames
     if (length(thin) == 1L) {
         thin <- rep(thin, nList)
     }
@@ -171,7 +171,7 @@ multiPlotGgplot <- function(objectList, thin = 1, thetaTrue = NULL, label = NULL
     if (!is.null(thetaTrue) & length(thetaTrue) != p) {
         stop('Length of thetaTrue does not match the number of parameters.')
     }
-    thetaNames <- objectList[[1]]@thetaNames
+    thetaNames <- objectList[[1]]@model@thetaNames
     if (is.null(label)) {
 	    if (is.null(names(objectList))) {
 		    label <- names(objectList) <- paste0('result', 1 : nList)

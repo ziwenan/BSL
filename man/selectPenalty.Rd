@@ -4,10 +4,11 @@
 \alias{selectPenalty}
 \title{Selecting BSLasso Penalty}
 \usage{
-selectPenalty(ssy, n, lambda_all, theta, M, sigma, fnSim, fnSum,
-  simArgs = NULL, sumArgs = NULL, standardise = FALSE,
+selectPenalty(ssy, n, lambda_all, M, sigma, model, theta = model@theta0,
+  method = c("BSL", "semiBSL")[1], shrinkage = c("glasso",
+  "Warton")[1], standardise = FALSE, GRC = FALSE,
   parallelSim = FALSE, parallelSimArgs = NULL, parallelMain = FALSE,
-  verbose = TRUE)
+  verbose = TRUE, fnSim, fnSum, simArgs, sumArgs)
 }
 \arguments{
 \item{ssy}{A summary statistic vector for the observed data.}
@@ -16,35 +17,50 @@ selectPenalty(ssy, n, lambda_all, theta, M, sigma, fnSim, fnSum,
 
 \item{lambda_all}{A list, with each entry containing the vector of penalty values to test for the corresponding choice of \code{n}.}
 
-\item{theta}{A point estimate of the parameter value which all of the simulations will be based on.}
-
 \item{M}{The number of repeats to use in estimating the standard deviation of the estimated log synthetic likelihood.}
 
-\item{sigma}{The standard deviation of the log synthetic likelihood estimator to aim for.}
+\item{sigma}{The standard deviation of the log synthetic likelihood estimator to aim for, usually a value between 1 and 2. This reflects the mixing of a Markov chain.}
 
-\item{fnSim}{A function that simulates data for a given parameter value. The first argument should be the
-parameters. Other necessary arguments (optional) can be specified with \code{simArgs}.}
+\item{model}{A ``BSLMODEL'' object generated with function \code{BSLModel}. See \code{\link{BSLModel}}.}
 
-\item{fnSum}{A function for computing summary statistics of data. The first argument should be the observed
-or simulated dataset. Other necessary arguments (optional) can be specified with \code{sumArgs}.}
+\item{theta}{A point estimate of the parameter value which all of the simulations will be based on.}
 
-\item{simArgs}{A list of additional arguments to pass into the simulation function. Only use when the input
-\code{fnSim} requires additional arguments. The default is \code{NULL}.}
+\item{method}{A string argument indicating the method to be used. The default, ``BSL'', runs BSL.
+``semiBSL'' runs the semi-parametric BSL algorithm and is more robust to non-normal summary statistics.}
 
-\item{sumArgs}{A list of additional arguments to pass into the summary statistics function. Only use when the
-input \code{fnSum} requires additional arguments. The default is \code{NULL}.}
+\item{shrinkage}{A string argument indicating which shrinkage method to be used. Current options 
+are ``glasso'' for the graphical lasso method of Friedman et al (2008) and ``Warton'' for the ridge regularisation method of Warton (2008).}
 
 \item{standardise}{A logical argument that determines whether to standardise the summary statistics before applying
-the graphical lasso. This is only valid if shrinkage is 'glasso' and penalty is not \code{NULL}. The diagonal
-elements will not be penalised if the shrinkage method is 'glasso'. The default is \code{FALSE}.}
+the graphical lasso. This is only valid if method is ``BSL'', shrinkage is ``glasso'' and penalty is not \code{NULL}. The 
+diagonal elements will not be penalised if the shrinkage method is ``glasso''. The default is \code{FALSE}.}
+
+\item{GRC}{A logical argument indicating whether the Gaussian rank correlation matrix (Boudt et al., 2012) 
+should be used to estimate the covariance matrix in ``BSL'' method. The default is \code{FALSE}, which uses the 
+sample covariance by default.}
 
 \item{parallelSim}{A logical value indicating whether parallel computing should be used for simulation and summary statistic evaluation. Default is \code{FALSE}.}
 
-\item{parallelSimArgs}{A string vector of package names to pass into the \code{foreach} function as argument '.package'. Only used when \code{parallel_sim} is \code{TRUE}, default is \code{NULL}.}
+\item{parallelSimArgs}{A list of additional arguments to pass into the \code{foreach} function. Only used when parallelSim is \code{TRUE}, default is \code{NULL}.}
 
 \item{parallelMain}{A logical value indicating whether parallel computing should be used to computing the graphical lasso function. Default is \code{FALSE}.}
 
 \item{verbose}{A logical argument indicating whether the iteration numbers (\code{1:M}) should be printed to track progress. The default is \code{FALSE}.}
+
+\item{fnSim}{Deprecated, will be removed in the future, use \code{model} instead. A function that simulates data 
+for a given parameter value. The first argument should be the parameters. Other necessary arguments (optional) can be 
+specified with \code{simArgs}.}
+
+\item{fnSum}{Deprecated, will be removed in the future, use \code{model} instead. A function for computing summary 
+statistics of data. The first argument should be the observed or simulated dataset. Other necessary arguments (optional) 
+can be specified with \code{sumArgs}.}
+
+\item{simArgs}{Deprecated, will be removed in the future, use \code{model} instead. A list of additional arguments 
+to pass into the simulation function. Only use when the input \code{fnSim} requires additional arguments. The default is 
+\code{NULL}.}
+
+\item{sumArgs}{Deprecated, will be removed in the future, use \code{model} instead. A list of additional arguments 
+to pass into the summary statistics function. Only use when the input \code{fnSum} requires additional arguments. The}
 }
 \value{
 An object of class \code{penbsl} is returned, containing the following components:
@@ -61,15 +77,21 @@ An object of class \code{penbsl} is returned, containing the following component
 The functions print() and plot() are both available for types of class \code{penbsl}.
 }
 \description{
-This is the main function for selecting the penalty for BSLasso based on a point estimate of the parameters.
-Parallel computing is supported with the R package \code{foreach}.
+This is the main function for selecting the shrinkage (graphical lasso or Warton's estimation) penalty parameter
+for method BSL or semiBSL based on a point estimate of the parameters. Parallel computing is supported with the R package 
+\code{foreach}.
 }
 \references{
-An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic
+An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2019). Accelerating Bayesian synthetic
 likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
 \url{https://doi.org/10.1080/10618600.2018.1537928}
+
+Warton, D. I. (2008). Penalized Normal Likelihood and Ridge Regularization of Correlation and
+Covariance Matrices, Journal of the American Statistical Association.
+\url{https://doi.org/10.1198/016214508000000021}
 }
 \seealso{
+\code{\link{ma2}}, \code{\link{cell}} and \code{\link{mgnk}} for examples. 
 \code{\link{bsl}} for a function to run BSLasso after selecting the tuning parameter
 and \code{\link{penbsl}} for functions related to visualisation.
 }

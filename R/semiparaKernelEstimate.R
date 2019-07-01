@@ -1,6 +1,6 @@
 #' Estimating the semi-parametric joint likelihood
 #'
-#' @description This function estimates the semi-parametric likelihood of An et al (2018).
+#' @description This function computes the semi-parametric likelihood estimator of An et al (2018).
 #' Kernel density estimates are used for modelling each univariate marginal distribution, and the
 #' dependence structure between summaries are captured using a Gaussian copula.
 #'
@@ -8,17 +8,17 @@
 #' @param ssx          A matrix of the simulated summary statistics. The number of rows is the same
 #' as the number of simulations per iteration.
 #' @param kernel       A string argument indicating the smoothing kernel to pass into
-#' \code{density} for estimating the marginal distribution of each summary statistic. Only "gaussian"
-#' and "epanechnikov" are available. The default is "gaussian".
+#' \code{density} for estimating the marginal distribution of each summary statistic. Only ``gaussian"
+#' and ``epanechnikov" are available. The default is ``gaussian".
 #' @param shrinkage     A string argument indicating which shrinkage method to be used on the
 #' correlation matrix of the Gaussian copula. The default is \code{NULL}, which means no shrinkage
-#' is used. Current options are 'glasso' for graphical lasso and 'Warton' for the ridge
+#' is used. Current options are ``glasso" for graphical lasso and ``Warton" for the ridge
 #' regularisation method of Warton (2008).
 #' @inheritParams bsl
 #' @param log          A logical argument indicating if the log of the likelihood is given as the result.
 #' The default is \code{TRUE}.
 #'
-#' @return             The estimated (log) likelihood value.
+#' @return             The estimated synthetic (log) likelihood value.
 #'
 #' @references
 #' An, Z., Nott, D. J. &  Drovandi, C. (2018). Robust Bayesian Synthetic Likelihood via
@@ -34,24 +34,19 @@
 #' @examples
 #' data(ma2)
 #' y <- ma2$data # the observed data
-#'
-#' # function that simulates an ma2 time series
-#' simulate_ma2 <- function(theta, L = 50) {
-#'     rand <- rnorm(L + 2)
-#'     y <- rand[3 : (L+2)] + theta[1] * rand[2 : (L+1)] + theta[2] * rand[1 : L]
-#'     return(y)
-#' }
-#'
+#' 
 #' theta_true <- c(0.6, 0.2)
 #' x <- matrix(0, 300, 50)
 #' set.seed(100)
-#' for(i in 1:300) x[i, ] <- simulate_ma2(theta_true)
-#'
+#' for(i in 1:300) x[i, ] <- ma2_sim(theta_true, 50)
+#' 
 #' # the default semi-parametric synthetic likelihood estimator of semiBSL
 #' semiparaKernelEstimate(y, x)
 #' # using shrinkage on the correlation matrix of the Gaussian copula is also possible
 #' semiparaKernelEstimate(y, x, shrinkage = 'Warton', penalty = 0.6)
 #'
+#' @seealso    \code{\link{gaussianSynLike}} for the standard synthetic likelihood estimator, 
+#' \code{\link{gaussianSynLikeGhuryeOlkin}} for the unbiased synthetic likelihood estimator.
 #' @export
 semiparaKernelEstimate <- function (ssy, ssx, kernel = 'gaussian', shrinkage = NULL, penalty = NULL, log = TRUE) {
     if (is.null(shrinkage) && !is.null(penalty)) {
@@ -73,10 +68,7 @@ semiparaKernelEstimate <- function (ssy, ssx, kernel = 'gaussian', shrinkage = N
     }
 
     # Gaussian rank correlation
-	r <- apply(ssx, FUN = rank, MARGIN = 2, ties.method = 'average')
-    rqnorm <- qnorm(r/(n+1))
-    den <- sum((qnorm(1:n/(n+1)))^2)
-    rhohat <- unlist(sapply(1:(ns-1), FUN = function(i) c(rqnorm[, i] %*% rqnorm[, (i+1):ns] / den)))
+	rhohat <- gaussianRankCorr(ssx, TRUE)
 
     if (!is.null(shrinkage)) {
         RHOHAT <- p2P(rhohat)

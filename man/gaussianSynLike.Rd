@@ -5,7 +5,7 @@
 \title{Estimating the Gaussian synthetic likelihood}
 \usage{
 gaussianSynLike(ssy, ssx, shrinkage = NULL, penalty = NULL,
-  standardise = FALSE, log = TRUE, verbose = FALSE)
+  standardise = FALSE, GRC = FALSE, log = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{ssy}{The observed summary statisic.}
@@ -14,15 +14,20 @@ gaussianSynLike(ssy, ssx, shrinkage = NULL, penalty = NULL,
 as the number of simulations per iteration.}
 
 \item{shrinkage}{A string argument indicating which shrinkage method to be used. The default is \code{NULL},
-which means no shrinkage is used. Current options are 'glasso' for graphical lasso and 'Warton' for the
-ridge regularisation method of Warton (2008).}
+which means no shrinkage is used. Shrinkage estimation is only available for method ``BSL'' and ``semiBSL''. Current options 
+are ``glasso'' for the graphical lasso method of Friedman et al (2008) and ``Warton'' for the ridge regularisation method 
+of Warton (2008).}
 
 \item{penalty}{The penalty value to be used for the specified shrinkage method. Must be between zero and one
-if the shrinkage method is 'Warton'.}
+if the shrinkage method is ``Warton''.}
 
 \item{standardise}{A logical argument that determines whether to standardise the summary statistics before applying
-the graphical lasso. This is only valid if shrinkage is 'glasso' and penalty is not \code{NULL}. The diagonal
-elements will not be penalised if the shrinkage method is 'glasso'. The default is \code{FALSE}.}
+the graphical lasso. This is only valid if method is ``BSL'', shrinkage is ``glasso'' and penalty is not \code{NULL}. The 
+diagonal elements will not be penalised if the shrinkage method is ``glasso''. The default is \code{FALSE}.}
+
+\item{GRC}{A logical argument indicating whether the Gaussian rank correlation matrix (Boudt et al., 2012) 
+should be used to estimate the covariance matrix in ``BSL'' method. The default is \code{FALSE}, which uses the 
+sample covariance by default.}
 
 \item{log}{A logical argument indicating if the log of likelihood is given as the result.
 The default is \code{TRUE}.}
@@ -31,33 +36,28 @@ The default is \code{TRUE}.}
 the function fails to compute a likelihood. The default is \code{FALSE}.}
 }
 \value{
-The estimated (log) likelihood value.
+The estimated synthetic (log) likelihood value.
 }
 \description{
 This function estimates the Gaussian synthetic likelihood function of Wood (2010).
-Shrinkage on the Gaussian covariance matrix is also available (see An et al 2018).
+Shrinkage on the Gaussian covariance matrix is also available (see An et al 2019).
 }
 \examples{
 data(ma2)
 y <- ma2$data # the observed data
 
-# function that simulates an ma2 time series
-simulate_ma2 <- function(theta, L = 50) {
-    rand <- rnorm(L + 2)
-    y <- rand[3 : (L+2)] + theta[1] * rand[2 : (L+1)] + theta[2] * rand[1 : L]
-    return(y)
-}
-
 theta_true <- c(0.6, 0.2)
 x <- matrix(0, 300, 50)
 set.seed(100)
-for(i in 1:300) x[i, ] <- simulate_ma2(theta_true)
+for(i in 1:300) x[i, ] <- ma2_sim(theta_true, 50)
 
 # the standard Gaussian synthetic likelihood (the likelihood estimator used in BSL)
 gaussianSynLike(y, x)
 # the Gaussian synthetic likelihood with glasso shrinkage estimation
 # (the likelihood estimator used in BSLasso)
 gaussianSynLike(y, x, shrinkage = 'glasso', penalty = 0.1)
+# the Gaussian synthetic likelihood with Warton shrinkage estimation
+gaussianSynLike(y, x, shrinkage = 'Warton', penalty = 0.9)
 
 }
 \references{
@@ -65,7 +65,7 @@ Price, L. F., Drovandi, C. C., Lee, A., & Nott, D. J. (2018).
 Bayesian synthetic likelihood. Journal of Computational and Graphical Statistics.
 \url{https://doi.org/10.1080/10618600.2017.1302882}
 
-An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic
+An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2019). Accelerating Bayesian synthetic
 likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
 \url{https://doi.org/10.1080/10618600.2018.1537928}
 
@@ -75,4 +75,8 @@ the graphical lasso. Biostatistics. \url{https://doi.org/10.1093/biostatistics/k
 Warton, D. I. (2008). Penalized Normal Likelihood and Ridge Regularization of Correlation and
 Covariance Matrices, Journal of the American Statistical Association.
 \url{https://doi.org/10.1198/016214508000000021}
+}
+\seealso{
+\code{\link{gaussianSynLikeGhuryeOlkin}} for the unbiased synthetic likelihood estimator, 
+\code{\link{semiparaKernelEstimate}} for the semi-parametric likelihood estimator.
 }
