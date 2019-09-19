@@ -1,64 +1,75 @@
-#' Estimating the semi-parametric joint likelihood
+#' Estimate the semi-parametric (joint) synthetic likelihood
 #'
-#' @description This function estimates the semi-parametric likelihood of An et al (2018).
-#' Kernel density estimates are used for modelling each univariate marginal distribution, and the
-#' dependence structure between summaries are captured using a Gaussian copula.
+#' @description This function computes the semi-parametric likelihood estimator
+#'   of \insertCite{An2018}{BSL}. The advantage of this semi-parametric
+#'   estimator over the standard synthetic likelihood estimator is that the
+#'   semi-parametric one could deal with non-normal summary statistics much
+#'   better. Kernel density estimation is used for modelling each univariate
+#'   marginal distribution, and the dependence structure between summaries are
+#'   captured using a Gaussian copula. Shrinkage on the correlation
+#'   matrix parameter of the Gaussian copula is helpful to bring down the number of simulations.
 #'
-#' @param ssy          The observed summary statistic.
-#' @param ssx          A matrix of the simulated summary statistics. The number of rows is the same
-#' as the number of simulations per iteration.
-#' @param kernel       A string argument indicating the smoothing kernel to pass into
-#' \code{density} for estimating the marginal distribution of each summary statistic. Only "gaussian"
-#' and "epanechnikov" are available. The default is "gaussian".
-#' @param shrinkage     A string argument indicating which shrinkage method to be used on the
-#' correlation matrix of the Gaussian copula. The default is \code{NULL}, which means no shrinkage
-#' is used. Current options are 'glasso' for graphical lasso and 'Warton' for the ridge
-#' regularisation method of Warton (2008).
+#' @param kernel       A string argument indicating the smoothing kernel to pass
+#'   into \code{density} for estimating the marginal distribution of each
+#'   summary statistic. Only ``gaussian" and ``epanechnikov" are available. The
+#'   default is ``gaussian".
+#' @param shrinkage     A string argument indicating which shrinkage method to
+#'   be used. The default is \code{NULL}, which means no shrinkage is used.
+#'   Current options are ``glasso'' for the graphical lasso method of
+#'   \insertCite{Friedman2008;textual}{BSL} and ``Warton'' for the ridge
+#'   regularisation method of \insertCite{Warton2008;textual}{BSL}.
 #' @inheritParams bsl
-#' @param log          A logical argument indicating if the log of the likelihood is given as the result.
-#' The default is \code{TRUE}.
+#' @inheritParams gaussianSynLike
 #'
-#' @return             The estimated (log) likelihood value.
+#' @return             The estimated synthetic (log) likelihood value.
 #'
 #' @references
-#' An, Z., Nott, D. J. &  Drovandi, C. (2018). Robust Bayesian Synthetic Likelihood via
-#' a Semi-Parametric Approach. \url{https://arxiv.org/abs/1809.05800}
 #'
-#' Friedman, J., Hastie, T., Tibshirani, R. (2008). Sparse inverse covariance estimation with
-#' the graphical lasso. Biostatistics. \url{https://doi.org/10.1093/biostatistics/kxm045}
+#' \insertAllCited{}
 #'
-#' Warton, D. I. (2008). Penalized Normal Likelihood and Ridge Regularization of Correlation and
-#' Covariance Matrices, Journal of the American Statistical Association.
-#' \url{https://www.tandfonline.com/doi/abs/10.1198/016214508000000021}
+#' \insertRef{Friedman2008}{BSL}
+#'
+#' \insertRef{Warton2008}{BSL}
+#'
+#' \insertRef{Boudt2012}{BSL}
 #'
 #' @examples
 #' data(ma2)
-#' y <- ma2$data # the observed data
-#'
-#' # function that simulates an ma2 time series
-#' simulate_ma2 <- function(theta, L = 50) {
-#'     rand <- rnorm(L + 2)
-#'     y <- rand[3 : (L+2)] + theta[1] * rand[2 : (L+1)] + theta[2] * rand[1 : L]
-#'     return(y)
-#' }
-#'
-#' theta_true <- c(0.6, 0.2)
-#' x <- matrix(0, 300, 50)
-#' set.seed(100)
-#' for(i in 1:300) x[i, ] <- simulate_ma2(theta_true)
-#'
-#' # the default semi-parametric synthetic likelihood estimator of semiBSL
-#' semiparaKernelEstimate(y, x)
+#' ssy <- ma2_sum(ma2$data)
+#' m <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args,
+#'               theta0 = ma2$start, sumArgs = list(delta = 0.5))
+#' ssx <- simulation(m, n = 300, theta = c(0.6, 0.2), seed = 10)$ssx
+#' 
+#' # check the distribution of the first summary statistic: highly non-normal
+#' plot(density(ssx[, 1]))
+#' 
+#' # the standard synthetic likelihood estimator over-estimates the likelihood here
+#' gaussianSynLike(ssy, ssx)
+#' # the semi-parametric synthetic likelihood estimator is more robust to non-normality
+#' semiparaKernelEstimate(ssy, ssx)
 #' # using shrinkage on the correlation matrix of the Gaussian copula is also possible
-#' semiparaKernelEstimate(y, x, shrinkage = 'Warton', penalty = 0.6)
+#' semiparaKernelEstimate(ssy, ssx, shrinkage = 'Warton', penalty = 0.8)
+#'
+#' @seealso    Other available synthetic likelihood estimators:
+#'   \code{\link{gaussianSynLike}} for the standard synthetic likelihood
+#'   estimator, \code{\link{gaussianSynLikeGhuryeOlkin}} for the unbiased
+#'   synthetic likelihood estimator, \code{\link{synLikeMisspec}} for the
+#'   Gaussian synthetic likelihood estimator for model misspecification.
 #'
 #' @export
-semiparaKernelEstimate <- function (ssy, ssx, kernel = 'gaussian', shrinkage = NULL, penalty = NULL, log = TRUE) {
-    if (is.null(shrinkage) && !is.null(penalty)) {
-        warning('"penalty" will not ignored since no shrinkage method is specified')
+semiparaKernelEstimate <- function (ssy, ssx, kernel = 'gaussian', shrinkage = NULL,
+                                    penalty = NULL, log = TRUE) {
+	if (!is.null(shrinkage)) {
+	    flagShrinkage <- TRUE
+	    shrinkage <- match.arg(shrinkage, c("glasso", "Warton"))
+	} else {
+	    flagShrinkage <- FALSE
+	}
+    if (!flagShrinkage && !is.null(penalty)) {
+        warning('"penalty" will be ignored since no shrinkage method is specified')
     }
-    if (!is.null(shrinkage) && is.null(penalty)) {
-        stop('"penalty" must be specified to provoke shrinkage method')
+    if (flagShrinkage && is.null(penalty)) {
+        stop('a penalty value must be specified to enable shrinkage estimation')
     }
 
     n <- nrow(ssx)
@@ -66,17 +77,15 @@ semiparaKernelEstimate <- function (ssy, ssx, kernel = 'gaussian', shrinkage = N
 
     pdfy <- yu <- numeric(ns)
     for (j in 1 : ns) {
-        f <- density(ssx[, j], kernel = kernel, n = 512, from = min(ssx[,j],ssy[j]), to = max(ssx[,j],ssy[j]))
+        f <- density(ssx[, j], kernel = kernel, n = 512, from = min(ssx[,j],ssy[j]),
+		             to = max(ssx[,j],ssy[j]))
         approxy <- approx(f$x, f$y, ssy[j])
         pdfy[j] <- approxy$y
         yu[j] <- mean(kernelCDF((ssy[j] - ssx[, j]) / f$bw, kernel))
     }
 
     # Gaussian rank correlation
-	r <- apply(ssx, FUN = rank, MARGIN = 2, ties.method = 'average')
-    rqnorm <- qnorm(r/(n+1))
-    den <- sum((qnorm(1:n/(n+1)))^2)
-    rhohat <- unlist(sapply(1:(ns-1), FUN = function(i) c(rqnorm[, i] %*% rqnorm[, (i+1):ns] / den)))
+	rhohat <- gaussianRankCorr(ssx, TRUE)
 
     if (!is.null(shrinkage)) {
         RHOHAT <- p2P(rhohat)

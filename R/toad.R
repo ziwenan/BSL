@@ -1,0 +1,199 @@
+#' Toad example
+#'
+#' @description This example estimates the parameter for the toad example. The
+#'   model simulates the movement of an amphibian called Fowler's toad. The
+#'   model is proposed in \insertCite{Marchand2017;textual}{BSL}. We provide the
+#'   data and tuning parameters required to reproduce the results in
+#'   \insertCite{An2018;textual}{BSL}.
+#'
+#' @param theta A vector of proposed model parameters,
+#'   \ifelse{html}{\out{<i>&#945</i>}}{\eqn{\alpha}},
+#'   \ifelse{html}{\out{<i>&#947</i>}}{\eqn{gamma}} and
+#'   \ifelse{html}{\out{p<sub>0</sub>}}{\eqn{p_0}}.
+#' @param ntoads The number of toads to simulate in the observation.
+#' @param ndays The number of days lasted of the observation.
+#' @param model Which model to be used. 1 for the random return model, 2 for 
+#'   the nearest return model, and 3 for the distance-based return probability model.
+#' @param d0 Characteristic distance for model 3. Only used if \code{model} is 3.
+#' @param na Logical. This is the index matrix for missing observations. By
+#'   default, \code{matrix(FALSE, ndays, ntoads)} indicates there is no
+#'   missingness in the observation matrix.
+#' @param X The data matrix.
+#' @param gmm The list of the Gaussian mixture model parameters. This should be
+#'   computed prior to running the example. See examples section for an example
+#'   code of computing this argument.
+#' @param lag The lag of days to compute the summary statistics, default as 1,
+#'   2, 4 and 8.
+#' @param power The transformation power, default as 1.
+#'
+#' @details The model here is the nearest return model of
+#'   \insertCite{Marchand2017;textual}{BSL}. Please see
+#'   \insertCite{Marchand2017;textual}{BSL} for a full description of the toad
+#'   model, and also \insertCite{An2018;textual}{BSL} for a Bayesian inference
+#'   with semi-BSL method.
+#'
+#' @usage data(toad)
+#'
+#' @section datasets (simulated and real):
+#'
+#'   A simulated dataset and a real dataset are provided in this example. Both
+#'   datasets contains observations from 66 toads for 63 days. The simulated
+#'   dataset is simulated with parameter
+#'   \ifelse{html}{\out{<i>&#952=(1.7,35,0.6)</i>}}{\eqn{\theta = (1.7, 35,
+#'   0.6)}}. This is the data used in \insertCite{An2018;textual}{BSL}. The real
+#'   dataset is obtained from the supplementary data of
+#'   \insertCite{Marchand2017;textual}{BSL}.
+#'
+#'   \itemize{
+#'
+#'   \item \code{data_simulated}:  A 63
+#'   \ifelse{html}{\out{<i>&times</i>}}{\eqn{\times}} 66 matrix of the observed
+#'   toad locations (simulated data).
+#'
+#'   \item \code{data_real}:       A 63
+#'   \ifelse{html}{\out{<i>&times</i>}}{\eqn{\times}} 66 matrix of the observed
+#'   toad locations (real data).
+#'
+#'   \item \code{cov}: The covariance matrix of a multivariate normal random
+#'   walk proposal distribution used in the MCMC, in the form of a 3
+#'   \ifelse{html}{\out{&times}}{\eqn{\times}} 3 matrix.
+#'
+#'   \item \code{theta0}: A vector of suitable initial values of the parameters
+#'   for MCMC.
+#'
+#'   \item \code{sim_args_simulated} and \code{sim_args_real}: A list of the
+#'   arguments to pass into the simulation function. 
+#'
+#'   \itemize{
+#'
+#'   \item \code{ndays}: The number of days lasted of the observation.
+#'
+#'   \item \code{ntoads}: The total number of toads being observed.
+#'
+#'   }
+#'
+#'   \item \code{sum_args_simulated} and \code{sum_args_real}: A list of the
+#'   arguments to pass into the summary statistics function. 
+#' 
+#'   \itemize{ \item
+#'   \code{gmm}: A list of the Gaussian mixture model parameters. Gaussian
+#'   mixtures are used to approximate the distribution of displacement of toads
+#'   in a 1,2,4 or 8-day period. Each element of the list contains the
+#'   parameters of a 3-component Gaussian mixture model for each day lag. This
+#'   is used to computed the summary statistics (scores of the Gaussian mixture
+#'   models).
+#'
+#'   \item \code{lag}: A vector of day lags.
+#'
+#'   \item \code{power}: The transformation parameter of the summary statistics.
+#'   Only used to motivate the ``semiBSL'' method. By default, 1 indicates no
+#'   transformation.
+#'
+#'   }
+#'
+#'
+#'   }
+#'
+#' @examples
+#' \donttest{
+#' require(doParallel) # You can use a different package to set up the parallel backend
+#'
+#' data(toad)
+#'
+#' ## run standard BSL for the simulated dataset
+#' model1 <- newModel(fnSim = toad_sim, fnSum = toad_sum, theta0 = toad$theta0,
+#'                    fnLogPrior = toad_prior, simArgs = toad$sim_args_simulated,
+#'                    sumArgs = toad$sum_args_simulated)
+#' paraBound <- matrix(c(1,2,0,100,0,0.9), 3, 2, byrow = TRUE)
+#'
+#' # Performing BSL (reduce the number of iterations M if desired)
+#' # Opening up the parallel pools using doParallel
+#' cl <- makeCluster(detectCores() - 1)
+#' registerDoParallel(cl)
+#' resultToadSimulated <- bsl(toad$data_simulated, n = 1000, M = 10000, model = model1,
+#'                            covRandWalk = toad$cov, logitTransformBound = paraBound,
+#'                            parallel = TRUE, verbose = 1L, plotOnTheFly = 100)
+#' stopCluster(cl)
+#' registerDoSEQ()
+#' show(resultToadSimulated)
+#' summary(resultToadSimulated)
+#' plot(resultToadSimulated, thetaTrue = toad$theta0, thin = 20)
+#'
+#' ## run standard BSL for the real dataset
+#' model2 <- newModel(fnSim = toad_sim, fnSum = toad_sum, theta0 = toad$theta0,
+#'                    fnLogPrior = toad_prior, simArgs = toad$sim_args_real,
+#'                    sumArgs = toad$sum_args_real)
+#' paraBound <- matrix(c(1,2,0,100,0,0.9), 3, 2, byrow = TRUE)
+#'
+#' # Performing BSL (reduce the number of iterations M if desired)
+#' # Opening up the parallel pools using doParallel
+#' cl <- makeCluster(detectCores() - 1)
+#' registerDoParallel(cl)
+#' resultToadReal <- bsl(toad$data_real, n = 1000, M = 10000, model = model2,
+#'                       covRandWalk = toad$cov, logitTransformBound = paraBound,
+#'                       parallel = TRUE, verbose = 1L, plotOnTheFly = 100)
+#' stopCluster(cl)
+#' registerDoSEQ()
+#' show(resultToadReal)
+#' summary(resultToadReal)
+#' plot(resultToadReal, thetaTrue = toad$theta0, thin = 20)
+#'
+#' ## an example code to estimate the gmm list for the real data (this requires
+#' ## the mixtools package)
+#' require("mixtools")
+#' lag <- c(1, 2, 4, 8)
+#' gmm <- vector("list", length(lag))
+#' set.seed(2)
+#' for (i in 1 : length(lag)) {
+#'     l <- lag[i]
+#'     y <- obsMat2deltaxR(toad$data_real, l)
+#'     z <- log(y[y >= 10] - 10)
+#'     fit <- mixtools::normalmixEM(z, k = 3, maxrestarts = 1000)
+#'     temp <- matrix(c(fit$lambda, fit$mu, fit$sigma^2), byrow = TRUE, ncol = 3)
+#'     rownames(temp) <- c("ComponentProportion", "mu", "Sigma")
+#'     gmm[[i]] <- temp
+#' }
+#' gmm
+#' }
+#'
+#' @references
+#'
+#' \insertAllCited()
+#'
+#' @author                                 Ziwen An, Leah F. South and Christopher C. Drovandi
+#' @name toad
+NULL
+
+
+
+#' @describeIn toad Simulates data from the model, using C++ in the backend.
+#' @export
+toad_sim <- function (theta, ntoads, ndays, model = 1, d0 = 100, na = matrix(FALSE, ndays, ntoads)) {
+    stopifnot(model %in% 1:3)
+    X <- sim_toad(theta, ntoads, ndays, model, d0)
+    X[na] <- NA
+    return (X)
+}
+
+#' @describeIn toad Computes the summary statistics (scores of Gaussian mixture models) for this example.
+#' @export
+toad_sum <- function(X, gmm, lag = c(1,2,4,8), power = 1) {
+    nlag <- length(lag)
+    scores <- vector('list', nlag)
+    ssx <- c()
+    for (k in 1 : nlag) {
+        temp <- gmmScores(X, gmm[[k]], lag[k])
+        ind_scores <- grepl('^score', names(temp))
+        freq <- unlist(temp[!ind_scores])
+        scores <- unlist(temp[ind_scores])
+        scores <- sign(scores) * abs(scores) ^ power
+        ssx <- c(ssx, freq, scores)
+    }
+    return (ssx)
+}
+
+#' @describeIn toad Evaluates the log prior at the chosen parameters.
+#' @export
+toad_prior <- function(theta) {
+    log(theta[1] > 1 & theta[1] < 2 & theta[2] > 0 & theta[2] < 80 & theta[3] > 0 & theta[3] < 1)
+}

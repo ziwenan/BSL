@@ -4,7 +4,7 @@
 \alias{plot.bsl}
 \alias{marginalPostDefault}
 \alias{marginalPostGgplot}
-\title{Plot method for class "bsl"}
+\title{Plot method for class ``bsl''}
 \usage{
 plot.bsl(x, which = 1L, thin = 1, thetaTrue = NULL,
   options.plot = NULL, top = "Approximate Univariate Posteriors",
@@ -18,7 +18,7 @@ marginalPostGgplot(x, thin = 1, thetaTrue = NULL,
   options.theme = list())
 }
 \arguments{
-\item{x}{A "bsl" class object to plot.}
+\item{x}{A ``bsl'' class object to plot.}
 
 \item{which}{An integer argument indicating which plot function to be used. The default, \code{1L}, uses
 the plain \code{plot} to visualise the result. \code{2L} uses ggplot2 to generate an aesthetically nicer figure.}
@@ -58,7 +58,7 @@ mtext('Approximate Univariate Posteriors', outer = TRUE, cex = 1.5)
 # plot using the ggplot2 package
 plot(result, which = 2, thin = 10, thetaTrue = c(0.6, 0.2),
      options.density = list(colour = 'darkblue', fill = 'grey80', size = 1),
-     options.theme = list(plot.margin = grid::unit(rep(0.05,4), "npc"),
+     options.theme = list(plot.margin = grid::unit(rep(0.05,4), 'npc'),
                           axis.text = ggplot2::element_text(size = 10)))
 }
 

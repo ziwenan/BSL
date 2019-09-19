@@ -2,12 +2,12 @@
 % Please edit documentation in R/S4Functions.R
 \name{show.bsl}
 \alias{show.bsl}
-\title{Show method for class "bsl". Display the basic information of a bsl object.}
+\title{Show method for class ``bsl''. Display the basic information of a bsl object.}
 \usage{
 show.bsl(object)
 }
 \arguments{
-\item{object}{A "bsl" class object to be displayed.}
+\item{object}{A ``bsl'' class object.}
 }
 \description{
 Display the basic information of a bsl object.

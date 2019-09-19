@@ -1,102 +1,265 @@
 #' An MA(2) model
 #'
-#' @description In this example we wish to estimate the parameters of a simple MA(2) time series model.
-#' We provide the data and tuning parameters required to reproduce the results in An et al. (2018).
+#' @description In this example we wish to estimate the parameters of a simple
+#'   MA(2) time series model. We provide the data and tuning parameters required
+#'   to reproduce the results in \insertCite{An2019;textual}{BSL}.
 #'
-#' @param theta     A vector of proposed model parameters, \eqn{\theta_1} and \eqn{\theta_2}
-#' @param x			Observed or simulated data in the format of a vector of length \eqn{T}.
+#' @param theta     A vector of proposed model parameters,
+#'   \ifelse{html}{\out{<i>&#952<sub>1</sub></i>}}{\eqn{\theta_1}} and
+#'   \ifelse{html}{\out{<i>&#952<sub>2</sub></i>}}{\eqn{\theta_2}}.
+#' @param n         The number of simulations to run with the vectorised
+#'   simulation function.
+#' @param x			Observed or simulated data in the format of a vector of length
+#'   \eqn{T}.
 #' @param T         The number of observations.
+#' @param epsilon   The skewness parameter in the sinh-arcsinh transformation.
+#' @param delta   The kurtosis parameter in the sinh-arcsinh transformation.
 #'
-#' @details
-#' This example is based on estimating the parameters of a basic MA(2) time series model
-#' of the form
+#' @details This example is based on estimating the parameters of a basic MA(2)
+#'   time series model of the form
 #'
-#' \deqn{y_t = z_t + \theta_1 z_{t-1} + \theta_2 z_{t-2},}
+#'   \ifelse{html}{\out{<center><i>y<sub>t</sub> = z<sub>t</sub> +
+#'   &#952<sub>1</sub>z<sub>t-1</sub> +
+#'   &#952<sub>2</sub>z<sub>t-2</sub></i>,</center>}}{\deqn{y_t = z_t + \theta_1
+#'   z_{t-1} + \theta_2 z_{t-2},}}
 #'
-
-#' where \eqn{t=1,\ldots,T} and \eqn{z_t ~ N(0,1)} for \eqn{t=-1,0,\ldots,T}.
-#' A uniform prior is used for this example, subject to the restrictions that
-#' \eqn{-2<\theta_1<2}, \eqn{\theta_1+\theta_2>-1} and \eqn{\theta_1-\theta_2<1}
-#' so that invertibility of the time series is satisfied. The summary statistics
-#' are simply the full data.
+#'   where \eqn{t=1,\ldots,T} and \ifelse{html}{\out{<i>z<sub>t</sub> ~
+#'   N(0,1)</i>}}{\eqn{z_t \sim N(0,1)}} for \eqn{t=-1,0,\ldots,T}. A uniform
+#'   prior is used for this example, subject to the restrictions that
+#'   \ifelse{html}{\out{-2<&#952<sub>1</sub><2}}{\eqn{-2<\theta_1<2}},
+#'   \ifelse{html}{\out{&#952<sub>1</sub>+&#952<sub>2</sub>>-1}}{\eqn{\theta_1+\theta_2>-1}}
+#'    and
+#'   \ifelse{html}{\out{&#952<sub>1</sub>-&#952<sub>2</sub><1}}{\eqn{\theta_1-\theta_2<1}}
+#'    so that invertibility of the time series is satisfied. The summary
+#'   statistics are simply the full data.
 #'
 #' @section A simulated dataset:
 #'
-#' An example 'observed' dataset and the tuning parameters relevant to that example
-#' can be obtained using \code{data(ma2)}. This 'observed' data is a simulated dataset
-#' with \eqn{\theta_1 = 0.6}, \eqn{\theta_2=0.2} and \eqn{T=50}. Further information
-#' about this model and the specific choices of tuning parameters used in BSL and
-#' BSLasso can be found in An et al. (2018).
+#'   An example ``observed'' dataset and the tuning parameters relevant to that
+#'   example can be obtained using \code{data(ma2)}. This ``observed'' data is a
+#'   simulated dataset with
+#'   \ifelse{html}{\out{&#952<sub>1</sub>=0.6}}{\eqn{\theta_1 = 0.6}},
+#'   \ifelse{html}{\out{&#952<sub>2</sub>=0.2}}{\eqn{\theta_2=0.2}} and
+#'   \eqn{T=50}. Further information about this model and the specific choices
+#'   of tuning parameters used in BSL and BSLasso can be found in An et al.
+#'   (2019).
 #'
-#' \itemize{
-#'  \item \code{data}: A time series dataset, in the form of a vector of length \eqn{T}
-#'  \item \code{sim_options}: A list containing \eqn{T=50}
-#'  \item \code{start}: A vector of suitable initial values of the parameters for MCMC
-#'  \item \code{cov}: Covariance matrix of the multivariate normal random walk, in the form of a \eqn{2 x 2} matrix
-#' }
+#'   \itemize{
+#'
+#'   \item \code{data}: A time series dataset, in the form of a vector of length
+#'   \eqn{T}
+#'
+#'   \item \code{sim_args}: A list containing \eqn{T=50}
+#'
+#'
+#'   \item \code{start}: A vector of suitable initial values of the parameters
+#'   for MCMC
+#'
+#'   \item \code{cov}: The covariance matrix of a multivariate normal random
+#'   walk proposal distribution used in the MCMC, in the form of a 2
+#'   \ifelse{html}{\out{&times}}{\eqn{\times}} 2 matrix }
 #'
 #' @examples
-#' \donttest{
-#' # Loading the data for this example
+#' \dontshow{
+#' # Load the data for this example and set up the model object
 #' data(ma2)
-#' true_ma2 <- c(0.6,0.2)
+#' model <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args,
+#'                   theta0 = ma2$start, fnLogPrior = ma2_prior)
+#' thetaExact <- c(0.6, 0.2)
 #'
-#' # Performing BSL (reduce the number of iterations M if desired)
-#' resultMa2BSL <- bsl(y = ma2$data, n = 500, M = 300000, theta0 = ma2$start, covRandWalk = ma2$cov,
-#'     fnSim = ma2_sim, fnSum = ma2_sum, fnPrior = ma2_prior, simArgs = ma2$sim_options,
-#'     thetaNames = expression(theta[1], theta[2]), verbose = TRUE)
+#' # reduce the number of iterations M if desired for all methods below
+#' # Method 1: standard BSL
+#' resultMa2BSL <- bsl(y = ma2$data, n = 500, M = 10, model = model, covRandWalk = ma2$cov,
+#'                     method = "BSL", verbose = FALSE)
 #' show(resultMa2BSL)
 #' summary(resultMa2BSL)
-#' plot(resultMa2BSL, which = 1, thetaTrue = true_ma2, thin = 20)
+#' plot(resultMa2BSL, thetaTrue = thetaExact)
 #'
-#' # Performing tuning for BSLasso
-#' lambda_all <- list(exp(seq(-3,0.5,length.out=20)), exp(seq(-4,-0.5,length.out=20)),
-#'                    exp(seq(-5.5,-1.5,length.out=20)), exp(seq(-7,-2,length.out=20)))
-#' sp_ma2 <- selectPenalty(ssy = ma2_sum(ma2$data), n = c(50, 150, 300, 500), lambda_all,
-#'                         theta = true_ma2, M = 100, sigma = 1.5, fnSim = ma2_sim,
-#'                         fnSum = ma2_sum, simArgs = ma2$sim_options)
-#' sp_ma2
-#' plot(sp_ma2)
+#' # Method 2: unbiased BSL
+#' resultMa2uBSL <- bsl(y = ma2$data, n = 500, M = 10, model = model, covRandWalk=ma2$cov,
+#'                      method = "uBSL", verbose = FALSE)
+#' show(resultMa2uBSL)
+#' summary(resultMa2uBSL)
+#' plot(resultMa2uBSL, thetaTrue = thetaExact)
 #'
-#' # Performing BSLasso with a fixed penalty (reduce the number of iterations M if desired)
-#' resultMa2BSLasso <- bsl(y = ma2$data, n = 300, M = 250000, theta0 = ma2$start, covRandWalk=ma2$cov,
-#'     fnSim = ma2_sim, fnSum = ma2_sum, shrinkage = 'glasso', penalty = 0.027, fnPrior = ma2_prior,
-#'     simArgs = ma2$sim_options, thetaNames = expression(theta[1], theta[2]), verbose = TRUE)
+#' # Method 3: BSLasso (BSL with glasso shrinkage estimation)
+#' # tune the penalty parameter fisrt
+#' ssy <- ma2_sum(ma2$data)
+#' lambdaAll <- list(exp(seq(-5.5,-1.5,length.out=20)))
+#' set.seed(100)
+#' penaltyGlasso <- selectPenalty(ssy = ssy, n = 300, lambdaAll, theta = thetaExact,
+#'                         M = 10, sigma = 1.5, model = model, method = "BSL", shrinkage = "glasso")
+#' penaltyGlasso
+#' plot(penaltyGlasso)
+#'
+#' resultMa2BSLasso <- bsl(y = ma2$data, n = 300, M = 10, model = model, covRandWalk=ma2$cov,
+#'                         method = "BSL", shrinkage = "glasso", penalty = 0.027, verbose = FALSE)
 #' show(resultMa2BSLasso)
 #' summary(resultMa2BSLasso)
-#' plot(resultMa2BSLasso, which = 1, thetaTrue = true_ma2, thin = 20)
+#' plot(resultMa2BSLasso, thetaTrue = thetaExact)
 #'
-#' # Performing semiBSL (reduce the number of iterations M if desired)
-#' resultMa2SemiBSL <- bsl(y = ma2$data, n = 500, M = 300000, theta0 = ma2$start, covRandWalk=ma2$cov,
-#'                         fnSim = ma2_sim, fnSum = ma2_sum, method = 'semiBSL', fnPrior = ma2_prior,
-#'                         simArgs = ma2$sim_options, thetaNames = expression(theta[1], theta[2]),
-#'                         verbose = TRUE)
+#' # Method 4: BSL with Warton's shrinkage and Whitening
+#' # estimate the Whtieing matrix and tune the penalty parameter first
+#' W <- estimateWhiteningMatrix(20000, model, method = "PCA", thetaPoint = ma2$start)
+#' gammaAll <- list(seq(0.3, 0.8, 0.02))
+#' set.seed(100)
+#' penaltyWarton <- selectPenalty(ssy = ssy, n = 300, gammaAll, theta = thetaExact,
+#'                         M = 10, sigma = 1.2, model = model, method = "BSL", shrinkage = "Warton",
+#'                         whitening = W)
+#' penaltyWarton
+#' plot(penaltyWarton, logscale = FALSE)
+#'
+#' resultMa2Whitening <- bsl(y = ma2$data, n = 300, M = 10, model = model, covRandWalk=ma2$cov,
+#'                         method = "BSL", shrinkage = "Warton", whitening = W,
+#'                         penalty = 0.52, verbose = FALSE)
+#' show(resultMa2Whitening)
+#' summary(resultMa2Whitening)
+#' plot(resultMa2Whitening, thetaTrue = thetaExact)
+#'
+#' # Method 5: semiBSL, the summary statistics function is different from previous methods
+#' model2 <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args,
+#'                   sumArgs = list(epsilon = 2), theta0 = ma2$start, fnLogPrior = ma2_prior)
+#' sim <- simulation(model, n = 1e4, theta = ma2$start, seed = 1) # run a short simulation
+#' plot(density(sim$ssx[, 1])) # the first marginal summary statistic is right-skewed
+#' resultMa2SemiBSL <- bsl(y = ma2$data, n = 500, M = 10, model = model2, covRandWalk=ma2$cov,
+#'                         method = "semiBSL", verbose = FALSE)
 #' show(resultMa2SemiBSL)
 #' summary(resultMa2SemiBSL)
-#' plot(resultMa2SemiBSL, which = 1, thetaTrue = true_ma2, thin = 20)
+#' plot(resultMa2SemiBSL, thetaTrue = thetaExact)
+#'
+#' # Method 6: BSL with consideration of model misspecification (mean adjustment)
+#' resultMa2Mean <- bsl(y = ma2$data, n = 500, M = 10, model = model, covRandWalk=ma2$cov,
+#'                         method = "BSLmisspec", misspecType = "mean", verbose = FALSE)
+#' show(resultMa2Mean)
+#' summary(resultMa2Mean)
+#' plot(resultMa2Mean, thetaTrue = thetaExact)
+#'
+#' # Method 7: BSL with consideration of model misspecification (variance inflation)
+#' resultMa2Variance <- bsl(y = ma2$data, n = 500, M = 10, model = model, covRandWalk=ma2$cov,
+#'                      method = "BSLmisspec", misspecType = "variance", verbose = FALSE)
+#' show(resultMa2Variance)
+#' summary(resultMa2Variance)
+#' plot(resultMa2Variance, thetaTrue = thetaExact)
 #'
 #' # Plotting the results together for comparison
 #' # plot using the R default plot function
 #' par(mar = c(5, 4, 1, 2), oma = c(0, 1, 2, 0))
-#' combinePlotsBSL(list(resultMa2BSL, resultMa2BSLasso, resultMa2SemiBSL), which = 1,
-#'     thetaTrue = true_ma2, thin = 20, label = c('bsl', 'bslasso', 'semiBSL'),
-#'     col = c('red', 'blue', 'green'), lty = 2:4, lwd = 1)
-#' mtext('Approximate Univariate Posteriors', outer = TRUE, cex = 1.5)
+#' combinePlotsBSL(list(resultMa2BSL, resultMa2uBSL, resultMa2BSLasso, resultMa2SemiBSL), which = 1,
+#'                 thetaTrue = thetaExact, thin = 1, label = c("bsl", "uBSL", "bslasso", "semiBSL"),
+#'                 col = c("black", "red", "blue", "green"), lty = 1:4, lwd = 1)
+#' mtext("Approximate Univariate Posteriors", outer = TRUE, cex = 1.5)
 #'
 #' # plot using the ggplot2 package
-#' combinePlotsBSL(list(resultMa2BSL, resultMa2BSLasso, resultMa2SemiBSL), which = 2,
-#'     thetaTrue = true_ma2, thin = 20, label = c('bsl   ', 'bslasso   ', 'semiBSL'),
-#'     options.color = list(values=c('red', 'blue', 'green')),
-#'     options.linetype = list(values = 2:4), options.size = list(values = rep(1, 3)),
+#' combinePlotsBSL(list(resultMa2BSL, resultMa2uBSL, resultMa2BSLasso, resultMa2SemiBSL), which = 2,
+#'     thetaTrue = thetaExact, thin = 1, label = c("bsl", "ubsl", "bslasso", "semiBSL"),
+#'     options.color = list(values=c("black", "red", "blue", "green")),
+#'     options.linetype = list(values = 1:4), options.size = list(values = rep(1, 4)),
 #'     options.theme = list(plot.margin = grid::unit(rep(0.03,4), "npc"),
-#'     axis.title = ggplot2::element_text(size=12), axis.text = ggplot2::element_text(size = 8),
-#'     legend.text = ggplot2::element_text(size = 12)))
+#'         axis.title = ggplot2::element_text(size=12), axis.text = ggplot2::element_text(size = 8),
+#'         legend.text = ggplot2::element_text(size = 12)))
+#' }
+#' \dontrun{
+#' # Load the data for this example and set up the model object
+#' data(ma2)
+#' model <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args,
+#'                   theta0 = ma2$start, fnLogPrior = ma2_prior)
+#' thetaExact <- c(0.6, 0.2)
+#'
+#' # reduce the number of iterations M if desired for all methods below
+#' # Method 1: standard BSL
+#' resultMa2BSL <- bsl(y = ma2$data, n = 500, M = 300000, model = model, covRandWalk = ma2$cov,
+#'                     method = "BSL", verbose = 1L)
+#' show(resultMa2BSL)
+#' summary(resultMa2BSL)
+#' plot(resultMa2BSL, thetaTrue = thetaExact, thin = 20)
+#'
+#' # Method 2: unbiased BSL
+#' resultMa2uBSL <- bsl(y = ma2$data, n = 500, M = 300000, model = model, covRandWalk=ma2$cov,
+#'                      method = "uBSL", verbose = 1L)
+#' show(resultMa2uBSL)
+#' summary(resultMa2uBSL)
+#' plot(resultMa2uBSL, thetaTrue = thetaExact, thin = 20)
+#'
+#' # Method 3: BSLasso (BSL with glasso shrinkage estimation)
+#' # tune the penalty parameter fisrt
+#' ssy <- ma2_sum(ma2$data)
+#' lambdaAll <- list(exp(seq(-5.5,-1.5,length.out=20)))
+#' set.seed(100)
+#' penaltyGlasso <- selectPenalty(ssy = ssy, n = 300, lambdaAll, theta = thetaExact,
+#'                         M = 100, sigma = 1.5, model = model, method = "BSL", shrinkage = "glasso")
+#' penaltyGlasso
+#' plot(penaltyGlasso)
+#'
+#' resultMa2BSLasso <- bsl(y = ma2$data, n = 300, M = 250000, model = model, covRandWalk=ma2$cov,
+#'                         method = "BSL", shrinkage = "glasso", penalty = 0.027, verbose = 1L)
+#' show(resultMa2BSLasso)
+#' summary(resultMa2BSLasso)
+#' plot(resultMa2BSLasso, thetaTrue = thetaExact, thin = 20)
+#'
+#' # Method 4: BSL with Warton's shrinkage and Whitening
+#' # estimate the Whtieing matrix and tune the penalty parameter first
+#' W <- estimateWhiteningMatrix(20000, model, method = "PCA", thetaPoint = ma2$start)
+#' gammaAll <- list(seq(0.3, 0.8, 0.02))
+#' set.seed(100)
+#' penaltyWarton <- selectPenalty(ssy = ssy, n = 300, gammaAll, theta = thetaExact,
+#'                         M = 100, sigma = 1.2, model = model, method = "BSL", shrinkage = "Warton",
+#'                         whitening = W)
+#' penaltyWarton
+#' plot(penaltyWarton, logscale = FALSE)
+#'
+#' resultMa2Whitening <- bsl(y = ma2$data, n = 300, M = 250000, model = model, covRandWalk=ma2$cov,
+#'                         method = "BSL", shrinkage = "Warton", whitening = W,
+#'                         penalty = 0.52, verbose = 1L)
+#' show(resultMa2Whitening)
+#' summary(resultMa2Whitening)
+#' plot(resultMa2Whitening, thetaTrue = thetaExact, thin = 20)
+#'
+#' # Method 5: semiBSL, the summary statistics function is different from previous methods
+#' model2 <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args,
+#'                   sumArgs = list(epsilon = 2), theta0 = ma2$start, fnLogPrior = ma2_prior)
+#' sim <- simulation(model, n = 1e4, theta = ma2$start, seed = 1) # run a short simulation
+#' plot(density(sim$ssx[, 1])) # the first marginal summary statistic is right-skewed
+#' resultMa2SemiBSL <- bsl(y = ma2$data, n = 500, M = 200000, model = model2, covRandWalk=ma2$cov,
+#'                         method = "semiBSL", verbose = 1L)
+#' show(resultMa2SemiBSL)
+#' summary(resultMa2SemiBSL)
+#' plot(resultMa2SemiBSL, thetaTrue = thetaExact, thin = 20)
+#'
+#' # Method 6: BSL with consideration of model misspecification (mean adjustment)
+#' resultMa2Mean <- bsl(y = ma2$data, n = 500, M = 200000, model = model, covRandWalk=ma2$cov,
+#'                         method = "BSLmisspec", misspecType = "mean", verbose = 1L)
+#' show(resultMa2Mean)
+#' summary(resultMa2Mean)
+#' plot(resultMa2Mean, thetaTrue = thetaExact, thin = 20)
+#'
+#' # Method 7: BSL with consideration of model misspecification (variance inflation)
+#' resultMa2Variance <- bsl(y = ma2$data, n = 500, M = 200000, model = model, covRandWalk=ma2$cov,
+#'                      method = "BSLmisspec", misspecType = "variance", verbose = 1L)
+#' show(resultMa2Variance)
+#' summary(resultMa2Variance)
+#' plot(resultMa2Variance, thetaTrue = thetaExact, thin = 20)
+#'
+#' # Plotting the results together for comparison
+#' # plot using the R default plot function
+#' par(mar = c(5, 4, 1, 2), oma = c(0, 1, 2, 0))
+#' combinePlotsBSL(list(resultMa2BSL, resultMa2uBSL, resultMa2BSLasso, resultMa2SemiBSL), which = 1,
+#'                 thetaTrue = thetaExact, thin = 20, label = c("bsl", "uBSL", "bslasso", "semiBSL"),
+#'                 col = c("black", "red", "blue", "green"), lty = 1:4, lwd = 1)
+#' mtext("Approximate Univariate Posteriors", outer = TRUE, cex = 1.5)
+#'
+#' # plot using the ggplot2 package
+#' combinePlotsBSL(list(resultMa2BSL, resultMa2uBSL, resultMa2BSLasso, resultMa2SemiBSL), which = 2,
+#'     thetaTrue = thetaExact, thin = 20, label = c("bsl", "ubsl", "bslasso", "semiBSL"),
+#'     options.color = list(values=c("black", "red", "blue", "green")),
+#'     options.linetype = list(values = 1:4), options.size = list(values = rep(1, 4)),
+#'     options.theme = list(plot.margin = grid::unit(rep(0.03,4), "npc"),
+#'         axis.title = ggplot2::element_text(size=12), axis.text = ggplot2::element_text(size = 8),
+#'         legend.text = ggplot2::element_text(size = 12)))
 #' }
 #'
 #' @references
-#' An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic
-#' likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
-#' \url{https://doi.org/10.1080/10618600.2018.1537928}
+#'
+#' \insertAllCited{}
 #'
 #' @author Ziwen An, Leah F. South and Christopher C. Drovandi
 #'
@@ -104,9 +267,7 @@
 #' @usage data(ma2)
 NULL
 
-
-#' The function \code{ma2_sim(theta,T)} simulates an MA(2) time series.
-#' @rdname ma2
+#' @describeIn ma2 Simulates an MA(2) time series.
 #' @export
 ma2_sim <- function(theta, T) {
     rand <- rnorm(T + 2)
@@ -114,16 +275,33 @@ ma2_sim <- function(theta, T) {
     return(y)
 }
 
-#' The function \code{ma2_sum(x)} returns the summary statistics for a given data set. Since the summary statistics are the data, this function simply returns the data.
-#' @rdname ma2
+#' @describeIn ma2 Simulates n MA(2) time series with a vectorised simulation
+#'   function.
 #' @export
-ma2_sum <- function(x) {
-    return(x)
+ma2_sim_vec <- function(n, theta, T) {
+    rand <- matrix(rnorm(n * (T + 2)), n, T + 2)
+    y <- rand[, 3 : (T + 2)] + theta[1] * rand[, 2 : (T + 1)]
+    + theta[2] * rand[, 1 : T]
+    return(y)
 }
 
-#' \code{ma2_prior(theta)} evaluates the (unnormalised) prior, which is uniform subject to several restrictions related to invertibility of the time series.
-#' @rdname ma2
+#' @describeIn ma2 Returns the summary statistics for a given data set. The
+#'   skewness and kurtosis of the summary statistics can be controlled via the
+#'   \ifelse{html}{\out{&#949}}{\eqn{\epsilon}} and
+#'   \ifelse{html}{\out{&#950}}{\eqn{\delta}} parameters. This is the
+#'   sinh-arcsinnh transformation of \insertCite{Jones2009;textual}{BSL}. By default,
+#'   the sumamry statistics function simply returns the raw data. Otherwise, the
+#'   transformation is introduced to motivate the ``semiBSL'' method.
+#' @export
+ma2_sum <- function(x, epsilon = 0, delta = 1) {
+    ssx = sinh((asinh(x) + epsilon) / delta)
+    return(ssx)
+}
+
+#' @describeIn ma2 Evaluates the (unnormalised) log prior, which is uniform
+#'   subject to several restrictions related to invertibility of the time
+#'   series.
 #' @export
 ma2_prior <- function(theta) {
-    theta[2] < 1 & sum(theta) > -1 & diff(theta) > -1
+    log(theta[2] < 1 & sum(theta) > -1 & diff(theta) > -1)
 }

@@ -1,8 +1,8 @@
 #' S3 reference class of the result from tuning to select the optimal penalty for BSLasso
 #'
-#' @description Two functions (print and plot) are provided for class "penbsl".
+#' @description Two functions (print and plot) are provided for class ``penbsl".
 #'
-#' @param x         A "penbsl" class object, typically the output of function \code{\link{selectPenalty}}.
+#' @param x         A ``penbsl" class object, typically the output of function \code{\link{selectPenalty}}.
 #' @param logscale  A logical indicator whether the x-axis (penalty) should be log transformed. The
 #' default is \code{TRUE}.
 #' @param digits    The number of digits to print.
@@ -15,7 +15,7 @@
 #' @aliases penbsl
 NULL
 
-#' print a "penbsl" class result
+#' Print the selecting penalty result of class ``penbsl".
 #' @rdname penbsl
 #' @method print penbsl
 #' @export
@@ -33,7 +33,7 @@ print.penbsl <- function(x, digits = max(3L, getOption("digits") - 4L), ...) {
     return(invisible(r1))
 }
 
-#' The function \code{plot.penbsl} can be used to plot the results from tuning to select the optimal penalty for BSLasso.
+#' Plot the selecting penalty result of class ``penbsl".
 #' @rdname penbsl
 #' @method plot penbsl
 #' @export

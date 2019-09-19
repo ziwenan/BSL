@@ -1,160 +1,161 @@
 #' Selecting BSLasso Penalty
 #'
-#' @description This is the main function for selecting the penalty for BSLasso based on a point estimate of the parameters.
-#' Parallel computing is supported with the R package \code{foreach}.
+#' @description This is the main function for selecting the shrinkage (graphical
+#'   lasso or Warton's estimation) penalty parameter for method BSL or semiBSL
+#'   based on a point estimate of the parameters. Parallel computing is
+#'   supported with the R package \code{foreach}. The penalty selection method
+#'   is outlined in \insertCite{An2019;textual}{BSL}.
 #'
-#' @param ssy                   A summary statistic vector for the observed data.
-#' @param n                     A vector of possible values of \code{n}, the number of simulations from the model per MCMC iteration for estimating the synthetic likelihood.
-#' @param lambda_all            A list, with each entry containing the vector of penalty values to test for the corresponding choice of \code{n}.
-#' @param theta                 A point estimate of the parameter value which all of the simulations will be based on.
-#' @param M                     The number of repeats to use in estimating the standard deviation of the estimated log synthetic likelihood.
-#' @param sigma                 The standard deviation of the log synthetic likelihood estimator to aim for.
-#' @param parallelSim           A logical value indicating whether parallel computing should be used for simulation and summary statistic evaluation. Default is \code{FALSE}.
-#' @param parallelSimArgs       A string vector of package names to pass into the \code{foreach} function as argument '.package'. Only used when \code{parallel_sim} is \code{TRUE}, default is \code{NULL}.
-#' @param parallelMain          A logical value indicating whether parallel computing should be used to computing the graphical lasso function. Default is \code{FALSE}.
-#' @param verbose               A logical argument indicating whether the iteration numbers (\code{1:M}) should be printed to track progress. The default is \code{FALSE}.
+#' @param ssy                   A summary statistic vector for the observed
+#'   data.
+#' @param n                     A vector of possible values of \code{n}, the
+#'   number of simulations from the model per MCMC iteration for estimating the
+#'   synthetic likelihood.
+#' @param lambda            A list, with each entry containing the vector of
+#'   penalty values to test for the corresponding choice of \code{n}.
+#' @param theta                 A point estimate of the parameter value which
+#'   all of the simulations will be based on. By default, if \code{theta} is \code{NULL},
+#'   it will be replaced by \code{theta0} from the given \code{model}.
+#' @param M                     The number of repeats to use in estimating the
+#'   standard deviation of the estimated log synthetic likelihood.
+#' @param sigma                 The standard deviation of the log synthetic
+#'   likelihood estimator to aim for, usually a value between 1 and 2. This
+#'   reflects the mixing of a Markov chain.
+#' @param method                A string argument indicating the method to be
+#'   used. The default, ``BSL'', runs BSL. ``semiBSL'' runs the semi-parametric
+#'   BSL algorithm and is more robust to non-normal summary statistics.
+#' @param shrinkage     A string argument indicating which shrinkage method to
+#'   be used. Current options are ``glasso'' for the graphical lasso method of
+#'   \insertCite{Friedman2008;textual}{BSL} and ``Warton'' for the ridge
+#'   regularisation method of \insertCite{Warton2008;textual}{BSL}.
+#' @param parallelSim           A logical value indicating whether parallel
+#'   computing should be used for simulation and summary statistic evaluation.
+#'   Default is \code{FALSE}.
+#' @param parallelSimArgs       A list of additional arguments to pass into the
+#'   \code{foreach} function. Only used when parallelSim is \code{TRUE}, default
+#'   is \code{NULL}.
+#' @param parallelMain          A logical value indicating whether parallel
+#'   computing should be used to computing the graphical lasso function. Default
+#'   is \code{FALSE}.
+#' @param ... Other arguments to pass to \code{\link{gaussianSynLike}} (``BSL''
+#'   method) or \code{\link{semiparaKernelEstimate}} (``semiBSL'' method).
 #' @inheritParams bsl
 #'
-#' @return 				An object of class \code{penbsl} is returned, containing the following components:
-#' \itemize{
-#' \item \code{resultsDF}: A data frame containing the following:
-#'    \itemize{
-#'    \item \code{n}: The choices of \code{n} that were specified.
-#'    \item \code{penalty}: The choices of the penalty that were specified.
-#'    \item \code{sigma}: The standard deviation of the log synthetic likelihood estimator under the above choices.
-#'    \item \code{sigmaOpt}: An indicator of whether it was the closest \code{sigma} to the desired one for each choice of \code{n}.
-#'    }
-#' \item \code{call}: The original code that was used to call the method.
-#' }
-#' The functions print() and plot() are both available for types of class \code{penbsl}.
+#' @return 				An S4 object \code{PENALTY} of the penalty selection results. The
+#'   \code{show} and \code{plot} methods are provided with the S4 class.
+#'
+#' @examples
+#' data(ma2)
+#' model <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args, 
+#'                   theta0 = ma2$start, fnLogPrior = ma2_prior)
+#' theta <- c(0.6,0.2)
+#' 
+#' # Performing tuning for BSLasso (BSL with glasso shrinkage estimation)
+#' ssy <- ma2_sum(ma2$data)
+#' lambda_all <- list(exp(seq(-3,0.5,length.out=20)), exp(seq(-4,-0.5,length.out=20)),
+#'                    exp(seq(-5.5,-1.5,length.out=20)), exp(seq(-7,-2,length.out=20)))
+#' set.seed(100)
+#' sp_ma2 <- selectPenalty(ssy = ssy, n = c(50, 150, 300, 500), lambda_all, theta = theta,
+#'     M = 100, sigma = 1.5, model = model, method = 'BSL', shrinkage = 'glasso')
+#' sp_ma2
+#' plot(sp_ma2)
 #'
 #' @references
-#' An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic
-#' likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
-#' \url{https://doi.org/10.1080/10618600.2018.1537928}
 #'
-#' @author 								Ziwen An, Leah F. South and Christopher C. Drovandi
-#' @seealso 							\code{\link{bsl}} for a function to run BSLasso after selecting the tuning parameter
-#' and \code{\link{penbsl}} for functions related to visualisation.
+#' \insertAllCited{}
+#'
+#' @author    Ziwen An, Leah F. South and Christopher C. Drovandi
+#' @seealso   \code{PENALTY} for the usage of the S4 class. \code{\link{ma2}},
+#'   \code{\link{cell}} and \code{\link{mgnk}} for examples. \code{\link{bsl}}
+#'   for the main function to run BSL.
 #' @export
-selectPenalty <- function(ssy, n, lambda_all, theta, M, sigma, fnSim, fnSum, simArgs = NULL,
-                          sumArgs = NULL, standardise = FALSE, parallelSim = FALSE, parallelSimArgs = NULL,
-						  parallelMain = FALSE, verbose = TRUE) {
+selectPenalty <- function(ssy, n, lambda, M, sigma = 1.5, model, theta = NULL,
+    method = c("BSL", "semiBSL"), shrinkage = c("glasso", "Warton"),
+	parallelSim = FALSE, parallelSimArgs = NULL, parallelMain = FALSE, verbose = 1L, ...) {
+	method <- match.arg(method)
+	shrinkage <- match.arg(shrinkage)
+	if (!verbose %in% c(0, 1, 2)) {
+	    stop("verbose must be 0 or 1 or 2")
+	}
+	if (!parallelSim & !is.null(parallelSimArgs)) {
+        warning("\"parallelSimArgs\" is omitted in serial computing")
+    }
+	stopifnot(inherits(model, "MODEL"))
+
+    if (is.null(theta)) {
+	    theta <- model@theta0
+	}
     n <- as.vector(n)
-    lambda_all <- as.list(lambda_all)
+    if (!is.list(lambda)) {
+	    lambda <- list(lambda)
+	}
     N <- length(n)
-    if (length(lambda_all) != N) {
-        stop('lambda_all must be a list with the same length as n')
+    if (length(lambda) != N) {
+        stop("lambda must be a list with the same length as n")
     }
     ns <- length(ssy)
-    cl <- match.call()
+    call <- match.call()
 
-    n_max <- max(n)
-    K <- max(sapply(lambda_all, length))
-    logSL <- array(NA, c(M, N, K))
+	if (verbose) {
+	    cat('*** selecting penalty with', method, 'likelihood and', shrinkage, 'shrinkage estimator ***\n')
+	}
+    nMax <- max(n)
+    loglike <- vector("list", N)
+	for (i in 1 : N) loglike[[i]] <- array(NA, c(M, length(lambda[[i]])))
 
-	# match the simulation function
-    if (is.null(simArgs)) {
-        myFnSim <- function(theta) {
-            do.call(fnSim, list(theta))
-        }
-    } else {
-        myFnSim <- function(theta) {
-            do.call(fnSim, c(list(theta), simArgs))
-        }
-    }
+	# map the simulation function
+	if (parallelSim) {
+	    myFnSimSum <- function(n, theta) fn(model)$fnPar(n, theta, parallelSimArgs)
+	} else {
+	    myFnSimSum <- fn(model)$fn
+	}
 
-    # match the summary statistics function
-    if (is.null(sumArgs)) {
-        myFnSum <- function(x) {
-            do.call(fnSum, list(x))
-        }
-    } else {
-        myFnSum <- function(x) {
-            do.call(fnSum, c(list(x), sumArgs))
-        }
-    }
-
+    if (verbose == 1L) timeStart <- Sys.time()
     for (m in 1 : M) {
 
         flush.console()
-        if (verbose) cat('m = ', m, '\n')
+        if (verbose == 2L)  {
+		    cat('m =', m, '\n')
+		} else if (verbose == 1L){
+		    timeElapsed <- difftime(Sys.time(), timeStart, units = 'secs')
+            timeLeft <- timeElapsed / m * (M - m)
+            elapsed <- myTimeStr(timeElapsed)
+            left <- myTimeStr(timeLeft)
+		    myMiniProgressBar(m / M, txt1 = paste('m =', m),
+                              txt2 = paste0('elapsed = ', elapsed, ', remaining = ', left),
+                              style = 2, label = c('=', '.', '|'))
+            flush.console()
+		}
 
         # simulate with theta_prop and calculate summaries
-        if (!parallelSim) {
-            ssx <- array(0, c(n_max, ns))
-            for (j in 1 : n_max) {
-			    x <- myFnSim(theta)
-                ssx[j, ] <- myFnSum(x)
-            }
-        } else { # use foreach for parallel computing
-		    ssx <- do.call(foreach, c(list(j = 1 : n_max, .combine = rbind), parallelSimArgs)) %dopar% {
-                x <- myFnSim(theta)
-                myFnSum(x)
-            }
-        }
+		ssx <- myFnSimSum(nMax, theta)
 
         for (i in 1 : N) {
-            n_curr <- n[i]
-            ssx_curr <- ssx[sample(n_max, n_curr), ]
-            mu <- colMeans(ssx_curr)
-            S <- cov(ssx_curr)
-            if (standardise) {
-                std <- apply(ssx_curr, MARGIN = 2, FUN = sd)
-                ssx_curr_std <- (ssx_curr - matrix(mu, n_curr, ns, byrow = TRUE)) / matrix(std, n_curr, ns, byrow = TRUE)
-				cov_ssx_curr_std <- cov(ssx_curr_std)
-            }
+            nCurr <- n[i]
+			nLambda <- length(lambda[[i]])
+            ssxCurr <- ssx[sample(nMax, nCurr), ]
 
             if (!parallelMain) {
-                for (k in 1 : K) {
-				    if (is.na(lambda_all[[i]][k])) {
-				        next
-				    }
-                    if (standardise) {
-                        gl <- glasso(cov_ssx_curr_std, rho = lambda_all[[i]][k])
-                        corr <- gl$w
-                        Sigma <- std %*% t(std) * corr
-                        Omega <- solve(Sigma)
-                    } else {
-                        gl <- glasso(S, rho = lambda_all[[i]][k])
-                        Sigma <- gl$w
-                        Omega <- gl$wi
-                    }
-                    logSL[m, i, k] <- as.numeric(-0.5 * log(det(Sigma)) - 0.5 * t(ssy-mu) %*% Omega %*% (ssy-mu))
+                for (k in 1 : nLambda) {
+				    lambdaCurr = lambda[[i]][k]
+					loglike[[i]][m, k] <- switch(method,
+					    "BSL" = gaussianSynLike(ssy, ssxCurr, shrinkage = shrinkage, penalty = lambdaCurr, log = TRUE, ...),
+						"semiBSL" = semiparaKernelEstimate(ssy, ssxCurr, shrinkage = shrinkage, penalty = lambdaCurr, log = TRUE, ...))
                 }
             } else {
-                logSL[m, i, ] <- foreach (k = 1 : K, .combine = rbind, .packages = c('glasso', 'cvTools'), .export='glasso_cv') %dopar% {
-				    if (is.na(lambda_all[[i]][k])) {
-				        return(NA)
-				    }
-                    if (standardise) {
-                        gl <- glasso(cov_ssx_curr_std, rho = lambda_all[[i]][k])
-                        corr <- gl$w
-                        Sigma <- std %*% t(std) * corr
-                        Omega <- solve(Sigma)
-                    } else {
-                        gl <- glasso(S, rho = lambda_all[[i]][k])
-                        Sigma <- gl$w
-                        Omega <- gl$wi
-                    }
-                    as.numeric(-0.5 * log(det(Sigma)) - 0.5 * t(ssy-mu) %*% Omega %*% (ssy-mu))
-                }
+			    loglike[[i]][m, ] <- foreach(k = 1 : nLambda, .combine = c, .packages = "glasso",
+				    .export = c("gaussianSynLike", "semiparaKernelEstimate")) %dopar% {
+				    lambdaCurr = lambda[[i]][k]
+					switch(method,
+					    "BSL" = gaussianSynLike(ssy, ssxCurr, shrinkage = shrinkage, penalty = lambdaCurr, log = TRUE, ...),
+						"semiBSL" = semiparaKernelEstimate(ssy, ssxCurr, shrinkage = shrinkage, penalty = lambdaCurr, log = TRUE, ...))
+				}
             }
-
         }
     }
+	if (verbose == 1L) cat('\n')
+	
+	ret <- PENALTY(loglike = loglike, n = n, lambda = lambda, sigma = sigma, model = model, call = call)
 
-    resultsDF <- array(list(), N)
-    for (i in 1 : N) {
-        temp <- apply(logSL[, i, ], MARGIN = 2, FUN = sd)
-        resultsDF[[i]] <- data.frame(n = n[i], penalty = lambda_all[[i]],
-                              sigma = temp[!is.na(temp)], sigmaOpt = FALSE)
-        resultsDF[[i]]$sigmaOpt[which.min(abs(resultsDF[[i]]$sigma - sigma))] <- TRUE
-    }
-    resultsDF <- do.call(rbind, resultsDF)
-
-    results <- list(resultsDF = resultsDF, call = cl)
-    class(results) <- 'penbsl'
-
-    return(results)
+    return(ret)
 }

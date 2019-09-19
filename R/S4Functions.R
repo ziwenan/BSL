@@ -1,20 +1,3 @@
-initialize.bsl <- function(.Object, theta = numeric(0), M = numeric(0), time = numeric(0), ...) {
-    .Object <- callNextMethod()
-    if (length(theta) == 0) {
-        .Object@theta <- matrix(0, 10, 1)
-    }
-    if (length(M) == 0) {
-        .Object@M <- 10
-    }
-    if (length(time) == 0) {
-        .Object@time <- as.difftime(0, units = 'secs')
-    }
-    validObject(.Object)
-    return (.Object)
-}
-
-
-
 check.bsl <- function(object) {
     if (any(length(object@theta) == 0, length(object@M) == 0)) { # slots that must include in bsl class
         warnings('empty slot "theta" or "M" in the "bsl" object')
@@ -33,11 +16,13 @@ check.bsl <- function(object) {
             error <- c(errors, msg)
         }
 
-        temp <- length(object@theta0)
-        if (temp != 0 && temp != p) {
-            msg <- paste('The length of theta0', temp, 'does not match the number of parameters', p)
+        temp <- class(object@model)
+        if (temp != 'BSLMODEL') {
+            msg <- paste('model must be a BSLMODEL class object')
             error <- c(errors, msg)
-        }
+        } else {
+		    invisible(capture.output(validObject(object@model)))
+		}
 
         if (nrow(object@covRandWalk) != p || ncol(object@covRandWalk) != p) {
             msg <- paste('covRandWalk must be a', p, 'by', p, 'square matrix')
@@ -51,12 +36,6 @@ check.bsl <- function(object) {
             }
         }
 
-        temp <- length(object@thetaNames)
-        if (temp != 0 && temp != p) {
-            msg <- paste('The length of thetaNames', temp, 'does not match the number of parameters', p)
-            error <- c(errors, msg)
-        }
-
         if (length(errors) == 0) {
             return (TRUE)
         } else {
@@ -67,9 +46,9 @@ check.bsl <- function(object) {
 
 
 
-#' Show method for class "bsl". Display the basic information of a bsl object.
+#' Show method for class ``bsl''. Display the basic information of a bsl object.
 #' @description Display the basic information of a bsl object.
-#' @param object   A "bsl" class object to be displayed.
+#' @param object   A ``bsl'' class object.
 show.bsl <- function(object) {
     digits = max(3L, getOption("digits") - 3L)
     cat("\nCall:\n", paste(deparse(object@call), sep = "\n", collapse = "\n"),
@@ -77,7 +56,7 @@ show.bsl <- function(object) {
     if (nrow(object@theta)) {
         cat("Summary of theta:\n")
         summ <- summary(object@theta)
-        attr(summ, 'dimnames') = list(NULL, object@thetaNames)
+        attr(summ, 'dimnames') = list(NULL, object@model@thetaNames)
         print.default(format(summ, digits = digits), print.gap = 2L,
                       quote = FALSE)
     }
@@ -105,19 +84,19 @@ show.bsl <- function(object) {
 }
 
 
-#' Summary method for class "bsl"
+#' Summary method for class ``bsl''
 #' @description Summarise a bsl class object.
-#' @param object     A "bsl" class object to be summarised.
+#' @param object     A ``bsl'' class object to be summarised.
 #' @param thetaNames Parameter names to be shown in the summary table. Parameter names of the bsl object will be used by default.
-#' @return A vector of the number of simulations per iteration, acceptance rate of the Markov chain annd scaled effective sample size for each parameter.
+#' @return A vector of the number of simulations per iteration, acceptance rate of the Markov chain and effective sample size for each parameter.
 summary.bsl <- function(object, thetaNames = NULL) {
     theta <- object@theta
     n <- object@n
     M <- nrow(theta)
     p <- ncol(theta)
     if (is.null(thetaNames)) {
-        if (!is.null(object@thetaNames)) {
-            thetaNames <- object@thetaNames
+        if (!is.null(object@model@thetaNames)) {
+            thetaNames <- object@model@thetaNames
         } else {
             thetaNames <- vector('expression',p)
             for (i in 1:p) {
@@ -125,7 +104,7 @@ summary.bsl <- function(object, thetaNames = NULL) {
             }
         }
     }
-    if (length(thetaNames) != p) {
+    if (length(object@model@thetaNames) != p) {
         warning('length of "thetaNames" does not match number of parameters\n')
     }
     if (!is.null(object@acceptanceRate)) {
@@ -137,15 +116,15 @@ summary.bsl <- function(object, thetaNames = NULL) {
     ess <- round(effectiveSize(theta), 0)
 	# ess <- round(effectiveSize(theta) / n / M * 1000000, 0)
     summ <- c(n, accRate*100, ess)
-    names(summ) <- c('n', 'acc. rate (\\%)', paste('EES', thetaNames))
+    names(summ) <- c('n', 'acc. rate (\\%)', paste('ESS', thetaNames))
     return(summ)
 }
 
 
 
-#' Plot method for class "bsl"
+#' Plot method for class ``bsl''
 #' @description Plot the univariate marginal posterior plot of a bsl class object.
-#' @param x           A "bsl" class object to plot.
+#' @param x           A ``bsl'' class object to plot.
 #' @param which       An integer argument indicating which plot function to be used. The default, \code{1L}, uses
 #' the plain \code{plot} to visualise the result. \code{2L} uses ggplot2 to generate an aesthetically nicer figure.
 #' @param thin        A numeric argument indicating the gap between samples to be taken when thinning the MCMC
@@ -175,7 +154,7 @@ summary.bsl <- function(object, thetaNames = NULL) {
 #' # plot using the ggplot2 package
 #' plot(result, which = 2, thin = 10, thetaTrue = c(0.6, 0.2),
 #'      options.density = list(colour = 'darkblue', fill = 'grey80', size = 1),
-#'      options.theme = list(plot.margin = grid::unit(rep(0.05,4), "npc"),
+#'      options.theme = list(plot.margin = grid::unit(rep(0.05,4), 'npc'),
 #'                           axis.text = ggplot2::element_text(size = 10)))
 #' }
 #'
@@ -211,7 +190,7 @@ marginalPostDefault <- function(x, thin = 1, thetaTrue = NULL, options.plot = NU
     if (!is.null(thetaTrue) & length(thetaTrue) != p) {
         stop('Length of thetaTrue does not match the number of parameters.')
     }
-    thetaNames <- x@thetaNames
+    thetaNames <- x@model@thetaNames
     par(mfrow = c(a, b))
     for(k in 1:p) {
         idx <- seq(1, n, thin)
@@ -240,7 +219,7 @@ marginalPostGgplot <- function(x, thin = 1, thetaTrue = NULL, top = 'Approximate
         stop('Length of thetaTrue does not match the number of parameters.')
     }
     samples <- data.frame(x@theta[seq(1, n, by = thin), ])
-    thetaNames <- x@thetaNames
+    thetaNames <- x@model@thetaNames
     plist <- list()
     for (i in 1 : p) {
         plist[[i]] <- ggplot(samples, aes_string(x = colnames(samples)[i])) +

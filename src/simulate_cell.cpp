@@ -117,6 +117,15 @@ int simulate(int *x, int *rows, int *cols, double Pm, double Pp, int N, int nrow
     return(K);
 }
 
+//' Simulation function of the cell biology example
+//'
+//' @param x The initial matrix of cell presences of size \code{rows} \ifelse{html}{\out{&times}}{\eqn{\times}} \code{cols}.
+//' @param Pm Parameter \ifelse{html}{\out{<i>P<sub>m</sub></i>}}{\eqn{P_m}}, the probability of cell movement.
+//' @param Pp Parameter \ifelse{html}{\out{<i>P<sub>p</sub></i>}}{\eqn{P_p}}, the probability of cell proliferation.
+//' @inheritParams cell
+//' @return  A \code{rows} \ifelse{html}{\out{&times}}{\eqn{\times}} \code{cols} \ifelse{html}{\out{&times}}{\eqn{\times}} \code{num_obs} array
+//'   of the cell presences at times \code{1:num_obs} (not time 0).
+//' @export
 // [[Rcpp::export]]
 arma::ucube simulate_cell(LogicalMatrix x, IntegerVector rows, IntegerVector cols, double Pm, double Pp, int sim_iters, int num_obs) {
     int *xc, *colsc, *rowsc; 
