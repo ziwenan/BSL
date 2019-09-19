@@ -1,5 +1,1 @@
-- Add a parameter that allows burn-in steps in MCMC.
-- Add a function "as.bsl" to coerce a list or data frame into "bsl" object.
 - Speed up the Gaussian rank correlation function.
-- Include more BSL methods, such as Frazier and Drovandi 2019, and variational Bayes synthetic likelihood.
-- Add more examples.
