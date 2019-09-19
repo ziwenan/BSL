@@ -1,11 +1,11 @@
-#' Plot the densities of multiple "bsl" class objects.
+#' Plot the densities of multiple ``bsl'' class objects.
 #' @description The function \code{combinePlotsBSL} can be used to plot multiple BSL densities together, optionally
 #' with the true values for the parameters.
-#' @param objectList     A list of "bsl" class objects.
+#' @param objectList     A list of ``bsl'' class objects.
 #' @param label          A string vector indicating the labels to be shown in the plot legend. The default is
 #' \code{NULL}, which uses the names from \code{objectList}.
-#' @param legendPosition One of the three string arguments, "auto", "right" or "bottom", indicating the legend
-#' position. The default is "auto", which automatically choose from "right" and "bottom". Only used when
+#' @param legendPosition One of the three string arguments, ``auto'', ``right'' or ``bottom'', indicating the legend
+#' position. The default is ``auto'', which automatically choose from ``right'' and ``bottom''. Only used when
 #' \code{which} is \code{1L}.
 #' @param legendNcol     A integer argument indicating the number of columns of the legend. The default,
 #' \code{NULL}, put all legends in the same row or column depending on \code{legendPosition}. Only used when
@@ -29,9 +29,27 @@
 #' Only used when \code{which} is \code{2L}.
 #' @param options.size A list of additional arguments to pass into function \code{ggplot2::scale_size_manual}.
 #' Only used when \code{which} is \code{2L}.
-#' @inheritParams plot
+#' @inheritParams BSL-class
 #'
-#' @seealso \code{\link{ma2}} for an example
+#' @examples
+#' \donttest{
+#' # (need fix)
+#' toy_sim <- function(n, theta) matrix(rnorm(n, theta), nrow = n)
+#' toy_sum <- ma2_sum
+#' 
+#' model <- newModel(fnSimVec = toy_sim, fnSum = toy_sum, sumArgs = list(epsilon = 2), theta0 = 0)
+#' 
+#' result1 <- bsl(y = 1, n = 100, M = 5e3, model = model, covRandWalk = matrix(1), 
+#'                method = "BSL", plotOnTheFly = TRUE)
+#' result2 <- bsl(y = 1, n = 100, M = 5e3, model = model, covRandWalk = matrix(1), 
+#'                method = "uBSL", plotOnTheFly = TRUE)
+#' result3 <- bsl(y = 1, n = 100, M = 5e3, model = model, covRandWalk = matrix(1), 
+#'                method = "semiBSL", plotOnTheFly = TRUE)
+#' combinePlotsBSL(list(result1, result2))
+#' }
+#'
+#' @seealso \code{\link{ma2}}, \code{\link{cell}}, \code{\link{mgnk}} and \code{\link{toad}} for
+#'   examples.
 #' @export
 combinePlotsBSL <- function(objectList, which = 1L, thin = 1, thetaTrue = NULL, label = NULL, legendPosition = c('auto','right','bottom')[1],
                           legendNcol = NULL, col = NULL, lty = NULL, lwd = NULL, cex.lab = 1, cex.axis = 1, cex.legend = 0.75,
@@ -78,7 +96,7 @@ multiPlotDefault <- function(objectList, thin = 1, thetaTrue = NULL, label = NUL
         }
     }
 
-    thetaNames <- objectList[[1]]@thetaNames
+    thetaNames <- objectList[[1]]@model@thetaNames
     if (length(thin) == 1L) {
         thin <- rep(thin, nList)
     }
@@ -171,7 +189,7 @@ multiPlotGgplot <- function(objectList, thin = 1, thetaTrue = NULL, label = NULL
     if (!is.null(thetaTrue) & length(thetaTrue) != p) {
         stop('Length of thetaTrue does not match the number of parameters.')
     }
-    thetaNames <- objectList[[1]]@thetaNames
+    thetaNames <- objectList[[1]]@model@thetaNames
     if (is.null(label)) {
 	    if (is.null(names(objectList))) {
 		    label <- names(objectList) <- paste0('result', 1 : nList)

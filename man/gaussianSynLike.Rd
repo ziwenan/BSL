@@ -2,77 +2,102 @@
 % Please edit documentation in R/gaussianSynLike.R
 \name{gaussianSynLike}
 \alias{gaussianSynLike}
-\title{Estimating the Gaussian synthetic likelihood}
+\title{Estimate the Gaussian synthetic likelihood}
 \usage{
 gaussianSynLike(ssy, ssx, shrinkage = NULL, penalty = NULL,
-  standardise = FALSE, log = TRUE, verbose = FALSE)
+  standardise = FALSE, GRC = FALSE, whitening = NULL,
+  ssyTilde = NULL, log = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{ssy}{The observed summary statisic.}
 
-\item{ssx}{A matrix of the simulated summary statistics. The number of rows is the same
-as the number of simulations per iteration.}
+\item{ssx}{A matrix of the simulated summary statistics. The number
+of rows is the same as the number of simulations per iteration.}
 
-\item{shrinkage}{A string argument indicating which shrinkage method to be used. The default is \code{NULL},
-which means no shrinkage is used. Current options are 'glasso' for graphical lasso and 'Warton' for the
-ridge regularisation method of Warton (2008).}
+\item{shrinkage}{A string argument indicating which shrinkage method to
+be used. The default is \code{NULL}, which means no shrinkage is used.
+Shrinkage estimation is only available for methods ``BSL'' and ``semiBSL''.
+Current options are ``glasso'' for the graphical lasso method of
+\insertCite{Friedman2008;textual}{BSL} and ``Warton'' for the ridge
+regularisation method of \insertCite{Warton2008;textual}{BSL}.}
 
-\item{penalty}{The penalty value to be used for the specified shrinkage method. Must be between zero and one
-if the shrinkage method is 'Warton'.}
+\item{penalty}{The penalty value to be used for the specified shrinkage
+method. Must be between zero and one if the shrinkage method is ``Warton''.}
 
-\item{standardise}{A logical argument that determines whether to standardise the summary statistics before applying
-the graphical lasso. This is only valid if shrinkage is 'glasso' and penalty is not \code{NULL}. The diagonal
-elements will not be penalised if the shrinkage method is 'glasso'. The default is \code{FALSE}.}
+\item{standardise}{A logical argument that determines whether to standardise
+the summary statistics before applying the graphical lasso. This is only
+valid if method is ``BSL'', shrinkage is ``glasso'' and penalty is not
+\code{NULL}. The diagonal elements will not be penalised if the shrinkage
+method is ``glasso''. The default is \code{FALSE}.}
 
-\item{log}{A logical argument indicating if the log of likelihood is given as the result.
-The default is \code{TRUE}.}
+\item{GRC}{A logical argument indicating whether the Gaussian rank
+correlation matrix \insertCite{Boudt2012}{BSL} should be used to estimate
+the covariance matrix in ``BSL'' method. The default is \code{FALSE}, which
+uses the sample covariance by default.}
 
-\item{verbose}{A logical argument indicating whether an error message should be printed if
-the function fails to compute a likelihood. The default is \code{FALSE}.}
+\item{whitening}{An argument determines whether Whitening transformation
+should be used in ``BSL'' method with Warton's shrinkage. Whitening
+transformation helps decorrelate the summary statistics, thus encourages
+sparsity of the synthetic likelihood covariance matrix. This might allow
+heavier shrinkage to be applied without losing much accuracy, hence
+allowing the number of simulations to be reduced. By default, \code{NULL}
+disable the Whitening transformation. Otherwise this is enabled if a
+Whitening matrix is provided. See \code{\link{estimateWhiteningMatrix}} for
+the function to estimate the Whitening matrix.}
+
+\item{ssyTilde}{The whitened observed summary statisic. If this is not
+\code{NULL}, it will be used to save computation effort. Only used if
+Whitening is enabled.}
+
+\item{log}{A logical argument indicating if the log of likelihood is
+given as the result. The default is \code{TRUE}.}
+
+\item{verbose}{A logical argument indicating whether an error message
+should be printed if the function fails to compute a likelihood. The
+default is \code{FALSE}.}
 }
 \value{
-The estimated (log) likelihood value.
+The estimated synthetic (log) likelihood value.
 }
 \description{
-This function estimates the Gaussian synthetic likelihood function of Wood (2010).
-Shrinkage on the Gaussian covariance matrix is also available (see An et al 2018).
+This function estimates the Gaussian synthetic likelihood
+  \insertCite{@see @Wood2010 and @Price2018}{BSL}. Several extensions are
+  provided in this function: \code{shrinkage} enables shrinkage estimation of
+  the covariance matrix and is helpful to bring down the number of model
+  simulations (see \insertCite{An2019;textual}{BSL} for an example of BSL
+  with glasso \insertCite{Friedman2008}{BSL} shrinkage estimation);
+  \code{GRC} uses Gaussian rank correlation \insertCite{Boudt2012}{BSL} to
+  find a more robust correlation matrix; \code{whitening}
+  \insertCite{Kessy2018}{BSL} could further reduce the number of model
+  simulations upon Warton's shrinkage \insertCite{Warton2008}{BSL} by
+  decorrelating the summary statistics.
 }
 \examples{
 data(ma2)
-y <- ma2$data # the observed data
-
-# function that simulates an ma2 time series
-simulate_ma2 <- function(theta, L = 50) {
-    rand <- rnorm(L + 2)
-    y <- rand[3 : (L+2)] + theta[1] * rand[2 : (L+1)] + theta[2] * rand[1 : L]
-    return(y)
-}
-
-theta_true <- c(0.6, 0.2)
-x <- matrix(0, 300, 50)
-set.seed(100)
-for(i in 1:300) x[i, ] <- simulate_ma2(theta_true)
+ssy <- ma2_sum(ma2$data)
+m <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args,
+              theta0 = ma2$start)
+ssx <- simulation(m, n = 300, theta = c(0.6, 0.2), seed = 10)$ssx
 
 # the standard Gaussian synthetic likelihood (the likelihood estimator used in BSL)
-gaussianSynLike(y, x)
+gaussianSynLike(ssy, ssx)
 # the Gaussian synthetic likelihood with glasso shrinkage estimation
 # (the likelihood estimator used in BSLasso)
-gaussianSynLike(y, x, shrinkage = 'glasso', penalty = 0.1)
+gaussianSynLike(ssy, ssx, shrinkage = 'glasso', penalty = 0.1)
+# the Gaussian synthetic likelihood with Warton's shrinkage estimation
+gaussianSynLike(ssy, ssx, shrinkage = 'Warton', penalty = 0.9)
+# the Gaussian synthetic likelihood with Warton's shrinkage estimation and Whitening transformation
+W <- estimateWhiteningMatrix(20000, m)
+gaussianSynLike(ssy, ssx, shrinkage = 'Warton', penalty = 0.9, whitening = W)
 
 }
 \references{
-Price, L. F., Drovandi, C. C., Lee, A., & Nott, D. J. (2018).
-Bayesian synthetic likelihood. Journal of Computational and Graphical Statistics.
-\url{https://doi.org/10.1080/10618600.2017.1302882}
-
-An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018). Accelerating Bayesian synthetic
-likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
-\url{https://doi.org/10.1080/10618600.2018.1537928}
-
-Friedman, J., Hastie, T., Tibshirani, R. (2008). Sparse inverse covariance estimation with
-the graphical lasso. Biostatistics. \url{https://doi.org/10.1093/biostatistics/kxm045}
-
-Warton, D. I. (2008). Penalized Normal Likelihood and Ridge Regularization of Correlation and
-Covariance Matrices, Journal of the American Statistical Association.
-\url{https://doi.org/10.1198/016214508000000021}
+\insertAllCited{}
+}
+\seealso{
+Other available synthetic likelihood estimators:
+  \code{\link{gaussianSynLikeGhuryeOlkin}} for the unbiased synthetic
+  likelihood estimator, \code{\link{semiparaKernelEstimate}} for the
+  semi-parametric likelihood estimator, \code{\link{synLikeMisspec}} for the
+  Gaussian synthetic likelihood estimator for model misspecification.
 }

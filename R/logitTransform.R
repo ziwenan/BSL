@@ -35,7 +35,7 @@ paraLogitBackTransform <- function(thetaTilde, bound) {
     return(theta)
 }
 
-jacobianLogitTransform <- function(thetaTilde, bound) {
+jacobianLogitTransform <- function(thetaTilde, bound, log = TRUE) {
     p <- length(thetaTilde)
     type <- as.character(is.infinite(bound) %*% c(1,2))
     logJ <- numeric(p)
@@ -53,6 +53,9 @@ jacobianLogitTransform <- function(thetaTilde, bound) {
                           '3' = 0
         )
     }
-    J = exp(sum(logJ))
+	J = sum(logJ)
+	if (!log) {
+	    J <- exp(J)
+	}    
     return(J)
 }

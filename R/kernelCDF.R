@@ -5,7 +5,6 @@ kernelCDF <- function(x, kernel) {
 }
 
 epanechnikovCDF <- function(x) {
-    # y <- numeric(length(x))
     y <- ifelse(x > 1, 1, 0)
     idx <- which(abs(x) <= 1)
     y[idx] <- -0.25 * x[idx] ^ 3 + 0.75 * x[idx] + 0.5

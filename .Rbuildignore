@@ -1,3 +1,7 @@
-^BSL\.Rproj$
+^\.git$
 ^\.Rproj\.user$
+^BSL\.Rproj$
 ^TODO\.txt$
+^.Rhistory$
+^foreach error replication code\.R$
+^help\.R$

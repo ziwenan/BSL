@@ -1,123 +1,268 @@
-#' Performing BSL, BSLasso and semiBSL
+#' @include s4-BSL.R
+NULL
+
+#' Performing BSL, uBSL, semiBSL and BSLmisspec
 #'
-#' @description This is the main function for performing MCMC BSL, MCMC BSLasso and MCMC semiBSL.
-#' Parallel computing is supported with the R package \code{foreach}.
+#' @description This is the main function for performing MCMC BSL (with a
+#'   standard or non-standard likelihood estimator) to sample from the
+#'   approximate posterior distribution. A couple of extentions to the standard
+#'   approach is available by changing the following arguments, \code{method},
+#'   \code{shrinkage}, \code{whitening}, \code{misspecType} and etc. Parallel
+#'   computing is supported with the R package \code{foreach}.
 #'
-#' @param y				The observed data - note this should be the raw dataset NOT the set of summary statistics.
-#' @param n				The number of simulations from the model per MCMC iteration for estimating the synthetic likelihood.
+#' @param y				The observed data. Note this should be the raw dataset NOT the
+#'   set of summary statistics.
+#' @param n				The number of simulations from the model per MCMC iteration for
+#'   estimating the synthetic likelihood.
 #' @param M				The number of MCMC iterations.
-#' @param theta0		Initial guess of the parameter value, which is used as the starting value for MCMC.
-#' @param covRandWalk	A covariance matrix to be used in multivariate normal random walk proposals.
-#' @param fnSim         A function that simulates data for a given parameter value. The first argument should be the
-#' parameters. Other necessary arguments (optional) can be specified with \code{simArgs}.
-#' @param fnSum         A function for computing summary statistics of data. The first argument should be the observed
-#' or simulated dataset. Other necessary arguments (optional) can be specified with \code{sumArgs}.
-#' @param method        A string argument indicating the method to be used. The default, 'BSL', runs standard BSL or
-#' BSLasso if \code{shrinkage} is used. 'semiBSL' runs the semi-parametric BSL algorithm and is more robust to
-#' non-normal summary statistics.
-#' @param shrinkage      A string argument indicating which shrinkage method to be used. The default is \code{NULL},
-#' which means no shrinkage is used. Current options are 'glasso' for graphical lasso and 'Warton' for the
-#' ridge regularisation method of Warton (2008).
-#' @param penalty		The penalty value to be used for the specified shrinkage method. Must be between zero and one
-#' if the shrinkage method is 'Warton'.
-#' @param fnPrior		A function that computes the prior density for a parameter. The default is \code{NULL}, which
-#' is an improper flat prior over the real line for each parameter. The function must have a single input: a vector
-#' of parameter values.
-#' @param simArgs	    A list of additional arguments to pass into the simulation function. Only use when the input
-#' \code{fnSim} requires additional arguments. The default is \code{NULL}.
-#' @param sumArgs	    A list of additional arguments to pass into the summary statistics function. Only use when the
-#' input \code{fnSum} requires additional arguments. The default is \code{NULL}.
-#' @param logitTransformBound A \eqn{p} by \eqn{2} numeric matrix indicating the upper and lower bound of parameters if a logit
-#' transformation is used on the parameter space, where \eqn{p} is the number of parameters. The default is \code{NULL},
-#' which means no logit transformation is used. It is also possible to define other transformations with \code{fnSim}
-#' and \code{fnPrior}. The first column contains the lower bound of each parameter and the second column contains the
-#' upper bound. Infinite lower or upper bound is also supported, eg. \code{matrix(c(1,Inf,0,10,-Inf,0.5),3,2,byrow=TRUE)}.
-#' @param standardise	A logical argument that determines whether to standardise the summary statistics before applying
-#' the graphical lasso. This is only valid if shrinkage is 'glasso' and penalty is not \code{NULL}. The diagonal
-#' elements will not be penalised if the shrinkage method is 'glasso'. The default is \code{FALSE}.
-#' @param parallel		A logical value indicating whether parallel computing should be used for simulation and summary
-#' statistic evaluation. The default is \code{FALSE}. When model simulation is fast, it may be preferable to perform
-#' serial computations to avoid significant communication overhead between workers.
-#' @param parallelArgs	A list of additional arguments to pass into the \code{foreach} function. Only used when parallel
-#' computing is enabled, default is \code{NULL}.
-#' @param thetaNames	A string vector of parameter names, which must have the same length as the parameter vector.
-#' The default is \code{NULL}.
-#' @param plotOnTheFly  A logical argument. If \code{TRUE}, a plot of approximate univariate posteriors based on the
-#' current accepted samples will be shown every 1000 iterations. The default is \code{FALSE}.
-#' @param verbose       A logical argument indicating whether the iteration numbers (\code{1:M}) and accepted proposal
-#' flags should be printed to track progress. The default is \code{FALSE}.
+#' @param model         A ``MODEL'' object generated with function
+#'   \code{newModel}. See \code{\link{newModel}}.
+#' @param covRandWalk	The covariance matrix of a multivariate normal random walk
+#'   proposal distribution used in the MCMC.
+#' @param method        A string argument indicating the method to be used. The
+#'   default, ``BSL'', runs standard BSL. ``uBSL'' uses the unbiased estimator
+#'   of a normal density of \insertCite{Ghurye1969;textual}{BSL}. ``semiBSL''
+#'   runs the semi-parametric BSL algorithm and is more robust to non-normal
+#'   summary statistics. ``BSLmisspec'' estimate the Gaussian synthetic
+#'   likelihood whilst acknowledging that there may be incompatibility between
+#'   the model and the observed summary statistic \insertCite{Frazier2019}{BSL}.
+#' @param shrinkage     A string argument indicating which shrinkage method to
+#'   be used. The default is \code{NULL}, which means no shrinkage is used.
+#'   Shrinkage estimation is only available for methods ``BSL'' and ``semiBSL''.
+#'   Current options are ``glasso'' for the graphical lasso method of
+#'   \insertCite{Friedman2008;textual}{BSL} and ``Warton'' for the ridge
+#'   regularisation method of \insertCite{Warton2008;textual}{BSL}.
+#' @param penalty		The penalty value to be used for the specified shrinkage
+#'   method. Must be between zero and one if the shrinkage method is ``Warton''.
 #'
-#' @return 				An object of class \code{bsl} is returned, containing the following components:
-#' \itemize{
-#' \item \code{theta}: MCMC samples from the joint approximate posterior distribution of the parameters.
-#' \item \code{loglike}: Accepted MCMC samples of the estimated log-likelihood values.
-#' \item \code{acceptanceRate}: The acceptance rate of the MCMC algorithm.
-#' \item \code{earlyRejectionRate}: The early rejection rate of the algorithm (early rejection may occur when using
-#' bounded prior distributions).
-#' \item \code{call}: The original code that was used to call the method.
-#' \item \code{y}: The input observed data.
-#' \item \code{n}: The input number of simulations from the model per MCMC iteration.
-#' \item \code{M}: The input number of MCMC iterations.
-#' \item \code{theta0}: The input initial guess of the parameter value.
-#' \item \code{covRandWalk}: The input covariance matrix used in multivariate normal random walk proposals.
-#' \item \code{fnSim}: The input data simulation function.
-#' \item \code{fnSum}: The input function for computing summary statistics of data.
-#' \item \code{method}: The input string argument indicating the used method.
-#' \item \code{shrinkage}: The input string argument indicating the shrinkage method.
-#' \item \code{penalty}: The input penalty value.
-#' \item \code{fnPrior}: The input function that computes the prior density for a parameter.
-#' \item \code{simArgs}: The input list of additional arguments to pass into the simulation function.
-#' \item \code{sumArgs}: The input list of additional arguments to pass into the summary statistics function.
-#' \item \code{logitTransform}: The logical argument indicating whether a logit transformation is used in the algorithm.
-#' \item \code{logitTransformBound}: The input matrix of logitTransformBound.
-#' \item \code{standardise}: The input logical argument that determines whether to standardise the summary statistics.
-#' \item \code{parallel}: The input logical value indicating whether parallel computing is used in the process.
-#' \item \code{parallelArgs}: The input list of additional arguments to pass into the \code{foreach} function.
-#' \item \code{thetaNames}: The string vector of parameter names.
-#' \item \code{time}: The running time of class \code{difftime}.
-#' }
+#' @param logitTransformBound A \eqn{p} by \eqn{2} numeric matrix indicating the
+#'   upper and lower bound of parameters if a logit transformation is used on
+#'   the parameter space, where \eqn{p} is the number of parameters. The default
+#'   is \code{NULL}, which means no logit transformation is used. It is also
+#'   possible to define other transformations within the simulation and prior
+#'   function from \code{model}. The first column contains the lower bound of
+#'   each parameter and the second column contains the upper bound. Infinite
+#'   lower or upper bound is also supported, eg.
+#'   \code{matrix(c(1,Inf,0,10,-Inf,0.5),3,2,byrow=TRUE)}.
+#' @param standardise	A logical argument that determines whether to standardise
+#'   the summary statistics before applying the graphical lasso. This is only
+#'   valid if method is ``BSL'', shrinkage is ``glasso'' and penalty is not
+#'   \code{NULL}. The diagonal elements will not be penalised if the shrinkage
+#'   method is ``glasso''. The default is \code{FALSE}.
+#' @param GRC           A logical argument indicating whether the Gaussian rank
+#'   correlation matrix \insertCite{Boudt2012}{BSL} should be used to estimate
+#'   the covariance matrix in ``BSL'' method. The default is \code{FALSE}, which
+#'   uses the sample covariance by default.
+#' @param whitening     An argument determines whether Whitening transformation
+#'   should be used in ``BSL'' method with Warton's shrinkage. Whitening
+#'   transformation helps decorrelate the summary statistics, thus encourages
+#'   sparsity of the synthetic likelihood covariance matrix. This might allow
+#'   heavier shrinkage to be applied without losing much accuracy, hence
+#'   allowing the number of simulations to be reduced. By default, \code{NULL}
+#'   disable the Whitening transformation. Otherwise this is enabled if a
+#'   Whitening matrix is provided. See \code{\link{estimateWhiteningMatrix}} for
+#'   the function to estimate the Whitening matrix.
+#' @param misspecType   A string argument indicating which type of model
+#'   misspecification to be used. The two options are "mean" and "variance".
+#'   Only used when method is ``BSLmisspec''. The default, \code{NULL}, means no
+#'   model misspecification is considered.
+#' @param tau           A numeric argument, parameter of the prior distribution
+#'   for "BSLmisspec" method. For mean adjustment, \code{tau} is the scale of
+#'   the Laplace distribution. For variance inflation, \code{tau} is the scale
+#'   (or mean) of the exponential distribution. Only used when method is
+#'   ``BSLmisspec''.
+#' @param parallel		A logical value indicating whether parallel computing should
+#'   be used for simulation and summary statistic evaluation. The default is
+#'   \code{FALSE}. When model simulation is fast, it may be preferable to
+#'   perform serial or vectorised computations to avoid significant
+#'   communication overhead between workers. Parallel computation can only be
+#'   used if not using a vectorised simulation function, see \code{\link{MODEL}}
+#'   for options of vectorised simulation function.
+#' @param parallelArgs	A list of additional arguments to pass into the
+#'   \code{foreach} function. Only used when parallel computing is enabled,
+#'   default is \code{NULL}.
+#' @param plotOnTheFly  A logical or numeric argument defining whether or by how
+#'   many iterations a posterior figure will be plotted during running. If
+#'   \code{TRUE}, a plot of approximate univariate posteriors based on the
+#'   current accepted samples will be shown by every one thousand iterations.
+#'   The default is \code{FALSE}.
+#' @param verbose               An integer indicating the verbose style. 0L
+#'   means no verbose messages will be printed. 1L use a custom progress bar to
+#'   track the progress. 2L print the iteration numbers (\code{1:M}) to track
+#'   the progress. The default is 1L.
+#'
+#' @param theta0		Deprecated, will be removed in the future, use \code{model}
+#'   instead. Initial guess of the parameter value, which is used as the
+#'   starting value for MCMC.
+#' @param fnSim         Deprecated, will be removed in the future, use
+#'   \code{model} instead. A function that simulates data for a given parameter
+#'   value. The first argument should be the parameters. Other necessary
+#'   arguments (optional) can be specified with \code{simArgs}.
+#' @param fnSum         Deprecated, will be removed in the future, use
+#'   \code{model} instead. A function for computing summary statistics of data.
+#'   The first argument should be the observed or simulated dataset. Other
+#'   necessary arguments (optional) can be specified with \code{sumArgs}.
+#' @param fnPrior       Deprecated, will be removed in the future, use
+#'   \code{model} instead. A function that computes the log of prior density for
+#'   a parameter. The default is \code{NULL}, which uses an improper flat prior
+#'   over the real line for each parameter. The function must have a single
+#'   input: a vector of parameter values.
+#' @param simArgs	    Deprecated, will be removed in the future, use
+#'   \code{model} instead. A list of additional arguments to pass into the
+#'   simulation function. Only use when the input \code{fnSim} requires
+#'   additional arguments. The default is \code{NULL}.
+#' @param sumArgs	    Deprecated, will be removed in the future, use
+#'   \code{model} instead. A list of additional arguments to pass into the
+#'   summary statistics function. Only use when the input \code{fnSum} requires
+#'   additional arguments. The default is \code{NULL}.
+#' @param thetaNames	Deprecated, will be removed in the future, use \code{model}
+#'   instead. A string vector of parameter names, which must have the same
+#'   length as the parameter vector. The default is \code{NULL}.
+#'
+#' @return 				An object of class \code{bsl} is returned, see \code{\link{BSL}}
+#'   for more information of the S4 class.
 #'
 #' @references
-#' Price, L. F., Drovandi, C. C., Lee, A., & Nott, D. J. (2018).
-#' Bayesian synthetic likelihood. Journal of Computational and Graphical Statistics.
-#' \url{https://doi.org/10.1080/10618600.2017.1302882}
 #'
-#' An, Z., South, L. F., Nott, D. J. &  Drovandi, C. C. (2018a). Accelerating Bayesian synthetic
-#' likelihood with the graphical lasso. Journal of Computational and Graphical Statistics.
-#' \url{https://doi.org/10.1080/10618600.2018.1537928}
+#' \insertAllCited{}
 #'
-#' An, Z., Nott, D. J. &  Drovandi, C. (2018b). Robust Bayesian Synthetic Likelihood via
-#' a Semi-Parametric Approach. ArXiv Preprint \url{https://arxiv.org/abs/1809.05800}
+#' \insertRef{Price2018}{BSL}
 #'
-#' Warton, D. I. (2008). Penalized Normal Likelihood and Ridge Regularization of Correlation and
-#' Covariance Matrices, Journal of the American Statistical Association.
-#' \url{https://doi.org/10.1198/016214508000000021}
+#' \insertRef{An2019}{BSL}
 #'
-#' @author 								Ziwen An, Leah F. South and Christopher C. Drovandi
-#' @seealso 							\code{\link{selectPenalty}} for a function to tune the BSLasso tuning parameter
-#' and \code{\link{plot}} for functions related to visualisation.
+#' \insertRef{An2018}{BSL}
+#'
+#' @examples
+#' \dontshow{
+#' toy_sim <- function(n, theta) matrix(rnorm(n, theta), nrow = n)
+#' toy_sum <- function(x) x
+#'
+#' model <- newModel(fnSimVec = toy_sim, fnSum = toy_sum, theta0 = 0)
+#'
+#' result_toy <- bsl(y = 1, n = 10, M = 100, model = model, covRandWalk = matrix(1),
+#'     method = "BSL", verbose = FALSE)
+#' summary(result_toy)
+#' plot(result_toy)
+#' }
+#' \dontrun{
+#' # This is just a minimal test run, please see package built-in examples for more
+#' # comprehensive usages of the function
+#' toy_sim <- function(n, theta) matrix(rnorm(n, theta), nrow = n)
+#' toy_sum <- function(x) x
+#' model <- newModel(fnSimVec = toy_sim, fnSum = toy_sum, theta0 = 0)
+#'
+#' result_toy <- bsl(y = 1, n = 100, M = 1e4, model = model, covRandWalk = matrix(1),
+#'     method = "BSL", plotOnTheFly = TRUE)
+#' summary(result_toy)
+#' plot(result_toy)
+#' }
+#'
+#' @author    Ziwen An, Leah F. South and Christopher C. Drovandi
+#' @seealso   \code{\link{ma2}}, \code{\link{cell}}, \code{\link{mgnk}} and
+#'   \code{\link{toad}} for examples. \code{\link{selectPenalty}} for a function
+#'   to tune the BSLasso tuning parameter and \code{\link{plot}} for functions
+#'   related to visualisation.
 #' @export
-bsl <- function(y, n, M, theta0, covRandWalk, fnSim, fnSum, method = c("BSL",
-    "semiBSL")[1], shrinkage = NULL, penalty = NULL, fnPrior = NULL, simArgs = NULL,
-    sumArgs = NULL, logitTransformBound = NULL, standardise = FALSE, parallel = FALSE,
-    parallelArgs = NULL, thetaNames = NULL, plotOnTheFly = FALSE, verbose = FALSE) {
-    if (!method %in% c("BSL", "semiBSL")) {
-        stop("method must be either \"BSL\" or \"semiBSL\"")
-    }
+bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("BSL", "uBSL",
+    "semiBSL", "BSLmisspec"), shrinkage = NULL, penalty = NULL, fnPrior = NULL, simArgs = NULL,
+    sumArgs = NULL, logitTransformBound = NULL, standardise = FALSE, GRC = FALSE, whitening = NULL,
+	misspecType = NULL, tau = 1, parallel = FALSE, parallelArgs = NULL,
+	thetaNames = NULL, plotOnTheFly = FALSE, verbose = 1L) {
+
+    method <- match.arg(method)
+	if (is.null(misspecType)) {
+	    flagType <- FALSE
+	} else {
+	    flagType <- TRUE
+	    misspecType <- match.arg(misspecType, c("mean", "variance"))
+	}
+	if (method != "BSLmisspec" && flagType) {
+	    warning("\"misspecType\" will be ignored because method is not \"BSLmisspec\"")
+	}
+	if (method == "BSLmisspec" && !flagType) {
+	    stop("\"misspecType\" must be provided to enable \"BSLmisspec\" method")
+	}
     if (!parallel & !is.null(parallelArgs)) {
         warning("\"parallelArgs\" is omitted in serial computing")
     }
-    if (is.null(shrinkage) && !is.null(penalty)) {
-        warning("\"penalty\" will not ignored since no shrinkage method is specified")
+	if (!is.null(shrinkage)) {
+	    flagShrinkage <- TRUE
+	    shrinkage <- match.arg(shrinkage, c("glasso", "Warton"))
+	} else {
+	    flagShrinkage <- FALSE
+	}
+	if (is.null(whitening) || !whitening) {
+	    flagWhitening <- FALSE
+		ssyTilde <- NULL
+	} else if (is.matrix(whitening)) {
+	    ns <- length(ssy)
+	    if (all(dim(whitening) == c(ns, ns))) {
+		    flagWhitening <- TRUE
+		    W <- whitening
+		} else {
+		    stop(paste("The Whitening matrix must be of dimension", ns, "by", ns))
+		}
+	} else {
+	    stop("invalid Whitening argument")
+	}
+    if (!flagShrinkage && !is.null(penalty)) {
+        warning("\"penalty\" will be ignored because no shrinkage method is specified")
     }
-    if (!is.null(shrinkage) && is.null(penalty)) {
-        stop("\"penalty\" must be specified to provoke shrinkage method")
+    if (flagShrinkage && is.null(penalty)) {
+        stop("a penalty value must be specified to enable shrinkage estimation")
     }
-    if (is.null(penalty) & standardise) {
-        warning("standardisation is only supported in BSLasso")
+	if (!flagShrinkage && standardise) {
+        warning("\"standardise\" will be ignored because shrinkage method is not \"glasso\"")
     }
+	if (!flagShrinkage && flagWhitening) {
+        warning("\"whitening\" will be ignored because shrinkage method is not \"Warton\"")
+    }
+	if (flagShrinkage) {
+	    if (shrinkage != "glasso" && standardise) {
+            warning("standardisation is only supported if shrinkage is \"glasso\"")
+        }
+	    if (shrinkage != "Warton" && flagWhitening) {
+            warning("Whitening is only supported if shrinkage is \"Warton\"")
+        }
+	}
 
-    p <- length(theta0)
+	# deprecated arguments
+	if (!missing(theta0)) {
+	    warning("theta0 will be deprecated in the future, use model instead, see \"?model\"")
+	}
+	if (!missing(fnSim)) {
+	    warning("fnSim will be deprecated in the future, use model instead, see \"?model\"")
+	}
+	if (!missing(fnSum)) {
+	    warning("fnSum will be deprecated in the future, use model instead, see \"?model\"")
+	}
+	if (!is.null(simArgs)) {
+	    warning("simArgs will be deprecated in the future, use model instead, see \"?model\"")
+	}
+	if (!is.null(sumArgs)) {
+	    warning("sumArgs will be deprecated in the future, use model instead, see \"?model\"")
+	}
+	if (!is.null(fnPrior)) {
+	    warning("fnPrior will be deprecated in the future, use model instead, see \"?model\"")
+	}
+	if (!is.null(thetaNames)) {
+	    warning("thetaNames will be deprecated in the future, use model instead, see \"?model\"")
+	}
+
+	if (missing(model)) {
+	    if (is.null(fnPrior)) {
+		    fnLogPrior <- NULL
+		} else {
+		    fnLogPrior <- function(...) log(fnPrior(...))
+		}
+	    model <- model(fnSim = fnSim, fnSum = fnSum, simArgs = simArgs, sumArgs = sumArgs,
+		             fnLogPrior = fnLogPrior, theta0 = theta0, thetaNames = thetaNames)
+	} else {
+	    stopifnot(inherits(model, "MODEL"))
+	}
+
+    p <- length(model@theta0)
+	fnLogPrior <- model@fnLogPrior
     logitTransform <- !is.null(logitTransformBound)
     if (logitTransform) {
         if (any(dim(logitTransformBound) != c(p, 2))) {
@@ -127,180 +272,238 @@ bsl <- function(y, n, M, theta0, covRandWalk, fnSim, fnSum, method = c("BSL",
 
     cl <- match.call()
     startTime <- Sys.time()
-    # match the simulation function
-    if (is.null(simArgs)) {
-        myFnSim <- function(theta) {
-            do.call(fnSim, list(theta))
-        }
-    } else {
-        myFnSim <- function(theta) {
-            do.call(fnSim, c(list(theta), simArgs))
-        }
-    }
 
-    # match the summary statistics function
-    if (is.null(sumArgs)) {
-        myFnSum <- function(x) {
-            do.call(fnSum, list(x))
-        }
-    } else {
-        myFnSum <- function(x) {
-            do.call(fnSum, c(list(x), sumArgs))
-        }
+	# initialise parameters
+    ssy <- do.call(model@fnSum, c(list(y), model@sumArgs))
+    ns <- length(ssy)
+    thetaCurr <- model@theta0
+    loglikeCurr <- Inf
+    if (logitTransform) {
+        thetaTildeCurr <- paraLogitTransform(thetaCurr, logitTransformBound)
     }
+    theta <- array(0, c(M, p), dimnames = list(NULL, thetaNames))
+    loglike <- numeric(M) # ignore if method is not "BSLmisspec"
+	gamma <- array(0, c(M, ns))
+    countAcc <- countEar <- countErr <- 0
 
+    if (flagWhitening) {
+	    ssyTilde <- c(tcrossprod(ssy, W))
+	}
+	if (method == "BSLmisspec") {
+		gammaCurr <- switch(misspecType,
+		                    mean = numeric(ns),
+							variance = rep(tau, ns))
+	}
+
+    # map the simulation function
+	if (parallel) {
+	    myFnSimSum <- function(n, theta) fn(model)$fnPar(n, theta, parallelArgs)
+	} else {
+	    myFnSimSum <- fn(model)$fn
+	}
+
+    # plot-on-the-fly
     if (plotOnTheFly) {
+	    if (plotOnTheFly == 1) {
+		    plotOnTheFly  <- 1000
+		}
         oldPar <- par()$mfrow
         a <- floor(sqrt(p))
         b <- ceiling(p/a)
         par(mfrow = c(a, b))
     }
 
-    # initialise parameters
-    ssy <- myFnSum(y)
-    ns <- length(ssy)
-    thetaCurr <- theta0
-    loglikeCurr <- Inf
-    if (logitTransform) {
-        thetaTildeCurr <- paraLogitTransform(thetaCurr, logitTransformBound)
-    }
-    theta <- array(0, c(M, p), dimnames = list(NULL, thetaNames))
-    loglike <- numeric(M)
-    countAcc <- countEar <- countErr <- 0
-
     while (is.infinite(loglikeCurr)) {
         # simulate with thetaProp and calculate the summary statistics
-        ssx <- Inf
-        while (any(is.infinite(ssx))) {
-            if (!parallel) {
-                ssx <- array(0, c(n, ns))
-                for (j in 1:n) {
-                    x <- myFnSim(thetaCurr)
-                    ssx[j, ] <- myFnSum(x)
-                }
-            } else {
-                # use foreach for parallel computing
-                ssx <- do.call(foreach, c(list(j = 1:n, .combine = rbind),
-                               parallelArgs)) %dopar% {
-                    x <- myFnSim(thetaCurr)
-                    myFnSum(x)
-                }
-            }
+		ssx <- myFnSimSum(n, thetaCurr)
+        if (any(is.infinite(ssx))) {
+		    stop("Inf detected in the summary statistics vector, this will cause an error in likelihood evaluation")
         }
 
         # compute the loglikelihood
-        loglikeCurr <- switch(method, BSL = gaussianSynLike(ssy, ssx, shrinkage,
-            penalty, standardise, log = TRUE, verbose = verbose), semiBSL = semiparaKernelEstimate(ssy,
-            ssx, shrinkage = shrinkage, penalty = penalty))
+        loglikeCurr <- switch(method,
+		    BSL = gaussianSynLike(ssy, ssx, shrinkage, penalty, standardise, GRC, whitening, ssyTilde, log = TRUE, verbose = verbose),
+            uBSL = gaussianSynLikeGhuryeOlkin(ssy, ssx, log = TRUE, verbose = verbose),
+			semiBSL = semiparaKernelEstimate(ssy, ssx, shrinkage = shrinkage, penalty = penalty),
+			BSLmisspec = synLikeMisspec(ssy, ssx, type = misspecType, gamma = gammaCurr, log = TRUE, verbose = verbose)
+			)
+
+		if (method == "BSLmisspec") {
+	        ssxCurr <- ssx
+			stdCurr <- attr(loglikeCurr, "std")
+	    }
     }
 
+    if (verbose == 1L) timeStart <- Sys.time()
     for (i in 1:M) {
 
         flush.console()
-        if (verbose) {
-            cat("i =", i, "\n")
-        }
+		if (verbose == 2L)  {
+		    cat("i =", i, "\n")
+		}
+
+		if (method == "BSLmisspec") {
+		    gammaCurr <- switch(misspecType,
+			                    mean = sliceGammaMean(ssy, ssxCurr, loglikeCurr, gammaCurr, tau, std = stdCurr),
+								variance = sliceGammaVariance(ssy, ssxCurr, loglikeCurr, gammaCurr, tau, std = stdCurr)
+							    )
+			loglikeCurr <- attr(gammaCurr, "loglike")
+		}
 
         # multivariate normal random walk to the proposed value of theta
         if (!logitTransform) {
-            thetaProp <- c(rmvnorm(1, mean = thetaCurr, sigma = covRandWalk))
-            p2 <- 1
+            thetaProp <- c(mvtnorm::rmvnorm(1, mean = thetaCurr, sigma = covRandWalk))
+            logp2 <- 0
         } else {
             thetaTildeCurr <- paraLogitTransform(thetaCurr, logitTransformBound)
             # thetaTildeProp <- mvrnorm(1, thetaTildeCurr, covRandWalk)
-            thetaTildeProp <- rmvnorm(1, mean = thetaTildeCurr, sigma = covRandWalk)
+            thetaTildeProp <- mvtnorm::rmvnorm(1, mean = thetaTildeCurr, sigma = covRandWalk)
             thetaProp <- paraLogitBackTransform(thetaTildeProp, logitTransformBound)
-            p2 <- jacobianLogitTransform(thetaTildeProp, logitTransformBound)/jacobianLogitTransform(thetaTildeCurr,
-                logitTransformBound)
+            logp2 <- jacobianLogitTransform(thetaTildeProp, logitTransformBound, TRUE) -
+			      jacobianLogitTransform(thetaTildeCurr, logitTransformBound, TRUE)
         }
 
         # early rejection if the proposed theta falls outside of prior coverage
         # / feasible region
-        if (!is.null(fnPrior)) {
-            p1 <- fnPrior(thetaProp)/fnPrior(thetaCurr) # We may want to change this to log prior in a future release for stability
-            if (p1 == 0) {
-                if (verbose) {
+        if (!is.null(fnLogPrior)) {
+            logp1 <- fnLogPrior(thetaProp) - fnLogPrior(thetaCurr)
+            if (logp1 == -Inf) {
+                if (verbose == 2L) {
                   cat("*** early rejection ***\n")
-                }
+                } else if (verbose == 1L){
+		            timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
+                    timeLeft <- timeElapsed / i * (M - i)
+                    elapsed <- myTimeStr(timeElapsed)
+                    left <- myTimeStr(timeLeft)
+					acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
+		            myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i, "*** early rejection ***"),
+									  txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
+                                      style = 3, label = c("=", ".", ""))
+                    flush.console()
+		        }
                 theta[i, ] <- thetaCurr
                 loglike[i] <- loglikeCurr
+				if (method == "BSLmisspec") {
+		            gamma[i, ] <- gammaCurr
+		        }
                 countEar <- countEar + 1
                 next
             }
         } else {
-            p1 <- 1
+            logp1 <- 0
         }
-        prob <- p1 * p2
+        prob <- exp(logp1 + logp2)
 
         # simulate with thetaProp and calculate the summary statistics
-        if (!parallel) {
-            ssx <- array(0, c(n, ns))
-            for (j in 1:n) {
-                x <- myFnSim(thetaProp)
-                ssx[j, ] <- myFnSum(x)
-            }
-        } else {
-            # use foreach for parallel computing
-            ssx <- do.call(foreach, c(list(j = 1:n, .combine = rbind),
-                parallelArgs)) %dopar% {
-                x <- myFnSim(thetaProp)
-                myFnSum(x)
-            }
-        }
+		ssx <- myFnSimSum(n, thetaProp)
 
         # reject if inifite value is detected in ssx
         if (any(is.infinite(ssx))) {
-            if (verbose) {
+            if (verbose == 2L) {
                 cat("*** reject (infinite ssx) ***\n")
-            }
+            } else if (verbose == 1L){
+		        timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
+                timeLeft <- timeElapsed / i * (M - i)
+                elapsed <- myTimeStr(timeElapsed)
+                left <- myTimeStr(timeLeft)
+				acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
+		        myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i, "*** reject (infinite ssx) ***"),
+                                  txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
+                                  style = 3, label = c("=", ".", ""))
+                flush.console()
+		    }
             theta[i, ] <- thetaCurr
             loglike[i] <- loglikeCurr
+			if (method == "BSLmisspec") {
+		        gamma[i, ] <- gammaCurr
+		    }
             countErr <- countErr + 1
             next
         }
 
         # compute the loglikelihood
-        loglikeProp <- switch(method, BSL = gaussianSynLike(ssy, ssx, shrinkage,
-            penalty, standardise, log = TRUE, verbose = verbose), semiBSL = semiparaKernelEstimate(ssy,
-            ssx, shrinkage = shrinkage, penalty = penalty))
+        loglikeProp <- switch(method,
+		    BSL = gaussianSynLike(ssy, ssx, shrinkage, penalty, standardise, GRC, whitening, ssyTilde, log = TRUE, verbose = verbose),
+			uBSL = gaussianSynLikeGhuryeOlkin(ssy, ssx, log = TRUE, verbose = verbose),
+			semiBSL = semiparaKernelEstimate(ssy, ssx, shrinkage = shrinkage, penalty = penalty),
+			BSLmisspec = synLikeMisspec(ssy, ssx, type = misspecType, gamma = gammaCurr, log = TRUE, verbose = verbose)
+			)
 
         if (loglikeProp == Inf) {
-            if (verbose) {
+            if (verbose == 2L) {
                 cat("*** reject (positive infinite loglike) ***\n")
-            }
+            } else if (verbose == 1L){
+		        timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
+                timeLeft <- timeElapsed / i * (M - i)
+                elapsed <- myTimeStr(timeElapsed)
+                left <- myTimeStr(timeLeft)
+				acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
+		        myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i, "*** reject (positive infinite loglike) ***"),
+                                  txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
+                                  style = 3, label = c("=", ".", ""))
+                flush.console()
+		    }
             theta[i, ] <- thetaCurr
             loglike[i] <- loglikeCurr
+			if (method == "BSLmisspec") {
+		        gamma[i, ] <- gammaCurr
+		    }
             countErr <- countErr + 1
             next
         }
 
         rloglike <- exp(loglikeProp - loglikeCurr)
-
-        # cat('theta: ',thetaProp,'\t') cat('ll: ',loglikeProp,'\t') cat('p:
-        # ',p,'\t') cat('prob: ',p * rloglike,'\n') accept the proposed theta
-        # with a probability
         if (runif(1) < prob * rloglike) {
-            if (verbose) {
+            if (verbose == 2L) {
                 cat("*** accept ***\n")
-            }
+            } else if (verbose == 1L){
+		        timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
+                timeLeft <- timeElapsed / i * (M - i)
+                elapsed <- myTimeStr(timeElapsed)
+                left <- myTimeStr(timeLeft)
+				acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
+		        myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i, "*** accept ***"),
+								  txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
+                                  style = 3, label = c("=", ".", ""))
+                flush.console()
+		    }
             thetaCurr <- thetaProp
             loglikeCurr <- loglikeProp
+			if (method == "BSLmisspec") {
+		        ssxCurr <- ssx
+				stdCurr <- attr(loglikeProp, "std")
+		    }
             countAcc <- countAcc + 1
-        }
+        } else {
+		    if (verbose == 1L){
+		        timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
+                timeLeft <- timeElapsed / i * (M - i)
+                elapsed <- myTimeStr(timeElapsed)
+                left <- myTimeStr(timeLeft)
+				acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
+		        myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i),
+								  txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
+                                  style = 3, label = c("=", ".", ""))
+                flush.console()
+		    }
+		}
 
         theta[i, ] <- thetaCurr
         loglike[i] <- loglikeCurr
+		if (method == "BSLmisspec") {
+		    gamma[i, ] <- gammaCurr
+		}
 
         if (plotOnTheFly) {
-            if (i %% 1000 == 0) {
+            if (i %% plotOnTheFly == 0) {
                 for (k in 1:p) {
                   plot(density(theta[1:i, k]), main = NA, xlab = thetaNames[k],
                     col = 1, lty = 1)
                 }
-                # Sys.sleep(0.5)
             }
         }
     }
+	if (verbose == 1L) cat('\n')
 
     accRate <- countAcc/M
     earRate <- countEar/M
@@ -311,13 +514,12 @@ bsl <- function(y, n, M, theta0, covRandWalk, fnSim, fnSum, method = c("BSL",
         par(mfrow = oldPar)
     }
 
-    results <- new('bsl', theta = theta, loglike = loglike,
-        acceptanceRate = accRate, earlyRejectionRate = earRate,
-        call = cl, y = y, n = n, M = M, theta0 = theta0, covRandWalk = covRandWalk,
-        fnSim = fnSim, fnSum = fnSum, method = method, shrinkage = shrinkage,
-        penalty = penalty, fnPrior = fnPrior, simArgs = simArgs, sumArgs = sumArgs,
-        logitTransform = logitTransform, logitTransformBound = logitTransformBound,
-        standardise = standardise, parallel = parallel, parallelArgs = parallelArgs,
-        thetaNames = as.expression(thetaNames), time = time)
-    return(results)
+	result <- new("BSL", theta = theta, loglike = loglike, call = cl, model = model,
+	    acceptanceRate = accRate, earlyRejectionRate = earRate, errorRate = errRate,
+		y = y, n = n, M = M, covRandWalk = covRandWalk, method = method,
+		shrinkage = shrinkage, penalty = penalty, standardise = standardise, GRC = GRC,
+		logitTransform = logitTransform, logitTransformBound = logitTransformBound,
+		parallel = parallel, parallelArgs = parallelArgs, time = time,
+		gamma = gamma, misspecType = misspecType, tau = tau, whitening = whitening)
+    return(result)
 }

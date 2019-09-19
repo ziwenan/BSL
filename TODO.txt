@@ -1,8 +1,5 @@
-- It would be nice to allow functionality for users to have the option of write their own function
-to produce the n model simulations (rather than 1). There are some simpler models where the n
-simulations can be generated say using vectorised code (eg g-and-k example), which would be much
-faster than a (parallel or serial) for loop.
-
-- Adjust code so that the fnPrior function returns the log value.
-
-- Add a sentence in bsl function help page, "See \code{\link{ma2}}, \code{\link{cell}} and \code{\link{mgnk}} for examples."
+- Add a parameter that allows burn-in steps in MCMC.
+- Add a function "as.bsl" to coerce a list or data frame into "bsl" object.
+- Speed up the Gaussian rank correlation function.
+- Include more BSL methods, such as Frazier and Drovandi 2019, and variational Bayes synthetic likelihood.
+- Add more examples.

@@ -2,70 +2,78 @@
 % Please edit documentation in R/semiparaKernelEstimate.R
 \name{semiparaKernelEstimate}
 \alias{semiparaKernelEstimate}
-\title{Estimating the semi-parametric joint likelihood}
+\title{Estimate the semi-parametric (joint) synthetic likelihood}
 \usage{
 semiparaKernelEstimate(ssy, ssx, kernel = "gaussian", shrinkage = NULL,
   penalty = NULL, log = TRUE)
 }
 \arguments{
-\item{ssy}{The observed summary statistic.}
+\item{ssy}{The observed summary statisic.}
 
-\item{ssx}{A matrix of the simulated summary statistics. The number of rows is the same
-as the number of simulations per iteration.}
+\item{ssx}{A matrix of the simulated summary statistics. The number
+of rows is the same as the number of simulations per iteration.}
 
-\item{kernel}{A string argument indicating the smoothing kernel to pass into
-\code{density} for estimating the marginal distribution of each summary statistic. Only "gaussian"
-and "epanechnikov" are available. The default is "gaussian".}
+\item{kernel}{A string argument indicating the smoothing kernel to pass
+into \code{density} for estimating the marginal distribution of each
+summary statistic. Only ``gaussian" and ``epanechnikov" are available. The
+default is ``gaussian".}
 
-\item{shrinkage}{A string argument indicating which shrinkage method to be used on the
-correlation matrix of the Gaussian copula. The default is \code{NULL}, which means no shrinkage
-is used. Current options are 'glasso' for graphical lasso and 'Warton' for the ridge
-regularisation method of Warton (2008).}
+\item{shrinkage}{A string argument indicating which shrinkage method to
+be used. The default is \code{NULL}, which means no shrinkage is used.
+Current options are ``glasso'' for the graphical lasso method of
+\insertCite{Friedman2008;textual}{BSL} and ``Warton'' for the ridge
+regularisation method of \insertCite{Warton2008;textual}{BSL}.}
 
-\item{penalty}{The penalty value to be used for the specified shrinkage method. Must be between zero and one
-if the shrinkage method is 'Warton'.}
+\item{penalty}{The penalty value to be used for the specified shrinkage
+method. Must be between zero and one if the shrinkage method is ``Warton''.}
 
-\item{log}{A logical argument indicating if the log of the likelihood is given as the result.
-The default is \code{TRUE}.}
+\item{log}{A logical argument indicating if the log of likelihood is
+given as the result. The default is \code{TRUE}.}
 }
 \value{
-The estimated (log) likelihood value.
+The estimated synthetic (log) likelihood value.
 }
 \description{
-This function estimates the semi-parametric likelihood of An et al (2018).
-Kernel density estimates are used for modelling each univariate marginal distribution, and the
-dependence structure between summaries are captured using a Gaussian copula.
+This function computes the semi-parametric likelihood estimator
+  of \insertCite{An2018}{BSL}. The advantage of this semi-parametric
+  estimator over the standard synthetic likelihood estimator is that the
+  semi-parametric one could deal with non-normal summary statistics much
+  better. Kernel density estimation is used for modelling each univariate
+  marginal distribution, and the dependence structure between summaries are
+  captured using a Gaussian copula. Shrinkage on the correlation
+  matrix parameter of the Gaussian copula is helpful to bring down the number of simulations.
 }
 \examples{
 data(ma2)
-y <- ma2$data # the observed data
+ssy <- ma2_sum(ma2$data)
+m <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args,
+              theta0 = ma2$start, sumArgs = list(delta = 0.5))
+ssx <- simulation(m, n = 300, theta = c(0.6, 0.2), seed = 10)$ssx
 
-# function that simulates an ma2 time series
-simulate_ma2 <- function(theta, L = 50) {
-    rand <- rnorm(L + 2)
-    y <- rand[3 : (L+2)] + theta[1] * rand[2 : (L+1)] + theta[2] * rand[1 : L]
-    return(y)
-}
+# check the distribution of the first summary statistic: highly non-normal
+plot(density(ssx[, 1]))
 
-theta_true <- c(0.6, 0.2)
-x <- matrix(0, 300, 50)
-set.seed(100)
-for(i in 1:300) x[i, ] <- simulate_ma2(theta_true)
-
-# the default semi-parametric synthetic likelihood estimator of semiBSL
-semiparaKernelEstimate(y, x)
+# the standard synthetic likelihood estimator over-estimates the likelihood here
+gaussianSynLike(ssy, ssx)
+# the semi-parametric synthetic likelihood estimator is more robust to non-normality
+semiparaKernelEstimate(ssy, ssx)
 # using shrinkage on the correlation matrix of the Gaussian copula is also possible
-semiparaKernelEstimate(y, x, shrinkage = 'Warton', penalty = 0.6)
+semiparaKernelEstimate(ssy, ssx, shrinkage = 'Warton', penalty = 0.8)
 
 }
 \references{
-An, Z., Nott, D. J. &  Drovandi, C. (2018). Robust Bayesian Synthetic Likelihood via
-a Semi-Parametric Approach. \url{https://arxiv.org/abs/1809.05800}
+\insertAllCited{}
 
-Friedman, J., Hastie, T., Tibshirani, R. (2008). Sparse inverse covariance estimation with
-the graphical lasso. Biostatistics. \url{https://doi.org/10.1093/biostatistics/kxm045}
+\insertRef{Friedman2008}{BSL}
 
-Warton, D. I. (2008). Penalized Normal Likelihood and Ridge Regularization of Correlation and
-Covariance Matrices, Journal of the American Statistical Association.
-\url{https://www.tandfonline.com/doi/abs/10.1198/016214508000000021}
+\insertRef{Warton2008}{BSL}
+
+\insertRef{Boudt2012}{BSL}
+}
+\seealso{
+Other available synthetic likelihood estimators:
+  \code{\link{gaussianSynLike}} for the standard synthetic likelihood
+  estimator, \code{\link{gaussianSynLikeGhuryeOlkin}} for the unbiased
+  synthetic likelihood estimator, \code{\link{synLikeMisspec}} for the
+  Gaussian synthetic likelihood estimator for model misspecification.
 }
