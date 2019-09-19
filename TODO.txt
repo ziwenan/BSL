@@ -1,1 +1,0 @@
-- Speed up the Gaussian rank correlation function.
