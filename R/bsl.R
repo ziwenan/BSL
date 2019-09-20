@@ -59,7 +59,7 @@ NULL
 #'   sparsity of the synthetic likelihood covariance matrix. This might allow
 #'   heavier shrinkage to be applied without losing much accuracy, hence
 #'   allowing the number of simulations to be reduced. By default, \code{NULL}
-#'   disable the Whitening transformation. Otherwise this is enabled if a
+#'   disables the Whitening transformation. Otherwise this is enabled if a
 #'   Whitening matrix is provided. See \code{\link{estimateWhiteningMatrix}} for
 #'   the function to estimate the Whitening matrix.
 #' @param misspecType   A string argument indicating which type of model
@@ -191,20 +191,6 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
 	} else {
 	    flagShrinkage <- FALSE
 	}
-	if (is.null(whitening) || !whitening) {
-	    flagWhitening <- FALSE
-		ssyTilde <- NULL
-	} else if (is.matrix(whitening)) {
-	    ns <- length(ssy)
-	    if (all(dim(whitening) == c(ns, ns))) {
-		    flagWhitening <- TRUE
-		    W <- whitening
-		} else {
-		    stop(paste("The Whitening matrix must be of dimension", ns, "by", ns))
-		}
-	} else {
-	    stop("invalid Whitening argument")
-	}
     if (!flagShrinkage && !is.null(penalty)) {
         warning("\"penalty\" will be ignored because no shrinkage method is specified")
     }
@@ -214,17 +200,6 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
 	if (!flagShrinkage && standardise) {
         warning("\"standardise\" will be ignored because shrinkage method is not \"glasso\"")
     }
-	if (!flagShrinkage && flagWhitening) {
-        warning("\"whitening\" will be ignored because shrinkage method is not \"Warton\"")
-    }
-	if (flagShrinkage) {
-	    if (shrinkage != "glasso" && standardise) {
-            warning("standardisation is only supported if shrinkage is \"glasso\"")
-        }
-	    if (shrinkage != "Warton" && flagWhitening) {
-            warning("Whitening is only supported if shrinkage is \"Warton\"")
-        }
-	}
 
 	# deprecated arguments
 	if (!missing(theta0)) {
@@ -260,6 +235,57 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
 	} else {
 	    stopifnot(inherits(model, "MODEL"))
 	}
+	
+	if (is.null(whitening)) {
+	    flagWhitening <- FALSE
+		ssyTilde <- NULL
+	} else if (is.atomic(whitening) & is.matrix(whitening)) {
+	    ns <- model@ns
+	    if (all(dim(whitening) == c(ns, ns))) {
+		    flagWhitening <- TRUE
+		} else {
+		    stop(paste("The Whitening matrix must be of dimension", ns, "by", ns))
+		}
+	} else if (is.atomic(whitening) & length(whitening) == 1) {
+	    flagWhitening <- as.logical(whitening)
+		if (flagWhitening) {
+			if (verbose) cat("estimating the Whitening matrix ... ")
+		    whitening <- estimateWhiteningMatrix(n = 1e3, model = model)
+			if (verbose) cat("finish\n")
+		} else {
+		    whitening <- ssyTilde <- NULL
+		}
+	} else {
+	   stop("invalid argument \"whitening\"")
+	}
+	
+	if (!flagShrinkage && flagWhitening) {
+        warning("\"whitening\" will be ignored because shrinkage method is not \"Warton\"")
+    }
+	if (flagShrinkage) {
+	    if (shrinkage != "glasso" && standardise) {
+            warning("standardisation is only supported if shrinkage is \"glasso\"")
+        }
+	    if (shrinkage != "Warton" && flagWhitening) {
+            warning("Whitening is only supported if shrinkage is \"Warton\"")
+        }
+	}
+	
+	if (verbose) {
+	    if (flagType) typeText <- switch(misspecType, 
+		                                 "mean"     = "mean-adjusted", 
+										 "variance" = "variance-inflated")
+	    methodText <- switch(method, 
+		                     "BSL"        = "standard BSL", 
+							 "uBSL"       = "unbiased BSL", 
+							 "semiBSL"    = "semi-BSL",
+							 "BSLmisspec" = paste("BSL with", typeText, "model misspecification")
+							)
+        shrinkageText <- paste("shrinkage:", ifelse(flagShrinkage, shrinkage, "disabled"))
+		whiteningText <- paste("whitening:", ifelse(flagWhitening, "enabled", "disable"))
+	    cat("*** runnning", methodText, "*** \n")
+		cat(shrinkageText, ", ", whiteningText, "\n", sep = "")
+	}
 
     p <- length(model@theta0)
 	fnLogPrior <- model@fnLogPrior
@@ -287,7 +313,7 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
     countAcc <- countEar <- countErr <- 0
 
     if (flagWhitening) {
-	    ssyTilde <- c(tcrossprod(ssy, W))
+	    ssyTilde <- c(tcrossprod(ssy, whitening))
 	}
 	if (method == "BSLmisspec") {
 		gammaCurr <- switch(misspecType,
@@ -313,6 +339,7 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
         par(mfrow = c(a, b))
     }
 
+    if (verbose) cat("initialising parameters ... ")
     while (is.infinite(loglikeCurr)) {
         # simulate with thetaProp and calculate the summary statistics
 		ssx <- myFnSimSum(n, thetaCurr)
@@ -333,6 +360,7 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
 			stdCurr <- attr(loglikeCurr, "std")
 	    }
     }
+	if (verbose) cat("finish\n")
 
     if (verbose == 1L) timeStart <- Sys.time()
     for (i in 1:M) {

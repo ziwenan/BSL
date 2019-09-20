@@ -12,8 +12,9 @@
 newModel(fnSim, fnSimVec, fnSum, fnLogPrior, simArgs, sumArgs, theta0,
   thetaNames, test = TRUE, verbose = TRUE)
 
-\S4method{simulation}{MODEL}(model, n, theta, summStat = TRUE,
-  parallel = FALSE, parallelArgs = NULL, seed = NULL)
+\S4method{simulation}{MODEL}(model, n = 1, theta = model@theta0,
+  summStat = TRUE, parallel = FALSE, parallelArgs = NULL,
+  seed = NULL)
 
 \S4method{summStat}{ANY,MODEL}(x, model)
 }

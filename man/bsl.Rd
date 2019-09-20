@@ -102,7 +102,7 @@ transformation helps decorrelate the summary statistics, thus encourages
 sparsity of the synthetic likelihood covariance matrix. This might allow
 heavier shrinkage to be applied without losing much accuracy, hence
 allowing the number of simulations to be reduced. By default, \code{NULL}
-disable the Whitening transformation. Otherwise this is enabled if a
+disables the Whitening transformation. Otherwise this is enabled if a
 Whitening matrix is provided. See \code{\link{estimateWhiteningMatrix}} for
 the function to estimate the Whitening matrix.}
 

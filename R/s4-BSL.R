@@ -5,6 +5,7 @@ setOldClass("difftime")
 setClassUnion("numericOrNULL", c("numeric", "NULL"))
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 setClassUnion("characterOrNULL", c("character", "NULL"))
+setClassUnion("logicalOrMatrixOrNULL", c("logical", "matrix", "NULL"))
 # setClassUnion("listOrNULL", c("list", "NULL")) # defined in s4-MODEL.R
 # setClassUnion("functionOrNULL", c("function", "NULL")) # defined in s4-MODEL.R
 
@@ -40,8 +41,8 @@ setClassUnion("characterOrNULL", c("character", "NULL"))
 #' inflation ("variance") to be used in "BSLmisspec" method.
 #' @slot tau Object of class ``numeric''. Parameter of the prior distribution for "BSLmisspec" method. For mean adjustment, \code{tau} 
 #' is the scale of the Laplace distribution. For variance inflation, \code{tau} is the scale (or mean) of the exponential distribution.
-#' @slot whitening Object of class ``matrixOrNULL''. An argument determines whether Whitening transformation
-#'   is used in ``BSL'' method with Warton's shrinkage.
+#' @slot whitening Object of class ``logicalOrMatrixOrNULL''. A logical argument determines whether Whitening transformation
+#'   is used in ``BSL'' method with Warton's shrinkage, or just the Whitening matrix used.
 #'
 #' @examples
 #' \dontshow{
@@ -84,7 +85,7 @@ setClass("BSL",
                    gamma = "matrix", 
                    misspecType = "characterOrNULL", 
                    tau = "numeric", 
-                   whitening = "matrixOrNULL", 
+                   whitening = "logicalOrMatrixOrNULL", 
                    logitTransform = "logical", 
                    logitTransformBound = "matrixOrNULL", 
                    parallel = "logical", 

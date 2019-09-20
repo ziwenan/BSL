@@ -136,7 +136,7 @@ setMethod("initialize",
                     .Object@test <- test
                   .Object@verbose <- verbose
                   validObject(.Object)
-                  .Object@ns <- setns(.Object)
+                  .Object@ns <- getns(.Object)
 
                   if (missing(thetaNames)) { # missing
                       if (!is.null(names(theta0))) { # use the name of theta0
@@ -223,7 +223,7 @@ setValidity("MODEL",
                 # pass all checks
                 TRUE
             }
-            )
+           )
 
 #' Run simulations with a give "MODEL" object
 #' @description see \code{\link{MODEL}}
@@ -249,7 +249,7 @@ setGeneric("simulation", function(model, ...) standardGeneric("simulation"))
 #' @export
 setMethod("simulation",
           signature(model = "MODEL"),
-          definition = function(model, n, theta, summStat = TRUE, parallel = FALSE, parallelArgs = NULL, seed = NULL) {
+          definition = function(model, n = 1, theta = model@theta0, summStat = TRUE, parallel = FALSE, parallelArgs = NULL, seed = NULL) {
               if (!is.null(seed)) set.seed(seed)
               flagVec <- !is.null(model@fnSimVec)
               if (flagVec && parallel) {
@@ -262,56 +262,59 @@ setMethod("simulation",
               if (model@fnLogPrior(theta) == -Inf) {
                   warning("The given parameter has no prior support")
               }
-			  
-			  ssx <- NULL
+              
+              ssx <- NULL
               if (parallel) { # parallel
                   # parallelArgs$.export <- c(parallelArgs$.export, "model")
                   x <- do.call(foreach, c(list(j = 1:n), parallelArgs)) %dopar% {
                       do.call(model@fnSim, c(list(theta), model@simArgs))
                   }
-				  if (summStat) {
-				      ssx <- do.call(foreach, c(list(j = 1:n, .combine = rbind), parallelArgs)) %dopar% {
+                  if (summStat) {
+                      ssx <- do.call(foreach, c(list(j = 1:n, .combine = rbind), parallelArgs)) %dopar% {
                           do.call(model@fnSum, c(x[j], model@sumArgs))
                       }
-				  }
-                  if (length(unique(sapply(x, FUN = length))) == 1) { # reduce to matrix
-                      x <- matrix(unlist(x), ncol = length(x[[1]]), byrow = TRUE)
                   }
-				  
+                  if (is.atomic(x[[1]]) && is.vector(x[[1]])) { # reduce to matrix
+                      if (length(unique(sapply(x, FUN = length))) == 1) {
+                                x <- matrix(unlist(x), ncol = length(x[[1]]), byrow = TRUE)
+                            }
+                  }
+                  
               } else { # not parallel
                   if (flagVec) { # vectorised
                       x <- do.call(model@fnSimVec, c(list(n, theta), model@simArgs))
-					  if (summStat) {
-					      if (is.matrix(x)) {
+                      if (summStat) {
+                          if (is.matrix(x)) {
                               ssx <- apply(x, FUN = function(y) do.call(model@fnSum, c(list(y), model@sumArgs)), MARGIN = 1)
                           } else {
                               ssx <- sapply(x, FUN = function(y) do.call(model@fnSum, c(list(y), model@sumArgs)))
                           }
-                          if (is.vector(ssx)) {
-                              ssx <- as.matrix(ssx)
-                          } else {
+                          if (!is.vector(ssx)) {
                               ssx <- t(ssx)
                           }
-					  }
+                      }
                       
                   } else { # serial
                       x <- vector("list", n)
-					  if (summStat) {
-					      ssx <- array(0, c(n, model@ns))
+                      if (summStat) {
+                          ns <- ifelse(length(model@ns) == 0, getns(model), model@ns)
+                          ssx <- array(0, c(n, ns))
                           for (j in 1 : n) {
                               x[[j]] <- do.call(model@fnSim, c(list(theta), model@simArgs))
                               ssx[j, ] <- do.call(model@fnSum, c(x[j], model@sumArgs))
                           }
-                          if (length(unique(sapply(x, FUN = length))) == 1) { # reduce to matrix
-                              x <- matrix(unlist(x), ncol = length(x[[1]]), byrow = TRUE)
+                          if (is.atomic(x[[1]]) && is.vector(x[[1]])) { # reduce to matrix
+                              if (length(unique(sapply(x, FUN = length))) == 1) {
+                                  x <- matrix(unlist(x), ncol = length(x[[1]]), byrow = TRUE)
+                              }
                           }
-					  }
+                      }
                   }
               }
               return (list(x = x, ssx = ssx))
           }
-          )
-		  
+         )
+          
 #' Compute the summary statistics with the given data
 #' @description see \code{\link{MODEL}}
 #' @param x The data to pass to the summary statistics function.
@@ -328,7 +331,7 @@ setGeneric("summStat", function(x, model) standardGeneric("summStat"))
 setMethod("summStat",
           signature(model = "MODEL"),
           definition = function(x, model) {
-		      stopifnot(!is.null(x))
+              stopifnot(!is.null(x))
               do.call(model@fnSum, c(list(x), model@sumArgs))
           }
           )
@@ -362,7 +365,8 @@ setMethod("fn",
                   }
 
                   fn <- function(n, theta) {
-                      ssx <- array(0, c(n, .Object@ns))
+                      ns <- ifelse(length(.Object@ns) == 0, getns(.Object), .Object@ns)
+                      ssx <- array(0, c(n, ns))
                       for (j in 1:n) {
                           x <- do.call(.Object@fnSim, c(list(theta), .Object@simArgs))
                           ssx[j, ] <- do.call(.Object@fnSum, c(list(x), .Object@sumArgs))
@@ -372,10 +376,10 @@ setMethod("fn",
               }
               return(list(fn = fn, fnPar = fnPar))
           }
-          )
+         )
           
-setGeneric("setns", valueClass = "integer", function(model) standardGeneric("setns"))
-setMethod("setns",
+setGeneric("getns", valueClass = "integer", function(model) standardGeneric("getns"))
+setMethod("getns",
           signature = c(model = "MODEL"),
           definition = function(model) {
               if (!is.null(model@fnSimVec)) {
@@ -384,7 +388,12 @@ setMethod("setns",
                   x <- list()
                   x[[1]] <- do.call(model@fnSim, c(list(model@theta0), model@simArgs))
               }
-              ns <- length(do.call(model@fnSum, c(list(x[[1]]), model@sumArgs)))
+			  if (is.matrix(x)) {
+			      y <- x[1, ]
+			  } else {
+			      y <- x[[1]]
+			  }
+              ns <- length(do.call(model@fnSum, c(list(y), model@sumArgs)))
               return(as.integer(ns))
           }
-          )
+         )

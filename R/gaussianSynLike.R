@@ -15,6 +15,15 @@
 #' @param ssy          The observed summary statisic.
 #' @param ssx          A matrix of the simulated summary statistics. The number
 #'   of rows is the same as the number of simulations per iteration.
+#' @param whitening     An argument determines whether Whitening transformation
+#'   should be used in ``BSL'' method with Warton's shrinkage. Whitening
+#'   transformation helps decorrelate the summary statistics, thus encourages
+#'   sparsity of the synthetic likelihood covariance matrix. This might allow
+#'   heavier shrinkage to be applied without losing much accuracy, hence
+#'   allowing the number of simulations to be reduced. By default, \code{NULL}
+#'   disables the Whitening transformation. Otherwise this is enabled if a
+#'   Whitening matrix is provided. See \code{\link{estimateWhiteningMatrix}} for
+#'   the function to estimate the Whitening matrix.
 #' @param ssyTilde     The whitened observed summary statisic. If this is not
 #'   \code{NULL}, it will be used to save computation effort. Only used if
 #'   Whitening is enabled.
@@ -64,18 +73,18 @@ gaussianSynLike <- function(ssy, ssx, shrinkage = NULL, penalty = NULL, standard
 	} else {
 	    flagShrinkage <- FALSE
 	}
-	if (is.null(whitening) || !whitening) {
+	if (is.null(whitening)) {
 	    flagWhitening <- FALSE
-	} else if (is.matrix(whitening)) {
+		ssyTilde <- NULL
+	} else if (is.atomic(whitening) & is.matrix(whitening)) {
 	    ns <- length(ssy)
 	    if (all(dim(whitening) == c(ns, ns))) {
 		    flagWhitening <- TRUE
-		    W <- whitening
 		} else {
 		    stop(paste("The Whitening matrix must be of dimension", ns, "by", ns))
 		}
 	} else {
-	    stop("invalid Whitening argument")
+	   stop("invalid argument \"whitening\"")
 	}
     if (!flagShrinkage && !is.null(penalty)) {
         warning('"penalty" will be ignored because no shrinkage method is specified')
@@ -142,12 +151,12 @@ gaussianSynLike <- function(ssy, ssx, shrinkage = NULL, penalty = NULL, standard
 		if (shrinkage == 'Warton') {
 		    if (flagWhitening) { # Whitening transformation
 			    if (is.null(ssyTilde)) {
-				    ssy <- c(tcrossprod(ssy, W))
+				    ssy <- c(tcrossprod(ssy, whitening))
 				} else { # inherit ssy to save computation
 				    ssy <- ssyTilde
 				}
-				ssx <- tcrossprod(ssx, W)
-				mu <- c(tcrossprod(mu, W))
+				ssx <- tcrossprod(ssx, whitening)
+				mu <- c(tcrossprod(mu, whitening))
 			}
 		    if (GRC) {
 			    std <- apply(ssx, MARGIN = 2, FUN = sd)

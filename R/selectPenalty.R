@@ -97,7 +97,7 @@ selectPenalty <- function(ssy, n, lambda, M, sigma = 1.5, model, theta = NULL,
     call <- match.call()
 
 	if (verbose) {
-	    cat('*** selecting penalty with', method, 'likelihood and', shrinkage, 'shrinkage estimator ***\n')
+	    cat("*** selecting penalty with", method, "likelihood and", shrinkage, "shrinkage estimator ***\n")
 	}
     nMax <- max(n)
     loglike <- vector("list", N)
@@ -115,15 +115,15 @@ selectPenalty <- function(ssy, n, lambda, M, sigma = 1.5, model, theta = NULL,
 
         flush.console()
         if (verbose == 2L)  {
-		    cat('m =', m, '\n')
+		    cat("m =", m, "\n")
 		} else if (verbose == 1L){
-		    timeElapsed <- difftime(Sys.time(), timeStart, units = 'secs')
+		    timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
             timeLeft <- timeElapsed / m * (M - m)
             elapsed <- myTimeStr(timeElapsed)
             left <- myTimeStr(timeLeft)
-		    myMiniProgressBar(m / M, txt1 = paste('m =', m),
-                              txt2 = paste0('elapsed = ', elapsed, ', remaining = ', left),
-                              style = 2, label = c('=', '.', '|'))
+		    myMiniProgressBar(m / M, txt1 = paste("m =", m),
+                              txt2 = paste0("elapsed = ", elapsed, ", remaining = ", left),
+                              style = 2, label = c("=", ".", "|"))
             flush.console()
 		}
 
@@ -153,7 +153,7 @@ selectPenalty <- function(ssy, n, lambda, M, sigma = 1.5, model, theta = NULL,
             }
         }
     }
-	if (verbose == 1L) cat('\n')
+	if (verbose == 1L) cat("\n")
 	
 	ret <- PENALTY(loglike = loglike, n = n, lambda = lambda, sigma = sigma, model = model, call = call)
 

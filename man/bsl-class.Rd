@@ -114,8 +114,8 @@ inflation ("variance") to be used in "BSLmisspec" method.}
 \item{\code{tau}}{Object of class ``numeric''. Parameter of the prior distribution for "BSLmisspec" method. For mean adjustment, \code{tau} 
 is the scale of the Laplace distribution. For variance inflation, \code{tau} is the scale (or mean) of the exponential distribution.}
 
-\item{\code{whitening}}{Object of class ``matrixOrNULL''. An argument determines whether Whitening transformation
-is used in ``BSL'' method with Warton's shrinkage.}
+\item{\code{whitening}}{Object of class ``logicalOrMatrixOrNULL''. A logical argument determines whether Whitening transformation
+is used in ``BSL'' method with Warton's shrinkage, or just the Whitening matrix used.}
 }}
 
 \examples{
