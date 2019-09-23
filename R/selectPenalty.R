@@ -72,92 +72,92 @@
 #'   for the main function to run BSL.
 #' @export
 selectPenalty <- function(ssy, n, lambda, M, sigma = 1.5, model, theta = NULL,
-    method = c("BSL", "semiBSL"), shrinkage = c("glasso", "Warton"),
-	parallelSim = FALSE, parallelSimArgs = NULL, parallelMain = FALSE, verbose = 1L, ...) {
-	method <- match.arg(method)
-	shrinkage <- match.arg(shrinkage)
-	if (!verbose %in% c(0, 1, 2)) {
-	    stop("verbose must be 0 or 1 or 2")
-	}
-	if (!parallelSim & !is.null(parallelSimArgs)) {
-        warning("\"parallelSimArgs\" is omitted in serial computing")
+                          method = c("BSL", "semiBSL"), shrinkage = c("glasso", "Warton"),
+                          parallelSim = FALSE, parallelSimArgs = NULL, parallelMain = FALSE, verbose = 1L, ...) {
+  method <- match.arg(method)
+  shrinkage <- match.arg(shrinkage)
+  if (!verbose %in% c(0, 1, 2)) {
+    stop("verbose must be 0 or 1 or 2")
+  }
+  if (!parallelSim & !is.null(parallelSimArgs)) {
+    warning("\"parallelSimArgs\" is omitted in serial computing")
+  }
+  stopifnot(inherits(model, "MODEL"))
+  
+  if (is.null(theta)) {
+    theta <- model@theta0
+  }
+  n <- as.vector(n)
+  if (!is.list(lambda)) {
+    lambda <- list(lambda)
+  }
+  N <- length(n)
+  if (length(lambda) != N) {
+    stop("lambda must be a list with the same length as n")
+  }
+  ns <- length(ssy)
+  call <- match.call()
+  
+  if (verbose) {
+    cat("*** selecting penalty with", method, "likelihood and", shrinkage, "shrinkage estimator ***\n")
+  }
+  nMax <- max(n)
+  loglike <- vector("list", N)
+  for (i in 1 : N) loglike[[i]] <- array(NA, c(M, length(lambda[[i]])))
+  
+  # map the simulation function
+  if (parallelSim) {
+    myFnSimSum <- function(n, theta) fn(model)$fnPar(n, theta, parallelSimArgs)
+  } else {
+    myFnSimSum <- fn(model)$fn
+  }
+  
+  if (verbose == 1L) timeStart <- Sys.time()
+  for (m in 1 : M) {
+    
+    flush.console()
+    if (verbose == 2L)  {
+      cat("m =", m, "\n")
+    } else if (verbose == 1L){
+      timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
+      timeLeft <- timeElapsed / m * (M - m)
+      elapsed <- myTimeStr(timeElapsed)
+      left <- myTimeStr(timeLeft)
+      myMiniProgressBar(m / M, txt1 = paste("m =", m),
+                        txt2 = paste0("elapsed = ", elapsed, ", remaining = ", left),
+                        style = 2, label = c("=", ".", "|"))
+      flush.console()
     }
-	stopifnot(inherits(model, "MODEL"))
-
-    if (is.null(theta)) {
-	    theta <- model@theta0
-	}
-    n <- as.vector(n)
-    if (!is.list(lambda)) {
-	    lambda <- list(lambda)
-	}
-    N <- length(n)
-    if (length(lambda) != N) {
-        stop("lambda must be a list with the same length as n")
-    }
-    ns <- length(ssy)
-    call <- match.call()
-
-	if (verbose) {
-	    cat("*** selecting penalty with", method, "likelihood and", shrinkage, "shrinkage estimator ***\n")
-	}
-    nMax <- max(n)
-    loglike <- vector("list", N)
-	for (i in 1 : N) loglike[[i]] <- array(NA, c(M, length(lambda[[i]])))
-
-	# map the simulation function
-	if (parallelSim) {
-	    myFnSimSum <- function(n, theta) fn(model)$fnPar(n, theta, parallelSimArgs)
-	} else {
-	    myFnSimSum <- fn(model)$fn
-	}
-
-    if (verbose == 1L) timeStart <- Sys.time()
-    for (m in 1 : M) {
-
-        flush.console()
-        if (verbose == 2L)  {
-		    cat("m =", m, "\n")
-		} else if (verbose == 1L){
-		    timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
-            timeLeft <- timeElapsed / m * (M - m)
-            elapsed <- myTimeStr(timeElapsed)
-            left <- myTimeStr(timeLeft)
-		    myMiniProgressBar(m / M, txt1 = paste("m =", m),
-                              txt2 = paste0("elapsed = ", elapsed, ", remaining = ", left),
-                              style = 2, label = c("=", ".", "|"))
-            flush.console()
-		}
-
-        # simulate with theta_prop and calculate summaries
-		ssx <- myFnSimSum(nMax, theta)
-
-        for (i in 1 : N) {
-            nCurr <- n[i]
-			nLambda <- length(lambda[[i]])
-            ssxCurr <- ssx[sample(nMax, nCurr), ]
-
-            if (!parallelMain) {
-                for (k in 1 : nLambda) {
-				    lambdaCurr = lambda[[i]][k]
-					loglike[[i]][m, k] <- switch(method,
-					    "BSL" = gaussianSynLike(ssy, ssxCurr, shrinkage = shrinkage, penalty = lambdaCurr, log = TRUE, ...),
-						"semiBSL" = semiparaKernelEstimate(ssy, ssxCurr, shrinkage = shrinkage, penalty = lambdaCurr, log = TRUE, ...))
-                }
-            } else {
-			    loglike[[i]][m, ] <- foreach(k = 1 : nLambda, .combine = c, .packages = "glasso",
-				    .export = c("gaussianSynLike", "semiparaKernelEstimate")) %dopar% {
-				    lambdaCurr = lambda[[i]][k]
-					switch(method,
-					    "BSL" = gaussianSynLike(ssy, ssxCurr, shrinkage = shrinkage, penalty = lambdaCurr, log = TRUE, ...),
-						"semiBSL" = semiparaKernelEstimate(ssy, ssxCurr, shrinkage = shrinkage, penalty = lambdaCurr, log = TRUE, ...))
-				}
-            }
+    
+    # simulate with theta_prop and calculate summaries
+    ssx <- myFnSimSum(nMax, theta)
+    
+    for (i in 1 : N) {
+      nCurr <- n[i]
+      nLambda <- length(lambda[[i]])
+      ssxCurr <- ssx[sample(nMax, nCurr), ]
+      
+      if (!parallelMain) {
+        for (k in 1 : nLambda) {
+          lambdaCurr = lambda[[i]][k]
+          loglike[[i]][m, k] <- switch(method,
+                                       "BSL" = gaussianSynLike(ssy, ssxCurr, shrinkage = shrinkage, penalty = lambdaCurr, log = TRUE, ...),
+                                       "semiBSL" = semiparaKernelEstimate(ssy, ssxCurr, shrinkage = shrinkage, penalty = lambdaCurr, log = TRUE, ...))
         }
+      } else {
+        loglike[[i]][m, ] <- foreach(k = 1 : nLambda, .combine = c, .packages = "glasso",
+                                     .export = c("gaussianSynLike", "semiparaKernelEstimate")) %dopar% {
+                                       lambdaCurr = lambda[[i]][k]
+                                       switch(method,
+                                              "BSL" = gaussianSynLike(ssy, ssxCurr, shrinkage = shrinkage, penalty = lambdaCurr, log = TRUE, ...),
+                                              "semiBSL" = semiparaKernelEstimate(ssy, ssxCurr, shrinkage = shrinkage, penalty = lambdaCurr, log = TRUE, ...))
+                                     }
+      }
     }
-	if (verbose == 1L) cat("\n")
-
-	ret <- PENALTY(loglike = loglike, n = n, lambda = lambda, sigma = sigma, model = model, call = call)
-
-    return(ret)
+  }
+  if (verbose == 1L) cat("\n")
+  
+  ret <- PENALTY(loglike = loglike, n = n, lambda = lambda, sigma = sigma, model = model, call = call)
+  
+  return(ret)
 }

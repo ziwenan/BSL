@@ -79,195 +79,195 @@
 #'   \code{\link{toad}} for examples.
 #' @export
 combinePlotsBSL <- function(objectList, which = 1L, thin = 1, thetaTrue = NULL, label = NULL, legendPosition = c('auto','right','bottom')[1],
-                          legendNcol = NULL, col = NULL, lty = NULL, lwd = NULL, cex.lab = 1, cex.axis = 1, cex.legend = 0.75,
-                          top = 'Approximate Marginal Posteriors', options.color = list(), options.linetype = list(),
-                          options.size = list(), options.theme = list()) {
-    if (which == 1L) {
-        if (length(options.color) != 0 || length(options.linetype) != 0 || length(options.size) != 0 || length(options.theme) != 0) {
-            warning('"options.color", "options.linetype", "options.size" and "options.theme" are ignored when which = 1')
-        }
-        multiPlotDefault(objectList, thin, thetaTrue, label, legendPosition, legendNcol, col, lty, lwd, cex.lab, cex.axis, cex.legend)
-    } else if (which == 2L) {
-        multiPlotGgplot(objectList, thin, thetaTrue, label, top, options.color, options.linetype, options.size, options.theme)
-    } else {
-        stop('Indicate a supported plot number, 1 for R default density plot or 2 for ggplot density plot')
+                            legendNcol = NULL, col = NULL, lty = NULL, lwd = NULL, cex.lab = 1, cex.axis = 1, cex.legend = 0.75,
+                            top = 'Approximate Marginal Posteriors', options.color = list(), options.linetype = list(),
+                            options.size = list(), options.theme = list()) {
+  if (which == 1L) {
+    if (length(options.color) != 0 || length(options.linetype) != 0 || length(options.size) != 0 || length(options.theme) != 0) {
+      warning('"options.color", "options.linetype", "options.size" and "options.theme" are ignored when which = 1')
     }
+    multiPlotDefault(objectList, thin, thetaTrue, label, legendPosition, legendNcol, col, lty, lwd, cex.lab, cex.axis, cex.legend)
+  } else if (which == 2L) {
+    multiPlotGgplot(objectList, thin, thetaTrue, label, top, options.color, options.linetype, options.size, options.theme)
+  } else {
+    stop('Indicate a supported plot number, 1 for R default density plot or 2 for ggplot density plot')
+  }
 }
 
 multiPlotDefault <- function(objectList, thin = 1, thetaTrue = NULL, label = NULL, legendPosition = c('auto','right','bottom')[1],
                              legendNcol = NULL, col = NULL, lty = NULL, lwd = NULL, cex.lab = 1, cex.axis = 1, cex.legend = 0.75) {
-    nList <- length(objectList)
-    p <- ncol(objectList[[1]]@theta)
-    a <- floor(sqrt(p))
-    b <- ceiling(p / a)
-
-    if (is.null(col)) {
-        col <- 1 : nList
+  nList <- length(objectList)
+  p <- ncol(objectList[[1]]@theta)
+  a <- floor(sqrt(p))
+  b <- ceiling(p / a)
+  
+  if (is.null(col)) {
+    col <- 1 : nList
+  } else {
+    if (length(col) != nList) {
+      stop ('length of "col" must match "objectList"')
+    }
+  }
+  if (is.null(lty)) {
+    lty <- 1 : nList
+  } else {
+    if (length(col) != nList) {
+      stop ('length of "col" must match "objectList"')
+    }
+  }
+  if (is.null(lwd)) {
+    lwd <- rep(1, nList)
+  } else {
+    if (length(col) != nList) {
+      stop ('length of "col" must match "objectList"')
+    }
+  }
+  
+  thetaNames <- objectList[[1]]@model@thetaNames
+  if (length(thin) == 1L) {
+    thin <- rep(thin, nList)
+  }
+  
+  if (legendPosition == 'auto') {
+    if (a*b == p) { # legend at bottom
+      layoutM <- matrix(c(1:p,rep(p+1,b)), nrow = a+1, ncol = b, byrow = TRUE)
+      layout(mat = layoutM, heights = c(rep(0.85/a,a),0.15))
+      legendx <- 'center'
+      legendHorz <- TRUE
+    } else { # legend at corner
+      layoutM <- matrix(c(1:p,rep(p+1,a*b-p)),nrow = a, ncol = b, byrow = TRUE)
+      layout(mat = layoutM, heights = rep.int(1,a))
+      legendx <- 'center'
+      legendHorz <- FALSE
+    }
+  } else if (legendPosition == 'right') {
+    if (a*b == p) {
+      layoutM <- cbind(matrix(c(1:p), nrow = a, ncol = b, byrow = TRUE), rep(p+1,a))
+      layout(mat = layoutM, widths = c(rep(0.85/b,b),0.15))
+      legendx <- 'center'
+      legendHorz <- FALSE
+      mfg <- c(a, b+1)
     } else {
-        if (length(col) != nList) {
-            stop ('length of "col" must match "objectList"')
-        }
+      layoutM <- cbind(matrix(c(1:p,rep(p+2,a*b-p)),nrow = a, ncol = b, byrow = TRUE), rep(p+1,a))
+      layout(mat = layoutM, widths = c(rep(0.85/b,b),0.15))
+      legendx <- 'center'
+      legendHorz <- FALSE
     }
-    if (is.null(lty)) {
-        lty <- 1 : nList
+  } else if (legendPosition == 'bottom') {
+    if (a*b == p) {
+      layoutM <- matrix(c(1:p,rep(p+1,b)), nrow = a+1, ncol = b, byrow = TRUE)
+      layout(mat = layoutM, heights = c(rep(0.85/a,a),0.15))
+      legendx <- 'center'
+      legendHorz <- TRUE
     } else {
-        if (length(col) != nList) {
-            stop ('length of "col" must match "objectList"')
-        }
+      layoutM <- rbind(matrix(c(1:p,rep(p+2,a*b-p)),nrow = a, ncol = b, byrow = TRUE), rep(p+1,b))
+      layout(mat = layoutM, heights = rep.int(1,a))
+      legendx <- 'center'
+      legendHorz <- TRUE
     }
-    if (is.null(lwd)) {
-        lwd <- rep(1, nList)
+  } else {
+    stop('"legendPosition" must be "auto" or "right" or "bottom"')
+  }
+  
+  if (is.null(legendNcol)) {
+    legendNcol <- ifelse(legendHorz, nList, 1)
+  }
+  
+  idx <- lapply(1:nList, FUN = function(i) seq(1, objectList[[i]]@M, thin[i]))
+  theta <- d <- xRange <- yRange <- vector('list', p)
+  for (k in 1:p) {
+    theta[[k]] <- lapply(1:nList, FUN = function(i) objectList[[i]]@theta[idx[[i]], k])
+    d[[k]] <- lapply(theta[[k]], FUN = density)
+    xRange[[k]] <- range(sapply(1:nList, FUN = function(i) range(d[[k]][[i]]$x)))
+    yRange[[k]] <- c(0, max(sapply(1:nList, FUN = function(i) max(d[[k]][[i]]$y))))
+  }
+  
+  for (k in 1:p) {
+    # par(mar = c(5.1,5.1,2,2))
+    plot(0, type = 'n', main = NA, xlab = thetaNames[k], ylab = 'density', cex.lab = cex.lab,
+         xlim = xRange[[k]], ylim = yRange[[k]], cex.axis = cex.axis)
+    for (i in 1 : nList) {
+      lines(d[[k]][[i]], col = col[i], lty = lty[i], lwd = lwd[i])
+    }
+    if (!is.null(thetaTrue)) {
+      abline(v = thetaTrue[k], col = 'forestgreen', lty = 3)
+    }
+  }
+  par(mar=c(0,0,0,0), cex = cex.legend)
+  plot(0, type = "n", axes = FALSE, xlab = "", ylab = "")
+  if (is.null(label)) {
+    if (is.null(names(objectList))) {
+      label <- paste0('result', 1 : nList)
     } else {
-        if (length(col) != nList) {
-            stop ('length of "col" must match "objectList"')
-        }
+      label <- names(objectList)
     }
-
-    thetaNames <- objectList[[1]]@model@thetaNames
-    if (length(thin) == 1L) {
-        thin <- rep(thin, nList)
-    }
-
-    if (legendPosition == 'auto') {
-        if (a*b == p) { # legend at bottom
-            layoutM <- matrix(c(1:p,rep(p+1,b)), nrow = a+1, ncol = b, byrow = TRUE)
-            layout(mat = layoutM, heights = c(rep(0.85/a,a),0.15))
-            legendx <- 'center'
-            legendHorz <- TRUE
-        } else { # legend at corner
-            layoutM <- matrix(c(1:p,rep(p+1,a*b-p)),nrow = a, ncol = b, byrow = TRUE)
-            layout(mat = layoutM, heights = rep.int(1,a))
-            legendx <- 'center'
-            legendHorz <- FALSE
-        }
-    } else if (legendPosition == 'right') {
-        if (a*b == p) {
-            layoutM <- cbind(matrix(c(1:p), nrow = a, ncol = b, byrow = TRUE), rep(p+1,a))
-            layout(mat = layoutM, widths = c(rep(0.85/b,b),0.15))
-            legendx <- 'center'
-            legendHorz <- FALSE
-            mfg <- c(a, b+1)
-        } else {
-            layoutM <- cbind(matrix(c(1:p,rep(p+2,a*b-p)),nrow = a, ncol = b, byrow = TRUE), rep(p+1,a))
-            layout(mat = layoutM, widths = c(rep(0.85/b,b),0.15))
-            legendx <- 'center'
-            legendHorz <- FALSE
-        }
-    } else if (legendPosition == 'bottom') {
-        if (a*b == p) {
-            layoutM <- matrix(c(1:p,rep(p+1,b)), nrow = a+1, ncol = b, byrow = TRUE)
-            layout(mat = layoutM, heights = c(rep(0.85/a,a),0.15))
-            legendx <- 'center'
-            legendHorz <- TRUE
-        } else {
-            layoutM <- rbind(matrix(c(1:p,rep(p+2,a*b-p)),nrow = a, ncol = b, byrow = TRUE), rep(p+1,b))
-            layout(mat = layoutM, heights = rep.int(1,a))
-            legendx <- 'center'
-            legendHorz <- TRUE
-        }
-    } else {
-        stop('"legendPosition" must be "auto" or "right" or "bottom"')
-    }
-
-    if (is.null(legendNcol)) {
-        legendNcol <- ifelse(legendHorz, nList, 1)
-    }
-
-    idx <- lapply(1:nList, FUN = function(i) seq(1, objectList[[i]]@M, thin[i]))
-    theta <- d <- xRange <- yRange <- vector('list', p)
-    for (k in 1:p) {
-        theta[[k]] <- lapply(1:nList, FUN = function(i) objectList[[i]]@theta[idx[[i]], k])
-        d[[k]] <- lapply(theta[[k]], FUN = density)
-        xRange[[k]] <- range(sapply(1:nList, FUN = function(i) range(d[[k]][[i]]$x)))
-        yRange[[k]] <- c(0, max(sapply(1:nList, FUN = function(i) max(d[[k]][[i]]$y))))
-    }
-
-    for (k in 1:p) {
-        # par(mar = c(5.1,5.1,2,2))
-        plot(0, type = 'n', main = NA, xlab = thetaNames[k], ylab = 'density', cex.lab = cex.lab,
-             xlim = xRange[[k]], ylim = yRange[[k]], cex.axis = cex.axis)
-        for (i in 1 : nList) {
-            lines(d[[k]][[i]], col = col[i], lty = lty[i], lwd = lwd[i])
-        }
-        if (!is.null(thetaTrue)) {
-            abline(v = thetaTrue[k], col = 'forestgreen', lty = 3)
-        }
-    }
-    par(mar=c(0,0,0,0), cex = cex.legend)
-    plot(0, type = "n", axes = FALSE, xlab = "", ylab = "")
-	if (is.null(label)) {
-	    if (is.null(names(objectList))) {
-		    label <- paste0('result', 1 : nList)
-		} else {
-		    label <- names(objectList)
-		}
-    }
-    legend(x = legendx, legend = label, col = col, lty = lty, lwd = lwd, ncol = legendNcol)
-    par(mfrow = c(1,1), mar = c(5, 4, 4, 2) + 0.1)
+  }
+  legend(x = legendx, legend = label, col = col, lty = lty, lwd = lwd, ncol = legendNcol)
+  par(mfrow = c(1,1), mar = c(5, 4, 4, 2) + 0.1)
 }
 
 
 multiPlotGgplot <- function(objectList, thin = 1, thetaTrue = NULL, label = NULL, top = 'Approximate Marginal Posteriors',
                             options.color = list(), options.linetype = list(), options.size = list(), options.theme = list()) {
-    nList <- length(objectList)
-    p <- ncol(objectList[[1]]@theta)
-    a <- floor(sqrt(p))
-    b <- ceiling(p / a)
-    if (!is.null(thetaTrue) & length(thetaTrue) != p) {
-        stop('Length of thetaTrue does not match the number of parameters.')
+  nList <- length(objectList)
+  p <- ncol(objectList[[1]]@theta)
+  a <- floor(sqrt(p))
+  b <- ceiling(p / a)
+  if (!is.null(thetaTrue) & length(thetaTrue) != p) {
+    stop('Length of thetaTrue does not match the number of parameters.')
+  }
+  thetaNames <- objectList[[1]]@model@thetaNames
+  if (is.null(label)) {
+    if (is.null(names(objectList))) {
+      label <- names(objectList) <- paste0('result', 1 : nList)
+    } else {
+      label <- names(objectList)
     }
-    thetaNames <- objectList[[1]]@model@thetaNames
-    if (is.null(label)) {
-	    if (is.null(names(objectList))) {
-		    label <- names(objectList) <- paste0('result', 1 : nList)
-		} else {
-		    label <- names(objectList)
-		}
-    }
-    samples <- array(list(), nList)
-    for (i in 1 : nList) {
-        idx <- seq(1, objectList[[i]]@M, thin)
-        samples[[i]] <- data.frame(objectList[[i]]@theta[idx, ], label = label[i])
-    }
-    samples <- do.call('rbind', samples)
-
-    plist <- array(list(), p)
-    for (i in 1 : p) {
-        plist[[i]] <- ggplot(samples, aes_string(x = colnames(samples)[i])) +
-            geom_density(aes(color = label, linetype = label, size = label)) + {
-                if (length(options.color) != 0) {
-                    do.call(scale_color_manual, options.color)
-                }
-            } + {
-                if (length(options.linetype) != 0) {
-                    do.call(scale_linetype_manual, options.linetype)
-                }
-            } + {
-                if (!'values' %in% names(options.size)) {
-				    options.size$values <- rep(1, nList)
-				}
-                    do.call(scale_size_manual, options.size)
-            } +
-            geom_hline(yintercept = 0, colour = "grey", size = 0.75) + {
-                if (!is.null(thetaTrue)) {
-                    geom_vline(xintercept = thetaTrue[i], color = 'forestgreen', linetype = 'dashed', size = 0.5)
-                }
-            } +
-            labs(x = thetaNames[i], y = 'density') + {
-                if (!'plot.margin' %in% names(options.theme)) {
-                    options.theme$plot.margin <- unit(rep(0.08,4), "npc")
-                }
-                if (!'legend.title' %in% names(options.theme)) {
-                    options.theme$legend.title <- element_blank()
-                }
-                options.theme$legend.position <- 'none'
-                do.call(theme, options.theme)
-            }
-    }
-    g <- ggplotGrob(plist[[1]] + theme(legend.position = 'bottom'))$grobs
-    legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
-    lheight <- sum(legend$height)
-    combined <- arrangeGrob(do.call(arrangeGrob, c(plist, nrow = a, ncol = b, top = top)), legend, nrow = 2, heights = unit.c(unit(1, "npc") - lheight, lheight))
-    grid.newpage()
-    grid.draw(combined)
+  }
+  samples <- array(list(), nList)
+  for (i in 1 : nList) {
+    idx <- seq(1, objectList[[i]]@M, thin)
+    samples[[i]] <- data.frame(objectList[[i]]@theta[idx, ], label = label[i])
+  }
+  samples <- do.call('rbind', samples)
+  
+  plist <- array(list(), p)
+  for (i in 1 : p) {
+    plist[[i]] <- ggplot(samples, aes_string(x = colnames(samples)[i])) +
+      geom_density(aes(color = label, linetype = label, size = label)) + {
+        if (length(options.color) != 0) {
+          do.call(scale_color_manual, options.color)
+        }
+      } + {
+        if (length(options.linetype) != 0) {
+          do.call(scale_linetype_manual, options.linetype)
+        }
+      } + {
+        if (!'values' %in% names(options.size)) {
+          options.size$values <- rep(1, nList)
+        }
+        do.call(scale_size_manual, options.size)
+      } +
+      geom_hline(yintercept = 0, colour = "grey", size = 0.75) + {
+        if (!is.null(thetaTrue)) {
+          geom_vline(xintercept = thetaTrue[i], color = 'forestgreen', linetype = 'dashed', size = 0.5)
+        }
+      } +
+      labs(x = thetaNames[i], y = 'density') + {
+        if (!'plot.margin' %in% names(options.theme)) {
+          options.theme$plot.margin <- unit(rep(0.08,4), "npc")
+        }
+        if (!'legend.title' %in% names(options.theme)) {
+          options.theme$legend.title <- element_blank()
+        }
+        options.theme$legend.position <- 'none'
+        do.call(theme, options.theme)
+      }
+  }
+  g <- ggplotGrob(plist[[1]] + theme(legend.position = 'bottom'))$grobs
+  legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
+  lheight <- sum(legend$height)
+  combined <- arrangeGrob(do.call(arrangeGrob, c(plist, nrow = a, ncol = b, top = top)), legend, nrow = 2, heights = unit.c(unit(1, "npc") - lheight, lheight))
+  grid.newpage()
+  grid.draw(combined)
 }

@@ -36,17 +36,17 @@
 #'   to covariance matrix.
 #' @export
 gaussianRankCorr <- function(x, vec = FALSE) {
-    n <- nrow(x)
-    p <- ncol(x)
-	stopifnot(p >= 2)
-    r <- apply(x, FUN = rank, MARGIN = 2, ties.method = "average")
-    rqnorm <- qnorm(r / (n + 1))
-    den <- sum((qnorm(1 : n / (n + 1))) ^ 2)
-    res <- unlist(sapply(1:(p-1), FUN = function(i) c(rqnorm[, i] %*% rqnorm[, (i+1):p]))) / den
-    if (!vec) {
-	   res <- p2P(res)
-	}
-	return (res)
+  n <- nrow(x)
+  p <- ncol(x)
+  stopifnot(p >= 2)
+  r <- apply(x, FUN = rank, MARGIN = 2, ties.method = "average")
+  rqnorm <- qnorm(r / (n + 1))
+  den <- sum((qnorm(1 : n / (n + 1))) ^ 2)
+  res <- unlist(sapply(1:(p-1), FUN = function(i) c(rqnorm[, i] %*% rqnorm[, (i+1):p]))) / den
+  if (!vec) {
+    res <- p2P(res)
+  }
+  return (res)
 }
 
 #' Convert a correlation matrix to a covariance matrix
@@ -56,5 +56,5 @@ gaussianRankCorr <- function(x, vec = FALSE) {
 #' @return        The covariance matrix.
 #' @export
 cor2cov <- function(corr, std) {
-	outer(std, std) * corr
+  outer(std, std) * corr
 }

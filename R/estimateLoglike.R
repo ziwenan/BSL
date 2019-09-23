@@ -2,7 +2,7 @@
 #'
 #' @description This function computes the estimated synthetic (log) likelihood
 #'   using one of the four methods (``BSL'', ``uBSL'', ``semiBSL'' and
-#'   ``BSLmisspec''). Please find the links below in the seealso section for
+#'   ``BSLmisspec''). Please find the links below in the see also section for
 #'   more details.
 #'
 #' @inheritParams gaussianSynLike
@@ -36,7 +36,7 @@
 #'   matrix in ``BSL'' method. The default is \code{FALSE}, which uses the
 #'   sample covariance by default.
 #'
-#'   \item \code{whitening} Available for method ``BSL''. An argument determines
+#'   \item \code{whitening} Available for method ``BSL''. This argument determines
 #'   whether Whitening transformation should be used in ``BSL'' method with
 #'   Warton's shrinkage. Whitening transformation helps decorrelate the summary
 #'   statistics, thus encourages sparsity of the synthetic likelihood covariance
@@ -89,11 +89,11 @@
 #'   \code{\link{semiparaKernelEstimate}} and \code{\link{synLikeMisspec}}.
 #' @export
 estimateLoglike <- function(ssy, ssx, method = c("BSL", "uBSL", "semiBSL", "BSLmisspec"), log = TRUE, verbose = FALSE, ...) {
-    method <- match.arg(method)
-	switch(method,
-	       "BSL"        = gaussianSynLike(ssy, ssx, log = log, verbose = verbose, ...),
-		   "uBSL"       = gaussianSynLikeGhuryeOlkin(ssy, ssx, log = log, verbose = verbose, ...),
-		   "semiBSL"    = semiparaKernelEstimate(ssy, ssx, log = log, ...),
-		   "BSLmisspec" = synLikeMisspec(ssy, ssx, log = log, verbose = verbose, ...)
-		   )
+  method <- match.arg(method)
+  switch(method,
+         "BSL"        = gaussianSynLike(ssy, ssx, log = log, verbose = verbose, ...),
+         "uBSL"       = gaussianSynLikeGhuryeOlkin(ssy, ssx, log = log, verbose = verbose, ...),
+         "semiBSL"    = semiparaKernelEstimate(ssy, ssx, log = log, ...),
+         "BSLmisspec" = synLikeMisspec(ssy, ssx, log = log, verbose = verbose, ...)
+  )
 }

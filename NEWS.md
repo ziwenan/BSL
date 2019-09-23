@@ -1,13 +1,13 @@
 # BSL 3.0.0 (Release date: 2019-07-01)
 
 * Added a new method ("uBSL") in the main function "bsl".
-* Two shrinkage methods ("glasso" and "Warton") are avialable now for method "BSL" and "semiBSL".
+* Two shrinkage methods ("glasso" and "Warton") are available now for methods "BSL" and "semiBSL".
 * A new S4 object class "BSLMODEL" is introduced to encapsulate the simulation function, summary statistic function, a point estimate of the parameter value and other arguments that are related to the model of interest. 
 * "BSLMODEL" now uses log of the prior function for numerical stability.
-* "BSLMODEL" supports vectorised simulation function ("fnSimVec") that produces n model simulations simulataneously.
-* A number of arguments ("fnSim", "fnSum", "theta0", "fnPrior", "simArgs", "sumArgs" and "thetaNAmes") are replaced by "model" and will be deprecated in a furture release.
-* Add a function "gaussianRankCorr" that computes the Gaussian rank correlation matrix.
-* It is now possible to use Gaussian rank correlation (GRC = TRUE) in "BSL" method for more robustness.
+* "BSLMODEL" supports vectorised simulation function ("fnSimVec") that produces n model simulations simultaneously.
+* A number of arguments ("fnSim", "fnSum", "theta0", "fnPrior", "simArgs", "sumArgs" and "thetaNAmes") are replaced by "model" and will be deprecated in a future release.
+* Added a function "gaussianRankCorr" that computes the Gaussian rank correlation matrix.
+* It is now possible to use Gaussian rank correlation (GRC = TRUE) in the "BSL" method for more robustness.
 * Other minor changes.
 
 

@@ -212,17 +212,17 @@ cell_sim <-function(theta, Yinit, rows, cols, sim_iters, num_obs) {
 cell_sum <- function(Y, Yinit) {
     num_obs = dim(Y)[3]
     summ_stat = numeric(num_obs+1)
-
+    
     # Hamming distances between cell locations across time
     summ_stat[1] = sum(abs(Yinit-Y[, , 1]))
     for (i in 2:num_obs) {
         summ_stat[i] = sum(abs(Y[, , i-1]-Y[, , i]))
     }
-
+    
     # Total number of cells in the final time period
     summ_stat[num_obs + 1] = sum(Y[, , num_obs])
-
-	return(summ_stat)
+    
+    return(summ_stat)
 }
 
 #' @describeIn cell The function \code{cell_prior(theta)} evaluates the log

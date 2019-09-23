@@ -118,7 +118,7 @@ setClass("BSL",
                    parallelArgs = "listOrNULL",
                    time = "difftime",
                    call = "call")
-        )
+)
 
 setValidity("BSL",
             method = function(object) {
@@ -132,13 +132,13 @@ setValidity("BSL",
                         msg <- paste('The number of rows of theta', M, 'does not match the number of iterations M', object@M)
                         error <- c(errors, msg)
                     }
-
+                    
                     temp <- length(object@loglike)
                     if (temp != 0 && temp != M) {
                         msg <- paste('The number of iterations M', M, 'does not match the length of loglike', temp)
                         error <- c(errors, msg)
                     }
-
+                    
                     temp <- class(object@model)
                     if (temp != 'MODEL') {
                         msg <- paste('model must be a MODEL class object')
@@ -146,19 +146,19 @@ setValidity("BSL",
                     } else {
                         invisible(capture.output(validObject(object@model)))
                     }
-
+                    
                     if (nrow(object@covRandWalk) != p || ncol(object@covRandWalk) != p) {
                         msg <- paste('covRandWalk must be a', p, 'by', p, 'square matrix')
                         error <- c(errors, msg)
                     }
-
+                    
                     if (!is.null(object@logitTransformBound)) {
                         if (nrow(object@logitTransformBound) != p || ncol(object@logitTransformBound) != 2L) {
                             msg <- paste('logitTransformBound must be a', p, 'by', 2, 'matrix')
                             error <- c(errors, msg)
                         }
                     }
-
+                    
                     if (length(errors) == 0) {
                         return (TRUE)
                     } else {
@@ -166,7 +166,7 @@ setValidity("BSL",
                     }
                 }
             }
-            )
+)
 
 #' @param object   A ``BSL'' class object to be displayed.
 #' @rdname BSL-class
@@ -206,7 +206,7 @@ setMethod("show",
               else cat("No early rejection rate\n")
               cat("\n")
           }
-          )
+)
 
 #' @param burnin the number of MCMC burn-in steps to be taken.
 #' @param thetaNames Parameter names to be shown in the summary table. If not
@@ -237,12 +237,12 @@ setMethod("summary",
               }
               accRate <- round(mean(diff(theta[, 1]) !=0), 2)
               ess <- round(effectiveSize(theta), 0)
-                # ess <- round(effectiveSize(theta) / n / M * 1000000, 0)
+              # ess <- round(effectiveSize(theta) / n / M * 1000000, 0)
               summ <- c(n, accRate*100, ess)
               names(summ) <- c('n', 'acc. rate (%)', paste('ESS', thetaNames))
               return(summ)
           }
-          )
+)
 
 #' @param x           A ``BSL'' class object to plot.
 #' @param which       An integer argument indicating which plot function to be
@@ -266,7 +266,7 @@ setMethod("summary",
 setMethod("plot",
           signature = c(x = "BSL"),
           definition = function(x, which = 1L, thin = 1, burnin = 0, thetaTrue = NULL, options.plot = NULL,
-                               top = 'Approximate Univariate Posteriors', options.density = list(), options.theme = list()) {
+                                top = 'Approximate Univariate Posteriors', options.density = list(), options.theme = list()) {
               if (which == 1L) {
                   if (length(options.density) != 0 || length(options.theme) != 0) {
                       warning('"options.density" and "options.theme" are ignored when which = 1')
@@ -281,7 +281,7 @@ setMethod("plot",
                   stop('Indicate a supported plot number, 1 for R default density plot or 2 for ggplot density plot')
               }
           }
-          )
+)
 
 # Plot the univariate marginal posterior plot of a bsl class object using the R
 # default plot function.
@@ -352,7 +352,7 @@ setMethod("getTheta",
           definition = function(object, burnin = 0) {
               as.matrix(object@theta[(burnin + 1) : nrow(object@theta), ])
           }
-          )
+)
 
 #' Obtain the log-likelihoods from a "BSL" object
 #' @description see \code{\link{BSLclass}}
@@ -367,7 +367,7 @@ setMethod("getLoglike",
           definition = function(object, burnin = 0) {
               object@loglike[(burnin + 1) : length(object@loglike)]
           }
-          )
+)
 
 #' Obtain the gamma samples (the latent parameters for BSLmisspec method) from a
 #' "BSL" object
@@ -383,4 +383,4 @@ setMethod("getGamma",
           definition = function(object, burnin = 0) {
               as.matrix(object@gamma[(burnin + 1) : nrow(object@gamma), ])
           }
-          )
+)

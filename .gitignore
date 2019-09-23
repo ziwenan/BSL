@@ -1,4 +1,5 @@
 .Rproj.user
 .Rhistory
-foreach error replication code.R
-help.R
+*.o
+*.so
+*.dll

@@ -3,9 +3,9 @@
 #'
 #' @description This function estimates the Gaussian synthetic likelihood whilst
 #'   acknowledging that there may be incompatibility between the model and the
-#'   observed summary statistic. The method has has two different ways to
+#'   observed summary statistic. The method has two different ways to
 #'   account for and detect incompatibility (mean adjustment and variance
-#'   inflation). Additional free parameter \code{gamma} is employed to account for the
+#'   inflation). An additional free parameter \code{gamma} is employed to account for the
 #'   model misspecification. See the R-BSL methods of
 #'   \insertCite{Frazier2019;textual}{BSL} for more details. Note this function
 #'   is mainly designed for interal use as the latent variable \code{gamma} need
@@ -58,27 +58,27 @@
 #' @export
 synLikeMisspec <- function(ssy, ssx, type = c("mean", "variance"), gamma = numeric(length(ssy)),
                            log = TRUE, verbose = FALSE) {
-	stopifnot(length(gamma) ==  length(ssy))
-	type <- match.arg(type)
-    n <- nrow(ssx)
-    d <- ncol(ssx)
-	mu <- colMeans(ssx)
-	Sigma <- cov(ssx)
-	std <- apply(ssx, MARGIN = 2, FUN = sd)
-	if (type == "mean") {
-	    mu <- mu + std * gamma
-	}
-	if (type == "variance") {
-	    Sigma <- Sigma + diag((std * gamma) ^ 2)
-	}
-
-	loglike <- try(mvtnorm::dmvnorm(ssy, mean = mu, sigma = Sigma, log = log))
-    if (inherits(loglike, 'try-error')) {
-        if (verbose) {
-            cat('*** reject (probably singular cov(ssx) matrix) ***\n')
-        }
-        return (-Inf)
+  stopifnot(length(gamma) ==  length(ssy))
+  type <- match.arg(type)
+  n <- nrow(ssx)
+  d <- ncol(ssx)
+  mu <- colMeans(ssx)
+  Sigma <- cov(ssx)
+  std <- apply(ssx, MARGIN = 2, FUN = sd)
+  if (type == "mean") {
+    mu <- mu + std * gamma
+  }
+  if (type == "variance") {
+    Sigma <- Sigma + diag((std * gamma) ^ 2)
+  }
+  
+  loglike <- try(mvtnorm::dmvnorm(ssy, mean = mu, sigma = Sigma, log = log))
+  if (inherits(loglike, 'try-error')) {
+    if (verbose) {
+      cat('*** reject (probably singular cov(ssx) matrix) ***\n')
     }
-	attr(loglike, 'std') <- std
-    return (loglike)
+    return (-Inf)
+  }
+  attr(loglike, 'std') <- std
+  return (loglike)
 }
