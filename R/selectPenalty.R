@@ -1,7 +1,7 @@
-#' Selecting BSLasso Penalty
+#' Selecting the Penalty Parameter
 #'
 #' @description This is the main function for selecting the shrinkage (graphical
-#'   lasso or Warton's estimation) penalty parameter for method BSL or semiBSL
+#'   lasso or Warton's estimator) penalty parameter for method BSL or semiBSL
 #'   based on a point estimate of the parameters. Parallel computing is
 #'   supported with the R package \code{foreach}. The penalty selection method
 #'   is outlined in \insertCite{An2019;textual}{BSL}.
@@ -14,16 +14,18 @@
 #' @param lambda            A list, with each entry containing the vector of
 #'   penalty values to test for the corresponding choice of \code{n}.
 #' @param theta                 A point estimate of the parameter value which
-#'   all of the simulations will be based on. By default, if \code{theta} is \code{NULL},
-#'   it will be replaced by \code{theta0} from the given \code{model}.
+#'   all of the simulations will be based on. By default, if \code{theta} is
+#'   \code{NULL}, it will be replaced by \code{theta0} from the given
+#'   \code{model}.
 #' @param M                     The number of repeats to use in estimating the
 #'   standard deviation of the estimated log synthetic likelihood.
 #' @param sigma                 The standard deviation of the log synthetic
 #'   likelihood estimator to aim for, usually a value between 1 and 2. This
-#'   reflects the mixing of a Markov chain.
+#'   parameter helps to control the mixing of a Markov chain.
 #' @param method                A string argument indicating the method to be
-#'   used. The default, ``BSL'', runs BSL. ``semiBSL'' runs the semi-parametric
-#'   BSL algorithm and is more robust to non-normal summary statistics.
+#'   used. If the methd is ``BSL'', the shrinkage is applied to the Gaussian
+#'   covariance matrix. Otherwise if the method is ``semiBSL'', the shrinkage is
+#'   applied to the correlation matrix of the Gaussian copula.
 #' @param shrinkage     A string argument indicating which shrinkage method to
 #'   be used. Current options are ``glasso'' for the graphical lasso method of
 #'   \insertCite{Friedman2008;textual}{BSL} and ``Warton'' for the ridge

@@ -1,8 +1,8 @@
 // Rcpp code for the Fowler's Toads example
-// The example is from the following paper 
-// Philippe Marchand, Morgan Boenke, David M. Green (2017). A stochastic movement model 
-// reproduces patterns of site fidelity and long-distance dispersal in a population 
-// of Fowlers toads (Anaxyrus fowleri). Ecological Modelling. 
+// The example is from the following paper
+// Philippe Marchand, Morgan Boenke, David M. Green (2017). A stochastic movement model
+// reproduces patterns of site fidelity and long-distance dispersal in a population
+// of Fowlers toads (Anaxyrus fowleri). Ecological Modelling.
 // https://doi.org/10.1016/j.ecolmodel.2017.06.025.
 //
 // This simulation code is based on the original R code of Marchand et al (2017).
@@ -40,8 +40,7 @@ double dnormal(double x, double mu, double sigma) {
 //' @param scale The scale parameter.
 //' @param alpha The stability parameter.
 //' @return  A random sample from the zero-centered stable distribution.
-//' @export
-// [[Rcpp::export]]
+//' @keywords internal
 double rstable(double scale, double alpha) {
     double x;
     if (alpha == 1) {
@@ -72,17 +71,17 @@ double prod(NumericVector x) {
 
 //' The simulation function for the toad example
 //'
+//' @description The simulation function for the toad example.
 //' @param params A vector of proposed model parameters, \ifelse{html}{\out{<i>&#945</i>}}{\eqn{\alpha}},
 //'   \ifelse{html}{\out{<i>&#947</i>}}{\eqn{gamma}} and \ifelse{html}{\out{p<sub>0</sub>}}{\eqn{p_0}}.
 //' @param ntoad The number of toads to simulate in the observation.
 //' @param nday The number of days lasted of the observation.
-//' @param model Which model to be used. 1 for the random return model, 2 for the nearest return model, 
+//' @param model Which model to be used. 1 for the random return model, 2 for the nearest return model,
 //'   and 3 for the distance-based return probability model.
 //' @param d0 Characteristic distance for model 3. Only used if model is 3.
 //' @return A data matrix.
 //' @examples sim_toad(c(1.7,36,0.6), 10, 8, 1)
 //' @export
-// [[Rcpp::export]]
 NumericMatrix sim_toad(NumericVector params, int ntoad, int nday, int model = 1, double d0 = 100) {
     double alpha = params[0];
     double scale = params[1];
@@ -91,7 +90,7 @@ NumericMatrix sim_toad(NumericVector params, int ntoad, int nday, int model = 1,
     double x, xn, p_noret;
     NumericVector ref(1), dist, pi_ret;
     int ret_pt;
-    
+
     for (int j = 0; j < ntoad; j++) {
         NumericVector curr(1);
         if (model == 3) {
@@ -104,11 +103,11 @@ NumericMatrix sim_toad(NumericVector params, int ntoad, int nday, int model = 1,
                 dist = abs(xn - ref); //distances to all previous unique refuge sites
                 pi_ret = p0 * exp(-dist / d0); // return prob to the each unique site
                 p_noret = prod(1 - pi_ret);
-                
+
             } else {
                 p_noret = 1 - p0;
             }
-            
+
             Rcpp::NumericVector r = Rcpp::runif(1);
             if (r[0] < p_noret) {
                 // If no return, take refuge here
@@ -116,7 +115,7 @@ NumericMatrix sim_toad(NumericVector params, int ntoad, int nday, int model = 1,
                 if (model == 3) {
                     ref.push_back(xn);
                 }
-            } else { 
+            } else {
                 if (model == 1) {
                     // model 1: random return
                     ret_pt = sample(i);
@@ -159,12 +158,13 @@ vector<double> obsMat2deltax(Rcpp::NumericMatrix X, unsigned int lag) {
 }
 
 //' Convert an observation matrix to a vector of n-day displacements
-//' 
+//'
+//' @description Convert an observation matrix to a vector of n-day
+//' displacements. This is a function for the toad example.
 //' @param X The observation matrix to be converted.
 //' @param lag Interger, the number of day lags to compute the displacement.
 //' @return A vector of displacements.
 //' @export
-// [[Rcpp::export]]
 NumericVector obsMat2deltaxR(Rcpp::NumericMatrix X, unsigned int lag) {
     unsigned int ndays = X.nrow();
     unsigned int ntoads =  X.ncol();
@@ -185,23 +185,24 @@ NumericVector obsMat2deltaxR(Rcpp::NumericMatrix X, unsigned int lag) {
 
 //' This function computes the scores of Gaussian mixture models for the toad example
 //'
-//' @description The summary statistics for the toad example is taken to be the 
-//' scores of Gaussian mixture model fitted to the displacement distribution. The 
-//' displacements is computed with a given day lag.
+//' @description The summary statistics for the toad example is taken to be the
+//' scores of Gaussian mixture model fitted to the displacement distribution. The
+//' displacements are computed with a given day lag.
 //' @param X The observation matrix.
-//' @param gmm A matrix containing the parameters for a Gaussian mixture model. The first row should be component proportion. 
-//' The second row should be mean. The last row should be Variance.
+//' @param gmm A matrix containing the parameters for a Gaussian mixture model.
+//' The first row should be component proportions. The second row should be
+//' component means. The last row should be component Variances.
 //' @param lag The lag of days to compute the displacements.
-//' @return A list of the following vectors: return frequencies, scores of component proportion, scores of mean and scores of variance.
+//' @return A list of the following vectors: return frequencies, scores of
+//' component proportion, scores of mean and scores of variance.
 //' @export
-// [[Rcpp::export]]
 Rcpp::List gmmScores(Rcpp::NumericMatrix X, NumericMatrix gmm, unsigned int lag) {
     int n, i, j, k;
     k = gmm.ncol();
     double temp, freq_ret;
     NumericVector sigma(k);
     vector<double> deltax, x_ret, x_noret;
-    
+
     deltax = obsMat2deltax(X,lag);
     for (i=0; i<(int) deltax.size(); i++) {
         temp = deltax[i];
@@ -213,17 +214,17 @@ Rcpp::List gmmScores(Rcpp::NumericMatrix X, NumericMatrix gmm, unsigned int lag)
     }
     freq_ret = (double) x_ret.size() / (double) deltax.size();
     n = (int) x_noret.size();
-    
-    
+
+
     NumericMatrix::Row p = gmm(0,_);
     NumericMatrix::Row mu = gmm(1,_);
     NumericMatrix::Row Sigma = gmm(2,_);
     transform(Sigma.begin(),Sigma.end(),sigma.begin(),(double(*)(double)) sqrt);
-    
+
     NumericVector f(n), scorepi(k-1), scoremu(k), scoreSigma(k);
     //  NumericVector scoresigma(k);
     NumericMatrix phi(n,k), xmu(n,k), A(n,k), w(n,k);
-    
+
     for (i=0; i<n; i++) {
         for (j=0; j<k; j++) {
             phi(i,j) = dnormal(x_noret[i],mu[j],sigma[j]);
@@ -235,7 +236,7 @@ Rcpp::List gmmScores(Rcpp::NumericMatrix X, NumericMatrix gmm, unsigned int lag)
             w(i,j) = phi(i,j) / f[i];
         }
     }
-    
+
     for (j=0; j<k-1; j++) {
         scorepi[j] = sum(w(_,j) - w(_,k-1));
     }
@@ -244,6 +245,6 @@ Rcpp::List gmmScores(Rcpp::NumericMatrix X, NumericMatrix gmm, unsigned int lag)
         //  scoresigma[j] = p[j] / sigma[j] * sum(w(_,j) * A(_,j));
         scoreSigma[j] = 0.5 * p[j] / Sigma[j] * sum(w(_,j) * A(_,j));
     }
-    
+
     return (Rcpp::List::create(Named("freq_ret")=freq_ret,Named("scorepi")=scorepi,Named("scoremu")=scoremu,Named("scoreSigma")=scoreSigma));
 }

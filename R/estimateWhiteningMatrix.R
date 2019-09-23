@@ -4,7 +4,7 @@
 #' @description This function estimates the Whitening matrix to be used in BSL
 #'   with Warton's shrinkage and Whitening (``wBSL'' method of
 #'   \insertCite{Priddle2019;textual}{BSL}). The Whitening transformation and
-#'   decorrelation methods are detailed in \insertCite{Kessy2018;textual}{BSL}
+#'   decorrelation methods are detailed in \insertCite{Kessy2018;textual}{BSL}.
 #'
 #' @param n The number of model simulations to estimate the Whitening matrix.
 #' @param method The type of Whitening method to be used. The default is

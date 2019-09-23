@@ -1,4 +1,4 @@
-#' Estimate the Gaussian synthetic likelihood whilst acknowledging model
+#' Estimate the Gaussian synthetic (log) likelihood whilst acknowledging model
 #' incompatibility
 #'
 #' @description This function estimates the Gaussian synthetic likelihood whilst

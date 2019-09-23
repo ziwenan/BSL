@@ -1,13 +1,14 @@
-#' Estimate the semi-parametric (joint) synthetic likelihood
+#' Estimate the semi-parametric synthetic (log) likelihood
 #'
-#' @description This function computes the semi-parametric likelihood estimator
-#'   of \insertCite{An2018}{BSL}. The advantage of this semi-parametric
-#'   estimator over the standard synthetic likelihood estimator is that the
-#'   semi-parametric one could deal with non-normal summary statistics much
-#'   better. Kernel density estimation is used for modelling each univariate
+#' @description This function computes the semi-parametric synthetic likelihood
+#'   estimator of \insertCite{An2018}{BSL}. The advantage of this
+#'   semi-parametric estimator over the standard synthetic likelihood estimator
+#'   is that the semi-parametric one is more robust to non-normal summary
+#'   statistics. Kernel density estimation is used for modelling each univariate
 #'   marginal distribution, and the dependence structure between summaries are
-#'   captured using a Gaussian copula. Shrinkage on the correlation
-#'   matrix parameter of the Gaussian copula is helpful to bring down the number of simulations.
+#'   captured using a Gaussian copula. Shrinkage on the correlation matrix
+#'   parameter of the Gaussian copula is helpful to bring down the number of
+#'   simulations.
 #'
 #' @param kernel       A string argument indicating the smoothing kernel to pass
 #'   into \code{density} for estimating the marginal distribution of each
@@ -39,10 +40,10 @@
 #' m <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args,
 #'               theta0 = ma2$start, sumArgs = list(delta = 0.5))
 #' ssx <- simulation(m, n = 300, theta = c(0.6, 0.2), seed = 10)$ssx
-#' 
+#'
 #' # check the distribution of the first summary statistic: highly non-normal
 #' plot(density(ssx[, 1]))
-#' 
+#'
 #' # the standard synthetic likelihood estimator over-estimates the likelihood here
 #' gaussianSynLike(ssy, ssx)
 #' # the semi-parametric synthetic likelihood estimator is more robust to non-normality

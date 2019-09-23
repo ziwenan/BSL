@@ -8,13 +8,15 @@
 #'
 #' @param theta A vector of proposed model parameters,
 #'   \ifelse{html}{\out{<i>&#945</i>}}{\eqn{\alpha}},
-#'   \ifelse{html}{\out{<i>&#947</i>}}{\eqn{gamma}} and
+#'   \ifelse{html}{\out{<i>&#947</i>}}{\eqn{\gamma}} and
 #'   \ifelse{html}{\out{p<sub>0</sub>}}{\eqn{p_0}}.
 #' @param ntoads The number of toads to simulate in the observation.
 #' @param ndays The number of days lasted of the observation.
-#' @param model Which model to be used. 1 for the random return model, 2 for
-#'   the nearest return model, and 3 for the distance-based return probability model.
-#' @param d0 Characteristic distance for model 3. Only used if \code{model} is 3.
+#' @param model Which model to be used. 1 for the random return model, 2 for the
+#'   nearest return model, and 3 for the distance-based return probability
+#'   model. The default is 1.
+#' @param d0 Characteristic distance for model 3. Only used if \code{model} is
+#'   3.
 #' @param na Logical. This is the index matrix for missing observations. By
 #'   default, \code{matrix(FALSE, ndays, ntoads)} indicates there is no
 #'   missingness in the observation matrix.
@@ -26,7 +28,7 @@
 #'   2, 4 and 8.
 #' @param power The transformation power, default as 1.
 #'
-#' @details The model here is the nearest return model of
+#' @details The example includes the three different returning model from
 #'   \insertCite{Marchand2017;textual}{BSL}. Please see
 #'   \insertCite{Marchand2017;textual}{BSL} for a full description of the toad
 #'   model, and also \insertCite{An2018;textual}{BSL} for a Bayesian inference
@@ -75,13 +77,12 @@
 #'   \item \code{sum_args_simulated} and \code{sum_args_real}: A list of the
 #'   arguments to pass into the summary statistics function.
 #'
-#'   \itemize{ \item
-#'   \code{gmm}: A list of the Gaussian mixture model parameters. Gaussian
-#'   mixtures are used to approximate the distribution of displacement of toads
-#'   in a 1,2,4 or 8-day period. Each element of the list contains the
-#'   parameters of a 3-component Gaussian mixture model for each day lag. This
-#'   is used to computed the summary statistics (scores of the Gaussian mixture
-#'   models).
+#'   \itemize{ \item \code{gmm}: A list of the Gaussian mixture model
+#'   parameters. Gaussian mixtures are used to approximate the distribution of
+#'   displacement of toads in a 1,2,4 or 8-day period. Each element of the list
+#'   contains the parameters of a 3-component Gaussian mixture model for each
+#'   day lag. This is used to computed the summary statistics (scores of the
+#'   Gaussian mixture models).
 #'
 #'   \item \code{lag}: A vector of day lags.
 #'
@@ -160,7 +161,8 @@
 #'
 #' \insertAllCited()
 #'
-#' @author                                 Ziwen An, Leah F. South and Christopher Drovandi
+#' @author                                 Ziwen An, Leah F. South and
+#'   Christopher Drovandi
 #' @name toad
 NULL
 

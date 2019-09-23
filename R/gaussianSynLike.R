@@ -1,6 +1,6 @@
-#' Estimate the Gaussian synthetic likelihood
+#' Estimate the Gaussian synthetic (log) likelihood
 #'
-#' @description This function estimates the Gaussian synthetic likelihood
+#' @description This function estimates the Gaussian synthetic log-likelihood
 #'   \insertCite{@see @Wood2010 and @Price2018}{BSL}. Several extensions are
 #'   provided in this function: \code{shrinkage} enables shrinkage estimation of
 #'   the covariance matrix and is helpful to bring down the number of model
@@ -15,15 +15,6 @@
 #' @param ssy          The observed summary statisic.
 #' @param ssx          A matrix of the simulated summary statistics. The number
 #'   of rows is the same as the number of simulations per iteration.
-#' @param whitening     An argument determines whether Whitening transformation
-#'   should be used in ``BSL'' method with Warton's shrinkage. Whitening
-#'   transformation helps decorrelate the summary statistics, thus encourages
-#'   sparsity of the synthetic likelihood covariance matrix. This might allow
-#'   heavier shrinkage to be applied without losing much accuracy, hence
-#'   allowing the number of simulations to be reduced. By default, \code{NULL}
-#'   disables the Whitening transformation. Otherwise this is enabled if a
-#'   Whitening matrix is provided. See \code{\link{estimateWhiteningMatrix}} for
-#'   the function to estimate the Whitening matrix.
 #' @param ssyTilde     The whitened observed summary statisic. If this is not
 #'   \code{NULL}, it will be used to save computation effort. Only used if
 #'   Whitening is enabled.
@@ -46,7 +37,7 @@
 #' m <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args,
 #'               theta0 = ma2$start)
 #' ssx <- simulation(m, n = 300, theta = c(0.6, 0.2), seed = 10)$ssx
-#' 
+#'
 #' # the standard Gaussian synthetic likelihood (the likelihood estimator used in BSL)
 #' gaussianSynLike(ssy, ssx)
 #' # the Gaussian synthetic likelihood with glasso shrinkage estimation

@@ -1,9 +1,9 @@
 #' Estimate the synthetic likelihood
 #'
 #' @description This function computes the estimated synthetic (log) likelihood
-#'   using one of the four methods ("BSL", "uBSL", "semiBSL" and "BSLmisspec").
-#'   This function is just a dispatch of the four methods, please find the
-#'   links below in the seealso section for more details.
+#'   using one of the four methods (``BSL'', ``uBSL'', ``semiBSL'' and
+#'   ``BSLmisspec''). Please find the links below in the seealso section for
+#'   more details.
 #'
 #' @inheritParams gaussianSynLike
 #' @inheritParams bsl
@@ -11,7 +11,7 @@
 #'
 #'   \itemize{
 #'
-#'   \item \code{shrinkage} Available for method ``BSL'' and ``semiBSL''. A
+#'   \item \code{shrinkage} Available for methods ``BSL'' and ``semiBSL''. A
 #'   string argument indicating which shrinkage method to be used. The default
 #'   is \code{NULL}, which means no shrinkage is used. Shrinkage estimation is
 #'   only available for methods ``BSL'' and ``semiBSL''. Current options are
@@ -19,7 +19,7 @@
 #'   \insertCite{Friedman2008;textual}{BSL} and ``Warton'' for the ridge
 #'   regularisation method of \insertCite{Warton2008;textual}{BSL}.
 #'
-#'   \item \code{penalty} Available for method ``BSL'' and ``semiBSL''. The
+#'   \item \code{penalty} Available for methods ``BSL'' and ``semiBSL''. The
 #'   penalty value to be used for the specified shrinkage method. Must be
 #'   between zero and one if the shrinkage method is ``Warton''.
 #'
@@ -42,7 +42,7 @@
 #'   statistics, thus encourages sparsity of the synthetic likelihood covariance
 #'   matrix. This might allow heavier shrinkage to be applied without losing
 #'   much accuracy, hence allowing the number of simulations to be reduced. By
-#'   default, \code{NULL} disable the Whitening transformation. Otherwise this
+#'   default, \code{NULL} represents no Whitening transformation. Otherwise this
 #'   is enabled if a Whitening matrix is provided. See
 #'   \code{\link{estimateWhiteningMatrix}} for the function to estimate the
 #'   Whitening matrix.

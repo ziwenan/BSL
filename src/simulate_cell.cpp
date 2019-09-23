@@ -11,7 +11,7 @@ double unifrnd(double a,double b) {
 }
 
 // sample from categorical distribution with equal probabilities
-int sample_equal(int n) { 
+int sample_equal(int n) {
     double cumsum = 0.0;
     double inc;
     int i;
@@ -29,12 +29,12 @@ int sample_equal(int n) {
 
 // the model simulation
 int simulate(int *x, int *rows, int *cols, double Pm, double Pp, int N, int nrow, int ncol, int sim_iters){
-    int i, r, row, col, row_prop, col_prop, K, s; 
+    int i, r, row, col, row_prop, col_prop, K, s;
 	double u;
     int num_motility_prop = 0, num_prolif_prop = 0;
-    
+
     K=N;
-    
+
     // simulate over discrete time steps
     for (s=0; s<sim_iters; s++) {
         // potential motility event for each cell
@@ -119,16 +119,21 @@ int simulate(int *x, int *rows, int *cols, double Pm, double Pp, int N, int nrow
 
 //' Simulation function of the cell biology example
 //'
-//' @param x The initial matrix of cell presences of size \code{rows} \ifelse{html}{\out{&times}}{\eqn{\times}} \code{cols}.
-//' @param Pm Parameter \ifelse{html}{\out{<i>P<sub>m</sub></i>}}{\eqn{P_m}}, the probability of cell movement.
-//' @param Pp Parameter \ifelse{html}{\out{<i>P<sub>p</sub></i>}}{\eqn{P_p}}, the probability of cell proliferation.
+//' @description Simulation function of the cell biology example.
+//' @param x The initial matrix of cell presences of size \code{rows}
+//' \ifelse{html}{\out{&times}}{\eqn{\times}} \code{cols}.
+//' @param Pm Parameter \ifelse{html}{\out{<i>P<sub>m</sub></i>}}{\eqn{P_m}},
+//' the probability of cell movement.
+//' @param Pp Parameter \ifelse{html}{\out{<i>P<sub>p</sub></i>}}{\eqn{P_p}},
+//' the probability of cell proliferation.
 //' @inheritParams cell
-//' @return  A \code{rows} \ifelse{html}{\out{&times}}{\eqn{\times}} \code{cols} \ifelse{html}{\out{&times}}{\eqn{\times}} \code{num_obs} array
+//' @return  A \code{rows} \ifelse{html}{\out{&times}}{\eqn{\times}} \code{cols}
+//'  \ifelse{html}{\out{&times}}{\eqn{\times}} \code{num_obs} array
 //'   of the cell presences at times \code{1:num_obs} (not time 0).
 //' @export
 // [[Rcpp::export]]
 arma::ucube simulate_cell(LogicalMatrix x, IntegerVector rows, IntegerVector cols, double Pm, double Pp, int sim_iters, int num_obs) {
-    int *xc, *colsc, *rowsc; 
+    int *xc, *colsc, *rowsc;
     int nrow, ncol, N, i, j, k, cap;
 
     // read in the data
@@ -136,8 +141,8 @@ arma::ucube simulate_cell(LogicalMatrix x, IntegerVector rows, IntegerVector col
     ncol = x.ncol();
     N = rows.length();
 	cap = nrow*ncol;
-       
-    // allocate double the space required 
+
+    // allocate double the space required
     rowsc = (int*)malloc(cap*sizeof(int));
     colsc = (int*)malloc(cap*sizeof(int));
 
@@ -145,19 +150,19 @@ arma::ucube simulate_cell(LogicalMatrix x, IntegerVector rows, IntegerVector col
         rowsc[i] = rows[i];
         colsc[i] = cols[i];
     }
-    
+
     // output (collection of binary matrices)
     arma::ucube xr(nrow, ncol, num_obs);
     xr.zeros();
-    
+
     xc = (int*)malloc(cap*sizeof(int));
-    
+
     for (i=0; i<nrow; i++) {
         for (j=0; j<ncol; j++) {
             xc[i + nrow*j] = x(i, j);
         }
     }
-    
+
     // perform simulation over num_obs time points
     for (k=0; k<num_obs; k++) {
 		if (N < cap){
@@ -170,12 +175,12 @@ arma::ucube simulate_cell(LogicalMatrix x, IntegerVector rows, IntegerVector col
             }
         }
     }
-    
+
     // clean memory
     free(rowsc);
     free(colsc);
     free(xc);
-    
+
     return (xr);
 }
 

@@ -1,4 +1,4 @@
-#' Estimate the Gaussian synthetic likelihood with an unbiased estimator
+#' Estimate the Gaussian synthetic (log) likelihood with an unbiased estimator
 #'
 #' @description This function computes an unbiased, nonnegative estimate of a
 #'   normal density function from simulations assumed to be drawn from it. See
@@ -19,7 +19,7 @@
 #' m <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args,
 #'               theta0 = ma2$start)
 #' ssx <- simulation(m, n = 300, theta = c(0.6, 0.2), seed = 10)$ssx
-#' 
+#'
 #' # unbiased estimate of the Gaussian synthetic likelihood
 #' # (the likelihood estimator used in uBSL)
 #' gaussianSynLikeGhuryeOlkin(ssy, ssx)
