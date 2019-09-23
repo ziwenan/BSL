@@ -60,8 +60,8 @@ regularisation method of \insertCite{Warton2008;textual}{BSL}.}
 method. Must be between zero and one if the shrinkage method is ``Warton''.}
 
 \item{fnPrior}{Deprecated, will be removed in the future, use
-\code{model} instead. A function that computes the log of prior density for
-a parameter. The default is \code{NULL}, which uses an improper flat prior
+\code{model} instead. A function that computes the log prior density for a
+parameter. The default is \code{NULL}, which uses an improper flat prior
 over the real line for each parameter. The function must have a single
 input: a vector of parameter values.}
 
@@ -102,7 +102,7 @@ transformation helps decorrelate the summary statistics, thus encourages
 sparsity of the synthetic likelihood covariance matrix. This might allow
 heavier shrinkage to be applied without losing much accuracy, hence
 allowing the number of simulations to be reduced. By default, \code{NULL}
-disables the Whitening transformation. Otherwise this is enabled if a
+represents no Whitening transformation. Otherwise this is enabled if a
 Whitening matrix is provided. See \code{\link{estimateWhiteningMatrix}} for
 the function to estimate the Whitening matrix.}
 
@@ -113,9 +113,8 @@ model misspecification is considered.}
 
 \item{tau}{A numeric argument, parameter of the prior distribution
 for "BSLmisspec" method. For mean adjustment, \code{tau} is the scale of
-the Laplace distribution. For variance inflation, \code{tau} is the scale
-(or mean) of the exponential distribution. Only used when method is
-``BSLmisspec''.}
+the Laplace distribution. For variance inflation, \code{tau} is the mean of
+the exponential distribution. Only used when method is ``BSLmisspec''.}
 
 \item{parallel}{A logical value indicating whether parallel computing should
 be used for simulation and summary statistic evaluation. The default is
@@ -152,9 +151,9 @@ An object of class \code{bsl} is returned, see \code{\link{BSL}}
 This is the main function for performing MCMC BSL (with a
   standard or non-standard likelihood estimator) to sample from the
   approximate posterior distribution. A couple of extentions to the standard
-  approach is available by changing the following arguments, \code{method},
-  \code{shrinkage}, \code{whitening}, \code{misspecType} and etc. Parallel
-  computing is supported with the R package \code{foreach}.
+  approach are available by changing the following arguments, \code{method},
+  \code{shrinkage}, \code{whitening}, \code{misspecType}. Parallel computing
+  is supported with the R package \code{foreach}.
 }
 \examples{
 \dontshow{
@@ -198,5 +197,5 @@ plot(result_toy)
   related to visualisation.
 }
 \author{
-Ziwen An, Leah F. South and Christopher C. Drovandi
+Ziwen An, Leah F. South and Christopher Drovandi
 }

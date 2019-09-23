@@ -6,9 +6,9 @@ NULL
 #' @description This is the main function for performing MCMC BSL (with a
 #'   standard or non-standard likelihood estimator) to sample from the
 #'   approximate posterior distribution. A couple of extentions to the standard
-#'   approach is available by changing the following arguments, \code{method},
-#'   \code{shrinkage}, \code{whitening}, \code{misspecType} and etc. Parallel
-#'   computing is supported with the R package \code{foreach}.
+#'   approach are available by changing the following arguments, \code{method},
+#'   \code{shrinkage}, \code{whitening}, \code{misspecType}. Parallel computing
+#'   is supported with the R package \code{foreach}.
 #'
 #' @param y				The observed data. Note this should be the raw dataset NOT the
 #'   set of summary statistics.
@@ -59,7 +59,7 @@ NULL
 #'   sparsity of the synthetic likelihood covariance matrix. This might allow
 #'   heavier shrinkage to be applied without losing much accuracy, hence
 #'   allowing the number of simulations to be reduced. By default, \code{NULL}
-#'   disables the Whitening transformation. Otherwise this is enabled if a
+#'   represents no Whitening transformation. Otherwise this is enabled if a
 #'   Whitening matrix is provided. See \code{\link{estimateWhiteningMatrix}} for
 #'   the function to estimate the Whitening matrix.
 #' @param misspecType   A string argument indicating which type of model
@@ -68,9 +68,8 @@ NULL
 #'   model misspecification is considered.
 #' @param tau           A numeric argument, parameter of the prior distribution
 #'   for "BSLmisspec" method. For mean adjustment, \code{tau} is the scale of
-#'   the Laplace distribution. For variance inflation, \code{tau} is the scale
-#'   (or mean) of the exponential distribution. Only used when method is
-#'   ``BSLmisspec''.
+#'   the Laplace distribution. For variance inflation, \code{tau} is the mean of
+#'   the exponential distribution. Only used when method is ``BSLmisspec''.
 #' @param parallel		A logical value indicating whether parallel computing should
 #'   be used for simulation and summary statistic evaluation. The default is
 #'   \code{FALSE}. When model simulation is fast, it may be preferable to
@@ -103,8 +102,8 @@ NULL
 #'   The first argument should be the observed or simulated dataset. Other
 #'   necessary arguments (optional) can be specified with \code{sumArgs}.
 #' @param fnPrior       Deprecated, will be removed in the future, use
-#'   \code{model} instead. A function that computes the log of prior density for
-#'   a parameter. The default is \code{NULL}, which uses an improper flat prior
+#'   \code{model} instead. A function that computes the log prior density for a
+#'   parameter. The default is \code{NULL}, which uses an improper flat prior
 #'   over the real line for each parameter. The function must have a single
 #'   input: a vector of parameter values.
 #' @param simArgs	    Deprecated, will be removed in the future, use
@@ -157,7 +156,7 @@ NULL
 #' plot(result_toy)
 #' }
 #'
-#' @author    Ziwen An, Leah F. South and Christopher C. Drovandi
+#' @author    Ziwen An, Leah F. South and Christopher Drovandi
 #' @seealso   \code{\link{ma2}}, \code{\link{cell}}, \code{\link{mgnk}} and
 #'   \code{\link{toad}} for examples. \code{\link{selectPenalty}} for a function
 #'   to tune the BSLasso tuning parameter and \code{\link{plot}} for functions
@@ -235,12 +234,15 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
 	} else {
 	    stopifnot(inherits(model, "MODEL"))
 	}
-	
+
+    ns <- model@ns
+	if (method == "semiBSL" && ns < 2) {
+	    stop("The dimension of summary statistic must be at least 2 to use method \"semiBSL\"")
+	}
 	if (is.null(whitening)) {
 	    flagWhitening <- FALSE
 		ssyTilde <- NULL
 	} else if (is.atomic(whitening) & is.matrix(whitening)) {
-	    ns <- model@ns
 	    if (all(dim(whitening) == c(ns, ns))) {
 		    flagWhitening <- TRUE
 		} else {
@@ -258,7 +260,7 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
 	} else {
 	   stop("invalid argument \"whitening\"")
 	}
-	
+
 	if (!flagShrinkage && flagWhitening) {
         warning("\"whitening\" will be ignored because shrinkage method is not \"Warton\"")
     }
@@ -270,21 +272,21 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
             warning("Whitening is only supported if shrinkage is \"Warton\"")
         }
 	}
-	
+
 	if (verbose) {
-	    if (flagType) typeText <- switch(misspecType, 
-		                                 "mean"     = "mean-adjusted", 
+	    if (flagType) typeText <- switch(misspecType,
+		                                 "mean"     = "mean-adjusted",
 										 "variance" = "variance-inflated")
-	    methodText <- switch(method, 
-		                     "BSL"        = "standard BSL", 
-							 "uBSL"       = "unbiased BSL", 
+	    methodText <- switch(method,
+		                     "BSL"        = "standard BSL",
+							 "uBSL"       = "unbiased BSL",
 							 "semiBSL"    = "semi-BSL",
 							 "BSLmisspec" = paste("BSL with", typeText, "model misspecification")
 							)
         shrinkageText <- paste("shrinkage:", ifelse(flagShrinkage, shrinkage, "disabled"))
-		whiteningText <- paste("whitening:", ifelse(flagWhitening, "enabled", "disable"))
-	    cat("*** runnning", methodText, "*** \n")
-		cat(shrinkageText, ", ", whiteningText, "\n", sep = "")
+		whiteningText <- paste("whitening:", ifelse(flagWhitening, "enabled", "disabled"))
+	    cat("*** runnning ", methodText, ", ", shrinkageText, ", ", whiteningText, " *** \n", sep = "")
+		# cat(shrinkageText, ", ", whiteningText, "\n", sep = "")
 	}
 
     p <- length(model@theta0)
@@ -301,7 +303,7 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
 
 	# initialise parameters
     ssy <- do.call(model@fnSum, c(list(y), model@sumArgs))
-    ns <- length(ssy)
+	stopifnot(length(ssy) == ns)
     thetaCurr <- model@theta0
     loglikeCurr <- Inf
     if (logitTransform) {
@@ -339,7 +341,7 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
         par(mfrow = c(a, b))
     }
 
-    if (verbose) cat("initialising parameters ... ")
+    # if (verbose) cat("initialising parameters ... ")
     while (is.infinite(loglikeCurr)) {
         # simulate with thetaProp and calculate the summary statistics
 		ssx <- myFnSimSum(n, thetaCurr)
@@ -360,7 +362,7 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
 			stdCurr <- attr(loglikeCurr, "std")
 	    }
     }
-	if (verbose) cat("finish\n")
+	# if (verbose) cat("finish\n")
 
     if (verbose == 1L) timeStart <- Sys.time()
     for (i in 1:M) {

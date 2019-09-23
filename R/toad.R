@@ -12,7 +12,7 @@
 #'   \ifelse{html}{\out{p<sub>0</sub>}}{\eqn{p_0}}.
 #' @param ntoads The number of toads to simulate in the observation.
 #' @param ndays The number of days lasted of the observation.
-#' @param model Which model to be used. 1 for the random return model, 2 for 
+#' @param model Which model to be used. 1 for the random return model, 2 for
 #'   the nearest return model, and 3 for the distance-based return probability model.
 #' @param d0 Characteristic distance for model 3. Only used if \code{model} is 3.
 #' @param na Logical. This is the index matrix for missing observations. By
@@ -62,7 +62,7 @@
 #'   for MCMC.
 #'
 #'   \item \code{sim_args_simulated} and \code{sim_args_real}: A list of the
-#'   arguments to pass into the simulation function. 
+#'   arguments to pass into the simulation function.
 #'
 #'   \itemize{
 #'
@@ -73,8 +73,8 @@
 #'   }
 #'
 #'   \item \code{sum_args_simulated} and \code{sum_args_real}: A list of the
-#'   arguments to pass into the summary statistics function. 
-#' 
+#'   arguments to pass into the summary statistics function.
+#'
 #'   \itemize{ \item
 #'   \code{gmm}: A list of the Gaussian mixture model parameters. Gaussian
 #'   mixtures are used to approximate the distribution of displacement of toads
@@ -160,7 +160,7 @@
 #'
 #' \insertAllCited()
 #'
-#' @author                                 Ziwen An, Leah F. South and Christopher C. Drovandi
+#' @author                                 Ziwen An, Leah F. South and Christopher Drovandi
 #' @name toad
 NULL
 

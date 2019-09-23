@@ -310,5 +310,5 @@ combinePlotsBSL(list(resultMa2BSL, resultMa2uBSL, resultMa2BSLasso, resultMa2Sem
 \insertAllCited{}
 }
 \author{
-Ziwen An, Leah F. South and Christopher C. Drovandi
+Ziwen An, Leah F. South and Christopher Drovandi
 }

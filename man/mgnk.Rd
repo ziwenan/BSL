@@ -75,7 +75,7 @@ plot(resultMgnkBSL, which = 2, thin = 20)
 # Opening up the parallel pools using doParallel
 cl <- makeCluster(detectCores() - 1)
 registerDoParallel(cl)
-resultMgnkuBSL <- bsl(mgnk$data, n = 60, M = 80000, model = model, covRandWalk = mgnk$cov, 
+resultMgnkuBSL <- bsl(mgnk$data, n = 60, M = 80000, model = model, covRandWalk = mgnk$cov,
     method = "uBSL", parallel = TRUE, parallelArgs = list(.packages="MASS",.export="ninenum"),
     verbose = 1L)
 stopCluster(cl)
@@ -94,7 +94,7 @@ lambda_all <- list(exp(seq(-2.5,0.5,length.out=20)), exp(seq(-2.5,0.5,length.out
 cl <- makeCluster(detectCores() - 1)
 registerDoParallel(cl)
 set.seed(100)
-sp_mgnk <- selectPenalty(ssy, n = c(15, 20, 30, 50), lambda = lambda_all, theta = mgnk$start, 
+sp_mgnk <- selectPenalty(ssy, n = c(15, 20, 30, 50), lambda = lambda_all, theta = mgnk$start,
     M = 100, sigma = 1.5, model = model, method = "BSL", shrinkage = "glasso", standardise = TRUE,
     parallelSim = TRUE, parallelSimArgs = list(.packages = "MASS", .export = "ninenum"),
     parallelMain = TRUE)
@@ -133,8 +133,8 @@ plot(resultMgnkSemiBSL, which = 2, thin = 20)
 # Plotting the results together for comparison
 # plot using the R default plot function
 par(mar = c(4, 4, 1, 1), oma = c(0, 1, 2, 0))
-combinePlotsBSL(list(resultMgnkBSL, resultMgnkuBSL, resultMgnkBSLasso, resultMgnkSemiBSL), 
-                which = 1, thin = 20, label = c("bsl", "bslasso", "semiBSL"), 
+combinePlotsBSL(list(resultMgnkBSL, resultMgnkuBSL, resultMgnkBSLasso, resultMgnkSemiBSL),
+                which = 1, thin = 20, label = c("bsl", "bslasso", "semiBSL"),
                 col = c("red", "blue", "green"), lty = 2:4, lwd = 1)
 mtext("Approximate Univariate Posteriors", outer = TRUE, line = 0.75, cex = 1.2)
 
@@ -153,5 +153,5 @@ combinePlotsBSL(list(resultMgnkBSL, resultMgnkuBSL, resultMgnkBSLasso, resultMgn
 \insertAllCited{}
 }
 \author{
-Ziwen An, Leah F. South and Christopher C. Drovandi
+Ziwen An, Leah F. South and Christopher Drovandi
 }

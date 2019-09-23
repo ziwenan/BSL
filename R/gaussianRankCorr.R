@@ -33,6 +33,7 @@
 gaussianRankCorr <- function(x, vec = FALSE) {
     n <- nrow(x)
     p <- ncol(x)
+	stopifnot(p >= 2)
     r <- apply(x, FUN = rank, MARGIN = 2, ties.method = "average")
     rqnorm <- qnorm(r / (n + 1))
     den <- sum((qnorm(1 : n / (n + 1))) ^ 2)

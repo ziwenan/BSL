@@ -31,13 +31,13 @@
 #' require(doParallel) # You can use a different package to set up the parallel backend
 #' require(MASS)
 #' require(elliplot)
-#' 
+#'
 #' # Loading the data for this example
 #' data(mgnk)
 #' model <- newModel(fnSim = mgnk_sim, fnSum = mgnk_sum, simArgs = mgnk$sim_args, theta0 = mgnk$start,
 #'     thetaNames = expression(a[1],b[1],g[1],k[1],a[2],b[2],g[2],k[2],
 #'                             a[3],b[3],g[3],k[3],delta[12],delta[13],delta[23]))
-#' 
+#'
 #' # Performing BSL (reduce the number of iterations M if desired)
 #' # Opening up the parallel pools using doParallel
 #' cl <- makeCluster(detectCores() - 1)
@@ -50,12 +50,12 @@
 #' show(resultMgnkBSL)
 #' summary(resultMgnkBSL)
 #' plot(resultMgnkBSL, which = 2, thin = 20)
-#' 
+#'
 #' # Performing uBSL (reduce the number of iterations M if desired)
 #' # Opening up the parallel pools using doParallel
 #' cl <- makeCluster(detectCores() - 1)
 #' registerDoParallel(cl)
-#' resultMgnkuBSL <- bsl(mgnk$data, n = 60, M = 80000, model = model, covRandWalk = mgnk$cov, 
+#' resultMgnkuBSL <- bsl(mgnk$data, n = 60, M = 80000, model = model, covRandWalk = mgnk$cov,
 #'     method = "uBSL", parallel = TRUE, parallelArgs = list(.packages="MASS",.export="ninenum"),
 #'     verbose = 1L)
 #' stopCluster(cl)
@@ -63,18 +63,18 @@
 #' show(resultMgnkuBSL)
 #' summary(resultMgnkuBSL)
 #' plot(resultMgnkuBSL, which = 2, thin = 20)
-#' 
-#' 
+#'
+#'
 #' # Performing tuning for BSLasso
 #' ssy <- mgnk_sum(mgnk$data)
 #' lambda_all <- list(exp(seq(-2.5,0.5,length.out=20)), exp(seq(-2.5,0.5,length.out=20)),
 #'                    exp(seq(-4,-0.5,length.out=20)), exp(seq(-5,-2,length.out=20)))
-#' 
+#'
 #' # Opening up the parallel pools using doParallel
 #' cl <- makeCluster(detectCores() - 1)
 #' registerDoParallel(cl)
 #' set.seed(100)
-#' sp_mgnk <- selectPenalty(ssy, n = c(15, 20, 30, 50), lambda = lambda_all, theta = mgnk$start, 
+#' sp_mgnk <- selectPenalty(ssy, n = c(15, 20, 30, 50), lambda = lambda_all, theta = mgnk$start,
 #'     M = 100, sigma = 1.5, model = model, method = "BSL", shrinkage = "glasso", standardise = TRUE,
 #'     parallelSim = TRUE, parallelSimArgs = list(.packages = "MASS", .export = "ninenum"),
 #'     parallelMain = TRUE)
@@ -82,7 +82,7 @@
 #' registerDoSEQ()
 #' sp_mgnk
 #' plot(sp_mgnk)
-#' 
+#'
 #' # Performing BSLasso with a fixed penalty (reduce the number of iterations M if desired)
 #' # Opening up the parallel pools using doParallel
 #' cl <- makeCluster(detectCores() - 1)
@@ -95,8 +95,8 @@
 #' show(resultMgnkBSLasso)
 #' summary(resultMgnkBSLasso)
 #' plot(resultMgnkBSLasso, which = 2, thin = 20)
-#' 
-#' 
+#'
+#'
 #' # Performing semiBSL (reduce the number of iterations M if desired)
 #' # Opening up the parallel pools using doParallel
 #' cl <- makeCluster(detectCores() - 1)
@@ -109,15 +109,15 @@
 #' show(resultMgnkSemiBSL)
 #' summary(resultMgnkSemiBSL)
 #' plot(resultMgnkSemiBSL, which = 2, thin = 20)
-#' 
+#'
 #' # Plotting the results together for comparison
 #' # plot using the R default plot function
 #' par(mar = c(4, 4, 1, 1), oma = c(0, 1, 2, 0))
-#' combinePlotsBSL(list(resultMgnkBSL, resultMgnkuBSL, resultMgnkBSLasso, resultMgnkSemiBSL), 
-#'                 which = 1, thin = 20, label = c("bsl", "bslasso", "semiBSL"), 
+#' combinePlotsBSL(list(resultMgnkBSL, resultMgnkuBSL, resultMgnkBSLasso, resultMgnkSemiBSL),
+#'                 which = 1, thin = 20, label = c("bsl", "bslasso", "semiBSL"),
 #'                 col = c("red", "blue", "green"), lty = 2:4, lwd = 1)
 #' mtext("Approximate Univariate Posteriors", outer = TRUE, line = 0.75, cex = 1.2)
-#' 
+#'
 #' # plot using the ggplot2 package
 #' combinePlotsBSL(list(resultMgnkBSL, resultMgnkuBSL, resultMgnkBSLasso, resultMgnkSemiBSL),
 #'     which = 2, thin = 20, label=c("bsl","bslasso","semiBSL"),
@@ -129,10 +129,10 @@
 #' }
 #'
 #' @references
-#' 
+#'
 #' \insertAllCited{}
 #'
-#' @author 								Ziwen An, Leah F. South and Christopher C. Drovandi
+#' @author 								Ziwen An, Leah F. South and Christopher Drovandi
 #'
 #' @name mgnk
 #' @usage data(mgnk)

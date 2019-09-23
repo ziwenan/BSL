@@ -76,7 +76,7 @@ This is the main function for selecting the shrinkage (graphical
 }
 \examples{
 data(ma2)
-model <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args, 
+model <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args,
                   theta0 = ma2$start, fnLogPrior = ma2_prior)
 theta <- c(0.6,0.2)
 
@@ -100,5 +100,5 @@ plot(sp_ma2)
   for the main function to run BSL.
 }
 \author{
-Ziwen An, Leah F. South and Christopher C. Drovandi
+Ziwen An, Leah F. South and Christopher Drovandi
 }

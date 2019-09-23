@@ -2,7 +2,8 @@
 % Please edit documentation in R/s4-BSL.R
 \name{getGamma}
 \alias{getGamma}
-\title{Obtain the gamma samples (the latent parameters for BSLmisspec method) from a "BSL" object}
+\title{Obtain the gamma samples (the latent parameters for BSLmisspec method) from a
+"BSL" object}
 \usage{
 getGamma(object, ...)
 }

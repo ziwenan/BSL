@@ -43,7 +43,7 @@
 #'   (\ifelse{html}{\out{<i>P<sub>m</sub></i>}}{\eqn{P_m}}) and the probability
 #'   of cell proliferation
 #'   (\ifelse{html}{\out{<i>P<sub>p</sub></i>}}{\eqn{P_p}}) and it has no
-#'   tractable likelihood function. We use the uninformative priors
+#'   tractable likelihood function. We use the vague priors
 #'   \ifelse{html}{\out{<i>P<sub>m</sub> ~ N(0,1)</i>}}{\eqn{P_m \sim U(0,1)}}
 #'   and \ifelse{html}{\out{<i>P<sub>p</sub> ~ N(0,1)</i>}}{\eqn{P_p \sim
 #'   U(0,1)}}.
@@ -63,12 +63,11 @@
 #'   An example ``observed'' dataset and the tuning parameters relevant to that
 #'   example can be obtained using \code{data(cell)}. This ``observed'' data is
 #'   a simulated dataset with \ifelse{html}{\out{<i>P<sub>m</sub> =
-#'   0.35</i>}}{\eqn{P_m = 0.35}} \eqn{Pm = 0.35} and
-#'   \ifelse{html}{\out{<i>P<sub>p</sub> = 0.001</i>}}{\eqn{P_p = 0.001}}. The
-#'   lattice has 27 \code{rows} and 36 \code{cols} and there are \code{num_obs =
-#'   144} observations after time 0 (to mimic images being taken every 5 minutes
-#'   for 12 hours). The simulation is based on there initially being 110 cells
-#'   in the assay.
+#'   0.35</i>}}{\eqn{P_m = 0.35}} and \ifelse{html}{\out{<i>P<sub>p</sub> =
+#'   0.001</i>}}{\eqn{P_p = 0.001}}. The lattice has 27 \code{rows} and 36
+#'   \code{cols} and there are \code{num_obs = 144} observations after time 0
+#'   (to mimic images being taken every 5 minutes for 12 hours). The simulation
+#'   is based on there initially being 110 cells in the assay.
 #'
 #'   Further information about the specific choices of tuning parameters used in
 #'   BSL and BSLasso can be found in An et al. (2019).
@@ -97,14 +96,14 @@
 #' @examples
 #' \donttest{
 #' require(doParallel) # You can use a different package to set up the parallel backend
-#' 
+#'
 #' # Loading the data for this example
 #' data(cell)
 #' model <- newModel(fnSim = cell_sim, fnSum = cell_sum, simArgs = cell$sim_args,
 #'                   sumArgs = cell$sum_args, theta0 = cell$start, fnLogPrior = cell_prior,
 #'                   thetaNames = expression(P[m], P[p]))
 #' thetaExact <- c(0.35, 0.001)
-#' 
+#'
 #' # Performing BSL (reduce the number of iterations M if desired)
 #' # Opening up the parallel pools using doParallel
 #' cl <- makeCluster(detectCores() - 1)
@@ -116,7 +115,7 @@
 #' show(resultCellBSL)
 #' summary(resultCellBSL)
 #' plot(resultCellBSL, thetaTrue = thetaExact, thin = 20)
-#' 
+#'
 #' # Performing uBSL (reduce the number of iterations M if desired)
 #' # Opening up the parallel pools using doParallel
 #' cl <- makeCluster(detectCores() - 1)
@@ -128,7 +127,7 @@
 #' show(resultCelluBSL)
 #' summary(resultCelluBSL)
 #' plot(resultCelluBSL, thetaTrue = thetaExact, thin = 20)
-#' 
+#'
 #' # Performing tuning for BSLasso
 #' ssy <- cell_sum(cell$data, cell$sum_args$Yinit)
 #' lambda_all <- list(exp(seq(0.5,2.5,length.out=20)), exp(seq(0,2,length.out=20)),
@@ -144,7 +143,7 @@
 #' registerDoSEQ()
 #' sp_cell
 #' plot(sp_cell)
-#' 
+#'
 #' # Performing BSLasso with a fixed penalty (reduce the number of iterations M if desired)
 #' # Opening up the parallel pools using doParallel
 #' cl <- makeCluster(detectCores() - 1)
@@ -160,7 +159,7 @@
 #' show(resultCellBSLasso)
 #' summary(resultCellBSLasso)
 #' plot(resultCellBSLasso, thetaTrue = thetaExact, thin = 20)
-#' 
+#'
 #' # Performing semiBSL (reduce the number of iterations M if desired)
 #' # Opening up the parallel pools using doParallel
 #' cl <- makeCluster(detectCores() - 1)
@@ -176,7 +175,7 @@
 #' show(resultCellSemiBSL)
 #' summary(resultCellSemiBSL)
 #' plot(resultCellSemiBSL, thetaTrue = thetaExact, thin = 20)
-#' 
+#'
 #' # Plotting the results together for comparison
 #' # plot using the R default plot function
 #' par(mar = c(5, 4, 1, 2), oma = c(0, 1, 2, 0))
@@ -184,19 +183,21 @@
 #'     which = 1, thetaTrue = thetaExact, thin = 20, label = c("bsl", "ubsl", "bslasso", "semiBSL"),
 #'     col = 1:4, lty = 1:4, lwd = 1)
 #' mtext("Approximate Univariate Posteriors", outer = TRUE, cex = 1.5)
-#' 
+#'
 #' }
 #'
 #' @references
 #'
 #' \insertAllCited{}
 #'
-#' @author 								Ziwen An, Leah F. South and Christopher C. Drovandi
+#' @author 								Ziwen An, Leah F. South and Christopher Drovandi
 #' @name cell
 #' @usage data(ma2)
 NULL
 
-#' @describeIn cell The function \code{cell_sim(theta, Yinit, rows, cols, sim_iters, num_obs)} simulates data from the model, using C++ in the backend.
+#' @describeIn cell The function \code{cell_sim(theta, Yinit, rows, cols,
+#'   sim_iters, num_obs)} simulates data from the model, using C++ in the
+#'   backend.
 #' @export
 cell_sim <-function(theta, Yinit, rows, cols, sim_iters, num_obs) {
     Pm <- theta[1]
@@ -205,7 +206,8 @@ cell_sim <-function(theta, Yinit, rows, cols, sim_iters, num_obs) {
     return(Y)
 }
 
-#' @describeIn cell The function \code{cell_sum(Y,sum_options)} calculates the summary statistics for this example.
+#' @describeIn cell The function \code{cell_sum(Y,sum_options)} calculates the
+#'   summary statistics for this example.
 #' @export
 cell_sum <- function(Y, Yinit) {
     num_obs = dim(Y)[3]
@@ -223,7 +225,9 @@ cell_sum <- function(Y, Yinit) {
 	return(summ_stat)
 }
 
-#' @describeIn cell The function \code{cell_prior(theta)} evaluates the log prior at the chosen parameters.
+#' @describeIn cell The function \code{cell_prior(theta)} evaluates the log
+#'   prior density at the parameter value
+#'   \ifelse{html}{\out{<i>&#952</i>}}{\eqn{\theta}}.
 #' @export
 cell_prior <- function(theta) {
     log(theta[1] > 0 & theta[1] < 1 & theta[2] > 0 & theta[2] < 1)

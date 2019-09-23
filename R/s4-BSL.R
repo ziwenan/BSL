@@ -10,39 +10,65 @@ setClassUnion("logicalOrMatrixOrNULL", c("logical", "matrix", "NULL"))
 # setClassUnion("functionOrNULL", c("function", "NULL")) # defined in s4-MODEL.R
 
 #' S4 class ``BSL''.
-#' @description The S4 class ``BSL'' is produced by running function \code{\link{bsl}} and contains the result of a BSL run.
-#' Basic S4 methods \code{show}, \code{summary} and \code{plot} are provided. \code{theta} and \code{loglike} returns the parameters (samples) and accepted log-likelihood of the class.
+#' @description The S4 class ``BSL'' is produced by running function
+#'   \code{\link{bsl}} and contains the result of a BSL run. Basic S4 methods
+#'   \code{show}, \code{summary} and \code{plot} are provided. \code{theta} and
+#'   \code{loglike} returns the MCMC samples of parameter values and estimated
+#'   log-likelihoods.
 #' @rawRd \Rdversion{1.1}
-#' @slot theta Object of class ``matrix''. MCMC samples from the joint approximate posterior distribution of the parameters.
-#' @slot loglike Object of class ``numeric''. Accepted MCMC samples of the estimated log-likelihood values.
-#' @slot call Object of class ``call''. The original code that was used to call the method.
+#' @slot theta Object of class ``matrix''. MCMC samples from the joint
+#'   approximate posterior distribution of the parameters.
+#' @slot loglike Object of class ``numeric''. Accepted MCMC samples of the
+#'   estimated log-likelihood values.
+#' @slot call Object of class ``call''. The original code that was used to call
+#'   the method.
 #' @slot model Object of class ``MODEL''.
-#' @slot acceptanceRate Object of class ``numeric''. The acceptance rate of the MCMC algorithm.
-#' @slot earlyRejectionRate Object of class ``numeric''. The early rejection rate of the algorithm (early rejection may occur when using
-#' bounded prior distributions).
-#' @slot errorRate Object of class ``numeric''. The error rate. If any infinite summary statistic or positive infinite loglike occurs during
-#' the process, it is marked as an error and the proposed parameter will be rejected.
+#' @slot acceptanceRate Object of class ``numeric''. The acceptance rate of the
+#'   MCMC algorithm.
+#' @slot earlyRejectionRate Object of class ``numeric''. The early rejection
+#'   rate of the algorithm (early rejection may occur when using bounded prior
+#'   distributions).
+#' @slot errorRate Object of class ``numeric''. The error rate. If any infinite
+#'   summary statistic or infinite log-likelihood estimate occurs during the
+#'   process, it is marked as an error and the proposed parameter will be
+#'   rejected.
 #' @slot y Object of class ``ANY''. The observed data.
-#' @slot n Object of class ``numeric''. The number of simulations from the model per MCMC iteration.
+#' @slot n Object of class ``numeric''. The number of simulations from the model
+#'   per MCMC iteration to estimate the synthetic likelihood.
 #' @slot M Object of class ``numeric''. The number of MCMC iterations.
-#' @slot covRandWalk Object of class ``matrix''. The covariance matrix used in multivariate normal random walk proposals.
-#' @slot method Object of class ``character''. The character argument indicating the used method.
-#' @slot shrinkage Object of class ``characterOrNULL''. The character argument indicating the shrinkage method.
+#' @slot covRandWalk Object of class ``matrix''. The covariance matrix used in
+#'   multivariate normal random walk proposals.
+#' @slot method Object of class ``character''. The character argument indicating
+#'   the used method.
+#' @slot shrinkage Object of class ``characterOrNULL''. The character argument
+#'   indicating the shrinkage method.
 #' @slot penalty Object of class ``numericOrNULL''. The penalty value.
-#' @slot GRC Object of class ``logical''. Whether the Gaussian rank correlation matrix is used.
-#' @slot logitTransform Object of class ``logical''. The logical argument indicating whether a logit transformation is used in the algorithm.
-#' @slot logitTransformBound Object of class ``matrixOrNULL''. The matrix of logitTransformBound.
-#' @slot standardise Object of class ``logical''. The logical argument that determines whether to standardise the summary statistics.
-#' @slot parallel Object of class ``logical''. The logical value indicating whether parallel computing is used in the process.
-#' @slot parallelArgs Object of class ``listOrNULL''. The list of additional arguments to pass into the \code{foreach} function.
+#' @slot GRC Object of class ``logical''. Whether the Gaussian rank correlation
+#'   matrix is used.
+#' @slot logitTransform Object of class ``logical''. The logical argument
+#'   indicating whether a logit transformation is used in the algorithm.
+#' @slot logitTransformBound Object of class ``matrixOrNULL''. The matrix of
+#'   logitTransformBound.
+#' @slot standardise Object of class ``logical''. The logical argument that
+#'   determines whether to standardise the summary statistics.
+#' @slot parallel Object of class ``logical''. The logical value indicating
+#'   whether parallel computing is used in the process.
+#' @slot parallelArgs Object of class ``listOrNULL''. The list of additional
+#'   arguments to pass into the \code{foreach} function.
 #' @slot time Object of class ``difftime''. The running time.
-#' @slot gamma Object of class ``numeric''. MCMC samples of gamma parameter values of the mean adjustment or variance inflation.
-#' @slot misspecType Object of class ``characterOrNULL''. The character argument indicating whether mean adjustment ("mean") or variance 
-#' inflation ("variance") to be used in "BSLmisspec" method.
-#' @slot tau Object of class ``numeric''. Parameter of the prior distribution for "BSLmisspec" method. For mean adjustment, \code{tau} 
-#' is the scale of the Laplace distribution. For variance inflation, \code{tau} is the scale (or mean) of the exponential distribution.
-#' @slot whitening Object of class ``logicalOrMatrixOrNULL''. A logical argument determines whether Whitening transformation
-#'   is used in ``BSL'' method with Warton's shrinkage, or just the Whitening matrix used.
+#' @slot gamma Object of class ``numeric''. MCMC samples of gamma parameter
+#'   values of the mean adjustment or variance inflation for method
+#'   ``BSLmisspec''.
+#' @slot misspecType Object of class ``characterOrNULL''. The character argument
+#'   indicating whether mean adjustment ("mean") or variance inflation
+#'   ("variance") to be used in "BSLmisspec" method.
+#' @slot tau Object of class ``numeric''. Parameter of the prior distribution
+#'   for "BSLmisspec" method. For mean adjustment, \code{tau} is the scale of
+#'   the Laplace distribution. For variance inflation, \code{tau} is the mean of
+#'   the exponential distribution.
+#' @slot whitening Object of class ``logicalOrMatrixOrNULL''. A logical argument
+#'   determines whether Whitening transformation is used in ``BSL'' method with
+#'   Warton's shrinkage, or just the Whitening matrix used.
 #'
 #' @examples
 #' \dontshow{
@@ -66,35 +92,35 @@ setClassUnion("logicalOrMatrixOrNULL", c("logical", "matrix", "NULL"))
 #'
 #' @aliases BSLclass
 #' @export
-setClass("BSL", 
-         slots = c(theta = "matrix", 
-                   loglike = "numeric", 
-                   model = "MODEL", 
-                   acceptanceRate = "numeric", 
-                   earlyRejectionRate = "numeric", 
-                   errorRate = "numeric", 
-                   y = "ANY", 
-                   n = "numeric", 
-                   M = "numeric", 
+setClass("BSL",
+         slots = c(theta = "matrix",
+                   loglike = "numeric",
+                   model = "MODEL",
+                   acceptanceRate = "numeric",
+                   earlyRejectionRate = "numeric",
+                   errorRate = "numeric",
+                   y = "ANY",
+                   n = "numeric",
+                   M = "numeric",
                    covRandWalk = "matrix",
-                   method = "character", 
-                   shrinkage = "characterOrNULL", 
-                   penalty = "numericOrNULL", 
-                   standardise = "logical", 
-                   GRC = "logical", 
-                   gamma = "matrix", 
-                   misspecType = "characterOrNULL", 
-                   tau = "numeric", 
-                   whitening = "logicalOrMatrixOrNULL", 
-                   logitTransform = "logical", 
-                   logitTransformBound = "matrixOrNULL", 
-                   parallel = "logical", 
-                   parallelArgs = "listOrNULL", 
-                   time = "difftime", 
+                   method = "character",
+                   shrinkage = "characterOrNULL",
+                   penalty = "numericOrNULL",
+                   standardise = "logical",
+                   GRC = "logical",
+                   gamma = "matrix",
+                   misspecType = "characterOrNULL",
+                   tau = "numeric",
+                   whitening = "logicalOrMatrixOrNULL",
+                   logitTransform = "logical",
+                   logitTransformBound = "matrixOrNULL",
+                   parallel = "logical",
+                   parallelArgs = "listOrNULL",
+                   time = "difftime",
                    call = "call")
         )
 
-setValidity("BSL", 
+setValidity("BSL",
             method = function(object) {
                 if (any(length(object@theta) == 0, length(object@M) == 0)) { # slots that must include in bsl class
                     warnings('empty slot "theta" or "M" in the "bsl" object')
@@ -106,13 +132,13 @@ setValidity("BSL",
                         msg <- paste('The number of rows of theta', M, 'does not match the number of iterations M', object@M)
                         error <- c(errors, msg)
                     }
-            
+
                     temp <- length(object@loglike)
                     if (temp != 0 && temp != M) {
                         msg <- paste('The number of iterations M', M, 'does not match the length of loglike', temp)
                         error <- c(errors, msg)
                     }
-            
+
                     temp <- class(object@model)
                     if (temp != 'MODEL') {
                         msg <- paste('model must be a MODEL class object')
@@ -120,19 +146,19 @@ setValidity("BSL",
                     } else {
                         invisible(capture.output(validObject(object@model)))
                     }
-            
+
                     if (nrow(object@covRandWalk) != p || ncol(object@covRandWalk) != p) {
                         msg <- paste('covRandWalk must be a', p, 'by', p, 'square matrix')
                         error <- c(errors, msg)
                     }
-            
+
                     if (!is.null(object@logitTransformBound)) {
                         if (nrow(object@logitTransformBound) != p || ncol(object@logitTransformBound) != 2L) {
                             msg <- paste('logitTransformBound must be a', p, 'by', 2, 'matrix')
                             error <- c(errors, msg)
                         }
                     }
-            
+
                     if (length(errors) == 0) {
                         return (TRUE)
                     } else {
@@ -145,8 +171,8 @@ setValidity("BSL",
 #' @param object   A ``BSL'' class object to be displayed.
 #' @rdname BSL-class
 #' @export
-setMethod("show", 
-          signature = c(object = "BSL"), 
+setMethod("show",
+          signature = c(object = "BSL"),
           definition = function(object) {
               digits = max(3L, getOption("digits") - 3L)
               cat("\nCall:\n", paste(deparse(object@call), sep = "\n", collapse = "\n"),
@@ -182,13 +208,14 @@ setMethod("show",
           }
           )
 
-#' @param burnin the number of burn-in steps to be taken.
-#' @param thetaNames Parameter names to be shown in the summary table. If not given, parameter names of the ``BSL'' object will be used by default.
+#' @param burnin the number of MCMC burn-in steps to be taken.
+#' @param thetaNames Parameter names to be shown in the summary table. If not
+#'   given, parameter names of the ``BSL'' object will be used by default.
 #' @inheritParams BSL-class
 #' @rdname BSL-class
 #' @export
-setMethod("summary", 
-          signature = c(object = "BSL"), 
+setMethod("summary",
+          signature = c(object = "BSL"),
           definition = function(object, burnin = 0, thetaNames = NULL) {
               theta <- getTheta(object, burnin = burnin)
               #theta <- as.matrix(object@theta[(burnin + 1) : nrow(object@theta), ])
@@ -218,22 +245,26 @@ setMethod("summary",
           )
 
 #' @param x           A ``BSL'' class object to plot.
-#' @param which       An integer argument indicating which plot function to be used. The default, \code{1L}, uses
-#' the plain \code{plot} to visualise the result. \code{2L} uses ggplot2 to draw the plot.
-#' @param thin        A numeric argument indicating the gap between samples to be taken when thinning the MCMC
-#' draws. The default is \code{1}, which means no thinning is used.
-#' @param thetaTrue   A set of values to be included on the plots as a reference line. The default is \code{NULL}.
-#' @param options.plot  A list of additional arguments to pass into the \code{plot} function. Only use when
-#' \code{which} is \code{1L}.
-#' @param top         A character argument of the combined plot title if \code{which} is \code{2L}.
-#' @param options.density  A list of additional arguments to pass into the \code{geom_density} function. Only use
-#' when \code{which} is \code{2L}.
-#' @param options.theme  A list of additional arguments to pass into the \code{theme} function. Only use
-#' when \code{which} is \code{2L}.
+#' @param which       An integer argument indicating which plot function to be
+#'   used. The default, \code{1L}, uses the plain \code{plot} to visualise the
+#'   result. \code{2L} uses ggplot2 to draw the plot.
+#' @param thin        A numeric argument indicating the gap between samples to
+#'   be taken when thinning the MCMC draws. The default is \code{1}, which means
+#'   no thinning is used.
+#' @param thetaTrue   A set of true parameter values to be included on the plots
+#'   as a reference line. The default is \code{NULL}.
+#' @param options.plot  A list of additional arguments to pass into the
+#'   \code{plot} function. Only use when \code{which} is \code{1L}.
+#' @param top         A character argument of the combined plot title if
+#'   \code{which} is \code{2L}.
+#' @param options.density  A list of additional arguments to pass into the
+#'   \code{geom_density} function. Only use when \code{which} is \code{2L}.
+#' @param options.theme  A list of additional arguments to pass into the
+#'   \code{theme} function. Only use when \code{which} is \code{2L}.
 #' @rdname BSL-class
 #' @export
-setMethod("plot", 
-          signature = c(x = "BSL"), 
+setMethod("plot",
+          signature = c(x = "BSL"),
           definition = function(x, which = 1L, thin = 1, burnin = 0, thetaTrue = NULL, options.plot = NULL,
                                top = 'Approximate Univariate Posteriors', options.density = list(), options.theme = list()) {
               if (which == 1L) {
@@ -252,7 +283,8 @@ setMethod("plot",
           }
           )
 
-# Plot the univariate marginal posterior plot of a bsl class object using the R default plot function.
+# Plot the univariate marginal posterior plot of a bsl class object using the R
+# default plot function.
 marginalPostDefault <- function(x, thin = 1, burnin = 0, thetaTrue = NULL, options.plot = NULL) {
     theta <- getTheta(x, burnin = burnin)
     n <- nrow(theta)
@@ -279,7 +311,8 @@ marginalPostDefault <- function(x, thin = 1, burnin = 0, thetaTrue = NULL, optio
     par(mfrow = c(1,1))
 }
 
-# Plot the univariate marginal posterior plot of a bsl class object using the ggplot2 package.
+# Plot the univariate marginal posterior plot of a bsl class object using the
+# ggplot2 package.
 marginalPostGgplot <- function(x, thin = 1, burnin = 0, thetaTrue = NULL, top = 'Approximate Univariate Posteriors', options.density = list(), options.theme = list()) {
     theta <- getTheta(x, burnin = burnin)
     n <- nrow(theta)
@@ -314,13 +347,13 @@ setGeneric("getTheta", function(object, ...) standardGeneric("getTheta"))
 #' @inheritParams BSL-class
 #' @rdname BSL-class
 #' @export
-setMethod("getTheta", 
-          signature = c(object = "BSL"), 
+setMethod("getTheta",
+          signature = c(object = "BSL"),
           definition = function(object, burnin = 0) {
               as.matrix(object@theta[(burnin + 1) : nrow(object@theta), ])
           }
           )
-          
+
 #' Obtain the log-likelihoods from a "BSL" object
 #' @description see \code{\link{BSLclass}}
 #' @param ... Other arguments.
@@ -329,14 +362,15 @@ setGeneric("getLoglike", function(object, ...) standardGeneric("getLoglike"))
 #' @inheritParams BSL-class
 #' @rdname BSL-class
 #' @export
-setMethod("getLoglike", 
-          signature = c(object = "BSL"), 
+setMethod("getLoglike",
+          signature = c(object = "BSL"),
           definition = function(object, burnin = 0) {
               object@loglike[(burnin + 1) : length(object@loglike)]
           }
           )
-		  
-#' Obtain the gamma samples (the latent parameters for BSLmisspec method) from a "BSL" object
+
+#' Obtain the gamma samples (the latent parameters for BSLmisspec method) from a
+#' "BSL" object
 #' @description see \code{\link{BSLclass}}
 #' @param ... Other arguments.
 #' @inheritParams BSL-class
@@ -344,8 +378,8 @@ setGeneric("getGamma", function(object, ...) standardGeneric("getGamma"))
 #' @inheritParams BSL-class
 #' @rdname BSL-class
 #' @export
-setMethod("getGamma", 
-          signature = c(object = "BSL"), 
+setMethod("getGamma",
+          signature = c(object = "BSL"),
           definition = function(object, burnin = 0) {
               as.matrix(object@gamma[(burnin + 1) : nrow(object@gamma), ])
           }

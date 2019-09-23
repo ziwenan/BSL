@@ -67,7 +67,7 @@ Cell motility (movement) and proliferation (reproduction) cause
   (\ifelse{html}{\out{<i>P<sub>m</sub></i>}}{\eqn{P_m}}) and the probability
   of cell proliferation
   (\ifelse{html}{\out{<i>P<sub>p</sub></i>}}{\eqn{P_p}}) and it has no
-  tractable likelihood function. We use the uninformative priors
+  tractable likelihood function. We use the vague priors
   \ifelse{html}{\out{<i>P<sub>m</sub> ~ N(0,1)</i>}}{\eqn{P_m \sim U(0,1)}}
   and \ifelse{html}{\out{<i>P<sub>p</sub> ~ N(0,1)</i>}}{\eqn{P_p \sim
   U(0,1)}}.
@@ -84,11 +84,16 @@ Cell motility (movement) and proliferation (reproduction) cause
 }
 \section{Functions}{
 \itemize{
-\item \code{cell_sim}: The function \code{cell_sim(theta, Yinit, rows, cols, sim_iters, num_obs)} simulates data from the model, using C++ in the backend.
+\item \code{cell_sim}: The function \code{cell_sim(theta, Yinit, rows, cols,
+sim_iters, num_obs)} simulates data from the model, using C++ in the
+backend.
 
-\item \code{cell_sum}: The function \code{cell_sum(Y,sum_options)} calculates the summary statistics for this example.
+\item \code{cell_sum}: The function \code{cell_sum(Y,sum_options)} calculates the
+summary statistics for this example.
 
-\item \code{cell_prior}: The function \code{cell_prior(theta)} evaluates the log prior at the chosen parameters.
+\item \code{cell_prior}: The function \code{cell_prior(theta)} evaluates the log
+prior density at the parameter value
+\ifelse{html}{\out{<i>&#952</i>}}{\eqn{\theta}}.
 }}
 
 \section{A simulated dataset}{
@@ -97,12 +102,11 @@ Cell motility (movement) and proliferation (reproduction) cause
   An example ``observed'' dataset and the tuning parameters relevant to that
   example can be obtained using \code{data(cell)}. This ``observed'' data is
   a simulated dataset with \ifelse{html}{\out{<i>P<sub>m</sub> =
-  0.35</i>}}{\eqn{P_m = 0.35}} \eqn{Pm = 0.35} and
-  \ifelse{html}{\out{<i>P<sub>p</sub> = 0.001</i>}}{\eqn{P_p = 0.001}}. The
-  lattice has 27 \code{rows} and 36 \code{cols} and there are \code{num_obs =
-  144} observations after time 0 (to mimic images being taken every 5 minutes
-  for 12 hours). The simulation is based on there initially being 110 cells
-  in the assay.
+  0.35</i>}}{\eqn{P_m = 0.35}} and \ifelse{html}{\out{<i>P<sub>p</sub> =
+  0.001</i>}}{\eqn{P_p = 0.001}}. The lattice has 27 \code{rows} and 36
+  \code{cols} and there are \code{num_obs = 144} observations after time 0
+  (to mimic images being taken every 5 minutes for 12 hours). The simulation
+  is based on there initially being 110 cells in the assay.
 
   Further information about the specific choices of tuning parameters used in
   BSL and BSLasso can be found in An et al. (2019).
@@ -227,5 +231,5 @@ mtext("Approximate Univariate Posteriors", outer = TRUE, cex = 1.5)
 \insertAllCited{}
 }
 \author{
-Ziwen An, Leah F. South and Christopher C. Drovandi
+Ziwen An, Leah F. South and Christopher Drovandi
 }

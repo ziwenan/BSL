@@ -261,7 +261,7 @@
 #'
 #' \insertAllCited{}
 #'
-#' @author Ziwen An, Leah F. South and Christopher C. Drovandi
+#' @author Ziwen An, Leah F. South and Christopher Drovandi
 #'
 #' @name ma2
 #' @usage data(ma2)

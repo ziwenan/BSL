@@ -26,7 +26,7 @@ toad_prior(theta)
 
 \item{ndays}{The number of days lasted of the observation.}
 
-\item{model}{Which model to be used. 1 for the random return model, 2 for 
+\item{model}{Which model to be used. 1 for the random return model, 2 for
 the nearest return model, and 3 for the distance-based return probability model.}
 
 \item{d0}{Characteristic distance for model 3. Only used if \code{model} is 3.}
@@ -98,7 +98,7 @@ The model here is the nearest return model of
   for MCMC.
 
   \item \code{sim_args_simulated} and \code{sim_args_real}: A list of the
-  arguments to pass into the simulation function. 
+  arguments to pass into the simulation function.
 
   \itemize{
 
@@ -109,7 +109,7 @@ The model here is the nearest return model of
   }
 
   \item \code{sum_args_simulated} and \code{sum_args_real}: A list of the
-  arguments to pass into the summary statistics function. 
+  arguments to pass into the summary statistics function.
 
   \itemize{ \item
   \code{gmm}: A list of the Gaussian mixture model parameters. Gaussian
@@ -198,5 +198,5 @@ gmm
 \insertAllCited()
 }
 \author{
-Ziwen An, Leah F. South and Christopher C. Drovandi
+Ziwen An, Leah F. South and Christopher Drovandi
 }

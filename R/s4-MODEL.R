@@ -133,7 +133,7 @@ setMethod("initialize",
                       if (verbose) cat("No prior has been defined in the model, use the default improper flat prior\n")
                   }
                   .Object@theta0 <- theta0
-                    .Object@test <- test
+                  .Object@test <- test
                   .Object@verbose <- verbose
                   validObject(.Object)
                   .Object@ns <- getns(.Object)
@@ -253,8 +253,8 @@ setMethod("simulation",
               if (!is.null(seed)) set.seed(seed)
               flagVec <- !is.null(model@fnSimVec)
               if (flagVec && parallel) {
-                    parallel <- FALSE
-                    warning("Parallel computation is disabled for vecotised simulations")
+                  parallel <- FALSE
+                  warning("Parallel computation is disabled for vecotised simulations")
               }
               if (!parallel & !is.null(parallelArgs)) {
                   warning("\"parallelArgs\" is omitted in serial computing")
@@ -262,6 +262,10 @@ setMethod("simulation",
               if (model@fnLogPrior(theta) == -Inf) {
                   warning("The given parameter has no prior support")
               }
+			  if (n == 1 && parallel) {
+			      parallel <- FALSE
+				  warning("Parallel computation is disabled for n = 1")
+			  }
               
               ssx <- NULL
               if (parallel) { # parallel
@@ -282,33 +286,51 @@ setMethod("simulation",
                   
               } else { # not parallel
                   if (flagVec) { # vectorised
-                      x <- do.call(model@fnSimVec, c(list(n, theta), model@simArgs))
-                      if (summStat) {
-                          if (is.matrix(x)) {
-                              ssx <- apply(x, FUN = function(y) do.call(model@fnSum, c(list(y), model@sumArgs)), MARGIN = 1)
-                          } else {
-                              ssx <- sapply(x, FUN = function(y) do.call(model@fnSum, c(list(y), model@sumArgs)))
+				      if (n == 1) {
+					      x <- do.call(model@fnSimVec, c(list(1, theta), model@simArgs))
+						  if (is.matrix(x)) {
+						      x <- as.vector(x)
+							  if (summStat) ssx <- do.call(model@fnSum, c(list(x), model@sumArgs))
+						  } else {
+						      if (summStat) ssx <- do.call(model@fnSum, c(x, model@sumArgs))
+						  }
+					  } else {
+					      x <- do.call(model@fnSimVec, c(list(n, theta), model@simArgs))
+                          if (summStat) {
+						      ns <- ifelse(length(model@ns) == 0, getns(model), model@ns)
+                              if (is.matrix(x)) {
+                                  temp <- apply(x, FUN = function(y) do.call(model@fnSum, c(list(y), model@sumArgs)), MARGIN = 1)
+								  ssx <- matrix(temp, nrow = n, ncol = ns, byrow = TRUE)
+                              } else {
+                                  temp <- sapply(x, FUN = function(y) do.call(model@fnSum, c(list(y), model@sumArgs)))
+								  ssx <- matrix(temp, nrow = n, ncol = ns, byrow = TRUE)
+                              }
+                              # if (!is.vector(ssx)) {
+                              #     ssx <- t(ssx)
+                              # }
                           }
-                          if (!is.vector(ssx)) {
-                              ssx <- t(ssx)
-                          }
-                      }
-                      
+					  }
+					  
                   } else { # serial
-                      x <- vector("list", n)
-                      if (summStat) {
+				      if (n == 1) {
+					      x <- do.call(model@fnSim, c(list(theta), model@simArgs))
+						  if (summStat) ssx <- do.call(model@fnSum, c(list(x), model@sumArgs))
+					  } else {
+					      x <- vector("list", n)
                           ns <- ifelse(length(model@ns) == 0, getns(model), model@ns)
-                          ssx <- array(0, c(n, ns))
+                          if (summStat) ssx <- array(0, c(n, ns))
                           for (j in 1 : n) {
                               x[[j]] <- do.call(model@fnSim, c(list(theta), model@simArgs))
-                              ssx[j, ] <- do.call(model@fnSum, c(x[j], model@sumArgs))
+						      if (summStat) {
+						          ssx[j, ] <- do.call(model@fnSum, c(x[j], model@sumArgs))
+						      }
                           }
                           if (is.atomic(x[[1]]) && is.vector(x[[1]])) { # reduce to matrix
                               if (length(unique(sapply(x, FUN = length))) == 1) {
                                   x <- matrix(unlist(x), ncol = length(x[[1]]), byrow = TRUE)
                               }
                           }
-                      }
+					  }
                   }
               }
               return (list(x = x, ssx = ssx))

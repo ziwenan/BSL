@@ -74,6 +74,8 @@ semiparaKernelEstimate <- function (ssy, ssx, kernel = 'gaussian', shrinkage = N
 
     n <- nrow(ssx)
     ns <- ncol(ssx)
+	stopifnot(ns >= 2)
+	stopifnot(length(ssy) == ns)
 
     pdfy <- yu <- numeric(ns)
     for (j in 1 : ns) {

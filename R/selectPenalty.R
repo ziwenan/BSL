@@ -46,10 +46,10 @@
 #'
 #' @examples
 #' data(ma2)
-#' model <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args, 
+#' model <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args,
 #'                   theta0 = ma2$start, fnLogPrior = ma2_prior)
 #' theta <- c(0.6,0.2)
-#' 
+#'
 #' # Performing tuning for BSLasso (BSL with glasso shrinkage estimation)
 #' ssy <- ma2_sum(ma2$data)
 #' lambda_all <- list(exp(seq(-3,0.5,length.out=20)), exp(seq(-4,-0.5,length.out=20)),
@@ -64,7 +64,7 @@
 #'
 #' \insertAllCited{}
 #'
-#' @author    Ziwen An, Leah F. South and Christopher C. Drovandi
+#' @author    Ziwen An, Leah F. South and Christopher Drovandi
 #' @seealso   \code{PENALTY} for the usage of the S4 class. \code{\link{ma2}},
 #'   \code{\link{cell}} and \code{\link{mgnk}} for examples. \code{\link{bsl}}
 #'   for the main function to run BSL.
@@ -154,7 +154,7 @@ selectPenalty <- function(ssy, n, lambda, M, sigma = 1.5, model, theta = NULL,
         }
     }
 	if (verbose == 1L) cat("\n")
-	
+
 	ret <- PENALTY(loglike = loglike, n = n, lambda = lambda, sigma = sigma, model = model, call = call)
 
     return(ret)
