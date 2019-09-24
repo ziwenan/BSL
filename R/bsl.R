@@ -483,7 +483,7 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
     }
     
     log_rloglike <- loglikeProp - loglikeCurr
-    if (runif(1) < exp(log_prob + log_rloglike) {
+    if (runif(1) < exp(log_prob + log_rloglike) ) {
       if (verbose == 2L) {
         cat("*** accept ***\n")
       } else if (verbose == 1L){
