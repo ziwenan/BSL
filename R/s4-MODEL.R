@@ -269,7 +269,7 @@ setMethod("simulation",
             
             ssx <- NULL
             if (parallel) { # parallel
-              # parallelArgs$.export <- c(parallelArgs$.export, "model")
+              parallelArgs$.export <- c(parallelArgs$.export, "model")
               x <- do.call(foreach, c(list(j = 1:n), parallelArgs)) %dopar% {
                 do.call(model@fnSim, c(list(theta), model@simArgs))
               }
@@ -379,7 +379,7 @@ setMethod("fn",
             } else { # non-vectorised simulation function
               fnPar <- function(n, theta, parallelArgs = list()) {
                 j <- NULL
-                # parallelArgs$.export <- c(parallelArgs$.export, ".Object")
+                parallelArgs$.export <- c(parallelArgs$.export, ".Object")
                 do.call(foreach, c(list(j = 1:n, .combine = rbind), parallelArgs)) %dopar% {
                   x <- do.call(.Object@fnSim, c(list(theta), .Object@simArgs))
                   do.call(.Object@fnSum, c(list(x), .Object@sumArgs))
