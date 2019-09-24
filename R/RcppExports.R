@@ -3,11 +3,16 @@
 
 #' Simulation function of the cell biology example
 #'
-#' @param x The initial matrix of cell presences of size \code{rows} \ifelse{html}{\out{&times}}{\eqn{\times}} \code{cols}.
-#' @param Pm Parameter \ifelse{html}{\out{<i>P<sub>m</sub></i>}}{\eqn{P_m}}, the probability of cell movement.
-#' @param Pp Parameter \ifelse{html}{\out{<i>P<sub>p</sub></i>}}{\eqn{P_p}}, the probability of cell proliferation.
+#' @description Simulation function of the cell biology example.
+#' @param x The initial matrix of cell presences of size \code{rows}
+#' \ifelse{html}{\out{&times}}{\eqn{\times}} \code{cols}.
+#' @param Pm Parameter \ifelse{html}{\out{<i>P<sub>m</sub></i>}}{\eqn{P_m}},
+#' the probability of cell movement.
+#' @param Pp Parameter \ifelse{html}{\out{<i>P<sub>p</sub></i>}}{\eqn{P_p}},
+#' the probability of cell proliferation.
 #' @inheritParams cell
-#' @return  A \code{rows} \ifelse{html}{\out{&times}}{\eqn{\times}} \code{cols} \ifelse{html}{\out{&times}}{\eqn{\times}} \code{num_obs} array
+#' @return  A \code{rows} \ifelse{html}{\out{&times}}{\eqn{\times}} \code{cols}
+#'  \ifelse{html}{\out{&times}}{\eqn{\times}} \code{num_obs} array
 #'   of the cell presences at times \code{1:num_obs} (not time 0).
 #' @export
 simulate_cell <- function(x, rows, cols, Pm, Pp, sim_iters, num_obs) {
@@ -21,18 +26,19 @@ simulate_cell <- function(x, rows, cols, Pm, Pp, sim_iters, num_obs) {
 #' @param scale The scale parameter.
 #' @param alpha The stability parameter.
 #' @return  A random sample from the zero-centered stable distribution.
-#' @export
+#' @keywords internal
 rstable <- function(scale, alpha) {
     .Call(`_BSL_rstable`, scale, alpha)
 }
 
 #' The simulation function for the toad example
 #'
+#' @description The simulation function for the toad example.
 #' @param params A vector of proposed model parameters, \ifelse{html}{\out{<i>&#945</i>}}{\eqn{\alpha}},
 #'   \ifelse{html}{\out{<i>&#947</i>}}{\eqn{gamma}} and \ifelse{html}{\out{p<sub>0</sub>}}{\eqn{p_0}}.
 #' @param ntoad The number of toads to simulate in the observation.
 #' @param nday The number of days lasted of the observation.
-#' @param model Which model to be used. 1 for the random return model, 2 for the nearest return model, 
+#' @param model Which model to be used. 1 for the random return model, 2 for the nearest return model,
 #'   and 3 for the distance-based return probability model.
 #' @param d0 Characteristic distance for model 3. Only used if model is 3.
 #' @return A data matrix.
@@ -43,7 +49,9 @@ sim_toad <- function(params, ntoad, nday, model = 1L, d0 = 100) {
 }
 
 #' Convert an observation matrix to a vector of n-day displacements
-#' 
+#'
+#' @description Convert an observation matrix to a vector of n-day
+#' displacements. This is a function for the toad example.
 #' @param X The observation matrix to be converted.
 #' @param lag Interger, the number of day lags to compute the displacement.
 #' @return A vector of displacements.
@@ -54,14 +62,16 @@ obsMat2deltaxR <- function(X, lag) {
 
 #' This function computes the scores of Gaussian mixture models for the toad example
 #'
-#' @description The summary statistics for the toad example is taken to be the 
-#' scores of Gaussian mixture model fitted to the displacement distribution. The 
-#' displacements is computed with a given day lag.
+#' @description The summary statistics for the toad example is taken to be the
+#' scores of Gaussian mixture model fitted to the displacement distribution. The
+#' displacements are computed with a given day lag.
 #' @param X The observation matrix.
-#' @param gmm A matrix containing the parameters for a Gaussian mixture model. The first row should be component proportion. 
-#' The second row should be mean. The last row should be Variance.
+#' @param gmm A matrix containing the parameters for a Gaussian mixture model.
+#' The first row should be component proportions. The second row should be
+#' component means. The last row should be component Variances.
 #' @param lag The lag of days to compute the displacements.
-#' @return A list of the following vectors: return frequencies, scores of component proportion, scores of mean and scores of variance.
+#' @return A list of the following vectors: return frequencies, scores of
+#' component proportion, scores of mean and scores of variance.
 #' @export
 gmmScores <- function(X, gmm, lag) {
     .Call(`_BSL_gmmScores`, X, gmm, lag)
