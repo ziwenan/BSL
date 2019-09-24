@@ -285,7 +285,7 @@ bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("B
     )
     shrinkageText <- paste("shrinkage:", ifelse(flagShrinkage, shrinkage, "disabled"))
     whiteningText <- paste("whitening:", ifelse(flagWhitening, "enabled", "disabled"))
-    cat("*** runnning ", methodText, ", ", shrinkageText, ", ", whiteningText, " *** \n", sep = "")
+    cat("*** running ", methodText, ", ", shrinkageText, ", ", whiteningText, " *** \n", sep = "")
     # cat(shrinkageText, ", ", whiteningText, "\n", sep = "")
   }
   
