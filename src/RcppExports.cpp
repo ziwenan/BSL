@@ -23,9 +23,52 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// sim_toad
+NumericMatrix sim_toad(NumericVector params, int ntoad, int nday, int model, double d0);
+RcppExport SEXP _BSL_sim_toad(SEXP paramsSEXP, SEXP ntoadSEXP, SEXP ndaySEXP, SEXP modelSEXP, SEXP d0SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type params(paramsSEXP);
+    Rcpp::traits::input_parameter< int >::type ntoad(ntoadSEXP);
+    Rcpp::traits::input_parameter< int >::type nday(ndaySEXP);
+    Rcpp::traits::input_parameter< int >::type model(modelSEXP);
+    Rcpp::traits::input_parameter< double >::type d0(d0SEXP);
+    rcpp_result_gen = Rcpp::wrap(sim_toad(params, ntoad, nday, model, d0));
+    return rcpp_result_gen;
+END_RCPP
+}
+// obsMat2deltaxR
+NumericVector obsMat2deltaxR(Rcpp::NumericMatrix X, unsigned int lag);
+RcppExport SEXP _BSL_obsMat2deltaxR(SEXP XSEXP, SEXP lagSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type X(XSEXP);
+    Rcpp::traits::input_parameter< unsigned int >::type lag(lagSEXP);
+    rcpp_result_gen = Rcpp::wrap(obsMat2deltaxR(X, lag));
+    return rcpp_result_gen;
+END_RCPP
+}
+// gmmScores
+Rcpp::List gmmScores(Rcpp::NumericMatrix X, NumericMatrix gmm, unsigned int lag);
+RcppExport SEXP _BSL_gmmScores(SEXP XSEXP, SEXP gmmSEXP, SEXP lagSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type X(XSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type gmm(gmmSEXP);
+    Rcpp::traits::input_parameter< unsigned int >::type lag(lagSEXP);
+    rcpp_result_gen = Rcpp::wrap(gmmScores(X, gmm, lag));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_BSL_simulate_cell", (DL_FUNC) &_BSL_simulate_cell, 7},
+    {"_BSL_sim_toad", (DL_FUNC) &_BSL_sim_toad, 5},
+    {"_BSL_obsMat2deltaxR", (DL_FUNC) &_BSL_obsMat2deltaxR, 2},
+    {"_BSL_gmmScores", (DL_FUNC) &_BSL_gmmScores, 3},
     {NULL, NULL, 0}
 };
 

@@ -7,17 +7,20 @@
 gaussianRankCorr(x, vec = FALSE)
 }
 \arguments{
-\item{x}{A numeric matrix representing data where the number of rows is the number of 
-independent data points and the number of columns are the number of variables in the dataset.}
+\item{x}{A numeric matrix representing data where the number of rows
+is the number of independent data points and the number of columns is the
+number of variables in the dataset.}
 
-\item{vec}{A logical argument indicating if the vector of correlations should be returned 
-instead of a matrix.}
+\item{vec}{A logical argument indicating if the vector of correlations
+should be returned instead of a matrix.}
 }
 \value{
-Gaussian rank correlation matrix (default) or a vector of pair correlations.
+Gaussian rank correlation matrix (default) or a vector of
+  pair correlations.
 }
 \description{
-This function computes the Gaussian rank correlation of \insertCite{Boudt2012;textual}{BSL}.
+This function computes the Gaussian rank correlation of
+  \insertCite{Boudt2012;textual}{BSL}.
 }
 \examples{
 data(ma2)
@@ -42,5 +45,6 @@ cor2cov(gaussianRankCorr(x), std) # convert to covariance matrix
 \insertAllCited{}
 }
 \seealso{
-\code{\link{cor2cov}} for conversion from correlation matrix to covariance matrix.
+\code{\link{cor2cov}} for conversion from correlation matrix
+  to covariance matrix.
 }

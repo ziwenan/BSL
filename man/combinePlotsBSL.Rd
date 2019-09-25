@@ -87,20 +87,33 @@ The function \code{combinePlotsBSL} can be used to plot multiple
   BSL densities together, optionally with the true values for the parameters.
 }
 \examples{
-\donttest{
-# (need fix)
-toy_sim <- function(n, theta) matrix(rnorm(n, theta), nrow = n)
+\dontshow{
+toy_sim <- function(n, theta) matrix(rnorm(2*n, theta), nrow = n)
 toy_sum <- ma2_sum
 
 model <- newModel(fnSimVec = toy_sim, fnSum = toy_sum, sumArgs = list(epsilon = 2), theta0 = 0)
 
-result1 <- bsl(y = 1, n = 100, M = 5e3, model = model, covRandWalk = matrix(1),
+result1 <- bsl(y = 1:2, n = 100, M = 100, model = model, covRandWalk = matrix(1),
+               method = "BSL")
+result2 <- bsl(y = 1:2, n = 100, M = 100, model = model, covRandWalk = matrix(1),
+               method = "uBSL")
+result3 <- bsl(y = 1:2, n = 100, M = 100, model = model, covRandWalk = matrix(1),
+               method = "semiBSL")
+combinePlotsBSL(list(result1, result2, result3), label = c("BSL","uBSL","semiBSL"), thin = 20)
+}
+\dontrun{
+toy_sim <- function(n, theta) matrix(rnorm(2*n, theta), nrow = n)
+toy_sum <- ma2_sum
+
+model <- newModel(fnSimVec = toy_sim, fnSum = toy_sum, sumArgs = list(epsilon = 2), theta0 = 0)
+
+result1 <- bsl(y = 1:2, n = 100, M = 5e3, model = model, covRandWalk = matrix(1),
                method = "BSL", plotOnTheFly = TRUE)
-result2 <- bsl(y = 1, n = 100, M = 5e3, model = model, covRandWalk = matrix(1),
+result2 <- bsl(y = 1:2, n = 100, M = 5e3, model = model, covRandWalk = matrix(1),
                method = "uBSL", plotOnTheFly = TRUE)
-result3 <- bsl(y = 1, n = 100, M = 5e3, model = model, covRandWalk = matrix(1),
+result3 <- bsl(y = 1:2, n = 100, M = 5e3, model = model, covRandWalk = matrix(1),
                method = "semiBSL", plotOnTheFly = TRUE)
-combinePlotsBSL(list(result1, result2))
+combinePlotsBSL(list(result1, result2, result3), label = c("BSL","uBSL","semiBSL"), thin = 20)
 }
 
 }

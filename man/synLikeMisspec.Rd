@@ -2,7 +2,7 @@
 % Please edit documentation in R/synLikeMisspec.R
 \name{synLikeMisspec}
 \alias{synLikeMisspec}
-\title{Estimate the Gaussian synthetic likelihood whilst acknowledging model
+\title{Estimate the Gaussian synthetic (log) likelihood whilst acknowledging model
 incompatibility}
 \usage{
 synLikeMisspec(ssy, ssx, type = c("mean", "variance"),

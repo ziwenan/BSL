@@ -45,7 +45,7 @@ necessary arguments (optional) can be specified with \code{sumArgs}.}
 default, ``BSL'', runs standard BSL. ``uBSL'' uses the unbiased estimator
 of a normal density of \insertCite{Ghurye1969;textual}{BSL}. ``semiBSL''
 runs the semi-parametric BSL algorithm and is more robust to non-normal
-summary statistics. ``BSLmisspec'' estimate the Gaussian synthetic
+summary statistics. ``BSLmisspec'' estimates the Gaussian synthetic
 likelihood whilst acknowledging that there may be incompatibility between
 the model and the observed summary statistic \insertCite{Frazier2019}{BSL}.}
 
@@ -98,7 +98,7 @@ uses the sample covariance by default.}
 
 \item{whitening}{An argument determines whether Whitening transformation
 should be used in ``BSL'' method with Warton's shrinkage. Whitening
-transformation helps decorrelate the summary statistics, thus encourages
+transformation helps decorrelate the summary statistics, thus encouraging
 sparsity of the synthetic likelihood covariance matrix. This might allow
 heavier shrinkage to be applied without losing much accuracy, hence
 allowing the number of simulations to be reduced. By default, \code{NULL}

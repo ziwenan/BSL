@@ -42,7 +42,9 @@ NULL
 #' @return A data matrix.
 #' @examples sim_toad(c(1.7,36,0.6), 10, 8, 1)
 #' @export
-NULL
+sim_toad <- function(params, ntoad, nday, model = 1L, d0 = 100) {
+    .Call(`_BSL_sim_toad`, params, ntoad, nday, model, d0)
+}
 
 #' Convert an observation matrix to a vector of n-day displacements
 #'
@@ -52,7 +54,9 @@ NULL
 #' @param lag Interger, the number of day lags to compute the displacement.
 #' @return A vector of displacements.
 #' @export
-NULL
+obsMat2deltaxR <- function(X, lag) {
+    .Call(`_BSL_obsMat2deltaxR`, X, lag)
+}
 
 #' This function computes the scores of Gaussian mixture models for the toad example
 #'
@@ -67,5 +71,7 @@ NULL
 #' @return A list of the following vectors: return frequencies, scores of
 #' component proportion, scores of mean and scores of variance.
 #' @export
-NULL
+gmmScores <- function(X, gmm, lag) {
+    .Call(`_BSL_gmmScores`, X, gmm, lag)
+}
 

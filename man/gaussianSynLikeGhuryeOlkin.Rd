@@ -2,7 +2,7 @@
 % Please edit documentation in R/gaussianSynLikeGhuryeOlkin.R
 \name{gaussianSynLikeGhuryeOlkin}
 \alias{gaussianSynLikeGhuryeOlkin}
-\title{Estimate the Gaussian synthetic likelihood with an unbiased estimator}
+\title{Estimate the Gaussian synthetic (log) likelihood with an unbiased estimator}
 \usage{
 gaussianSynLikeGhuryeOlkin(ssy, ssx, log = TRUE, verbose = FALSE)
 }

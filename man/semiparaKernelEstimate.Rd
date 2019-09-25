@@ -2,7 +2,7 @@
 % Please edit documentation in R/semiparaKernelEstimate.R
 \name{semiparaKernelEstimate}
 \alias{semiparaKernelEstimate}
-\title{Estimate the semi-parametric (joint) synthetic likelihood}
+\title{Estimate the semi-parametric synthetic (log) likelihood}
 \usage{
 semiparaKernelEstimate(ssy, ssx, kernel = "gaussian", shrinkage = NULL,
   penalty = NULL, log = TRUE)
@@ -34,14 +34,15 @@ given as the result. The default is \code{TRUE}.}
 The estimated synthetic (log) likelihood value.
 }
 \description{
-This function computes the semi-parametric likelihood estimator
-  of \insertCite{An2018}{BSL}. The advantage of this semi-parametric
-  estimator over the standard synthetic likelihood estimator is that the
-  semi-parametric one could deal with non-normal summary statistics much
-  better. Kernel density estimation is used for modelling each univariate
+This function computes the semi-parametric synthetic likelihood
+  estimator of \insertCite{An2018}{BSL}. The advantage of this
+  semi-parametric estimator over the standard synthetic likelihood estimator
+  is that the semi-parametric one is more robust to non-normal summary
+  statistics. Kernel density estimation is used for modelling each univariate
   marginal distribution, and the dependence structure between summaries are
-  captured using a Gaussian copula. Shrinkage on the correlation
-  matrix parameter of the Gaussian copula is helpful to bring down the number of simulations.
+  captured using a Gaussian copula. Shrinkage on the correlation matrix
+  parameter of the Gaussian copula is helpful to bring down the number of
+  simulations.
 }
 \examples{
 data(ma2)

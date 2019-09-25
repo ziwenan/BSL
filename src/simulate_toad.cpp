@@ -82,6 +82,7 @@ double prod(NumericVector x) {
 //' @return A data matrix.
 //' @examples sim_toad(c(1.7,36,0.6), 10, 8, 1)
 //' @export
+// [[Rcpp::export]]
 NumericMatrix sim_toad(NumericVector params, int ntoad, int nday, int model = 1, double d0 = 100) {
     double alpha = params[0];
     double scale = params[1];
@@ -165,6 +166,7 @@ vector<double> obsMat2deltax(Rcpp::NumericMatrix X, unsigned int lag) {
 //' @param lag Interger, the number of day lags to compute the displacement.
 //' @return A vector of displacements.
 //' @export
+// [[Rcpp::export]]
 NumericVector obsMat2deltaxR(Rcpp::NumericMatrix X, unsigned int lag) {
     unsigned int ndays = X.nrow();
     unsigned int ntoads =  X.ncol();
@@ -196,6 +198,7 @@ NumericVector obsMat2deltaxR(Rcpp::NumericMatrix X, unsigned int lag) {
 //' @return A list of the following vectors: return frequencies, scores of
 //' component proportion, scores of mean and scores of variance.
 //' @export
+// [[Rcpp::export]]
 Rcpp::List gmmScores(Rcpp::NumericMatrix X, NumericMatrix gmm, unsigned int lag) {
     int n, i, j, k;
     k = gmm.ncol();

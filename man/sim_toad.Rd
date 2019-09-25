@@ -14,7 +14,7 @@ sim_toad(params, ntoad, nday, model = 1L, d0 = 100)
 
 \item{nday}{The number of days lasted of the observation.}
 
-\item{model}{Which model to be used. 1 for the random return model, 2 for the nearest return model, 
+\item{model}{Which model to be used. 1 for the random return model, 2 for the nearest return model,
 and 3 for the distance-based return probability model.}
 
 \item{d0}{Characteristic distance for model 3. Only used if model is 3.}
@@ -23,7 +23,7 @@ and 3 for the distance-based return probability model.}
 A data matrix.
 }
 \description{
-The simulation function for the toad example
+The simulation function for the toad example.
 }
 \examples{
 sim_toad(c(1.7,36,0.6), 10, 8, 1)

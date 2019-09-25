@@ -15,5 +15,6 @@ obsMat2deltaxR(X, lag)
 A vector of displacements.
 }
 \description{
-Convert an observation matrix to a vector of n-day displacements
+Convert an observation matrix to a vector of n-day
+displacements. This is a function for the toad example.
 }
