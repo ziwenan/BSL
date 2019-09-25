@@ -17,7 +17,7 @@ of rows is the same as the number of simulations per iteration.}
 default, ``BSL'', runs standard BSL. ``uBSL'' uses the unbiased estimator
 of a normal density of \insertCite{Ghurye1969;textual}{BSL}. ``semiBSL''
 runs the semi-parametric BSL algorithm and is more robust to non-normal
-summary statistics. ``BSLmisspec'' estimate the Gaussian synthetic
+summary statistics. ``BSLmisspec'' estimates the Gaussian synthetic
 likelihood whilst acknowledging that there may be incompatibility between
 the model and the observed summary statistic \insertCite{Frazier2019}{BSL}.}
 
@@ -32,7 +32,7 @@ default is \code{FALSE}.}
 
   \itemize{
 
-  \item \code{shrinkage} Available for method ``BSL'' and ``semiBSL''. A
+  \item \code{shrinkage} Available for methods ``BSL'' and ``semiBSL''. A
   string argument indicating which shrinkage method to be used. The default
   is \code{NULL}, which means no shrinkage is used. Shrinkage estimation is
   only available for methods ``BSL'' and ``semiBSL''. Current options are
@@ -40,7 +40,7 @@ default is \code{FALSE}.}
   \insertCite{Friedman2008;textual}{BSL} and ``Warton'' for the ridge
   regularisation method of \insertCite{Warton2008;textual}{BSL}.
 
-  \item \code{penalty} Available for method ``BSL'' and ``semiBSL''. The
+  \item \code{penalty} Available for methods ``BSL'' and ``semiBSL''. The
   penalty value to be used for the specified shrinkage method. Must be
   between zero and one if the shrinkage method is ``Warton''.
 
@@ -57,13 +57,13 @@ default is \code{FALSE}.}
   matrix in ``BSL'' method. The default is \code{FALSE}, which uses the
   sample covariance by default.
 
-  \item \code{whitening} Available for method ``BSL''. An argument determines
+  \item \code{whitening} Available for method ``BSL''. This argument determines
   whether Whitening transformation should be used in ``BSL'' method with
   Warton's shrinkage. Whitening transformation helps decorrelate the summary
   statistics, thus encourages sparsity of the synthetic likelihood covariance
   matrix. This might allow heavier shrinkage to be applied without losing
   much accuracy, hence allowing the number of simulations to be reduced. By
-  default, \code{NULL} disable the Whitening transformation. Otherwise this
+  default, \code{NULL} represents no Whitening transformation. Otherwise this
   is enabled if a Whitening matrix is provided. See
   \code{\link{estimateWhiteningMatrix}} for the function to estimate the
   Whitening matrix.
@@ -93,9 +93,9 @@ The estimated synthetic (log) likelihood value.
 }
 \description{
 This function computes the estimated synthetic (log) likelihood
-  using one of the four methods ("BSL", "uBSL", "semiBSL" and "BSLmisspec").
-  This function is just a dispatch of the four methods, please find the
-  links below in the seealso section for more details.
+  using one of the four methods (``BSL'', ``uBSL'', ``semiBSL'' and
+  ``BSLmisspec''). Please find the links below in the see also section for
+  more details.
 }
 \examples{
 data(ma2)

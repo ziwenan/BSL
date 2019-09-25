@@ -2,7 +2,7 @@
 % Please edit documentation in R/gaussianSynLike.R
 \name{gaussianSynLike}
 \alias{gaussianSynLike}
-\title{Estimate the Gaussian synthetic likelihood}
+\title{Estimate the Gaussian synthetic (log) likelihood}
 \usage{
 gaussianSynLike(ssy, ssx, shrinkage = NULL, penalty = NULL,
   standardise = FALSE, GRC = FALSE, whitening = NULL,
@@ -35,13 +35,13 @@ correlation matrix \insertCite{Boudt2012}{BSL} should be used to estimate
 the covariance matrix in ``BSL'' method. The default is \code{FALSE}, which
 uses the sample covariance by default.}
 
-\item{whitening}{An argument determines whether Whitening transformation
+\item{whitening}{This argument determines whether Whitening transformation
 should be used in ``BSL'' method with Warton's shrinkage. Whitening
-transformation helps decorrelate the summary statistics, thus encourages
+transformation helps decorrelate the summary statistics, thus encouraging
 sparsity of the synthetic likelihood covariance matrix. This might allow
 heavier shrinkage to be applied without losing much accuracy, hence
 allowing the number of simulations to be reduced. By default, \code{NULL}
-disables the Whitening transformation. Otherwise this is enabled if a
+represents no Whitening transformation. Otherwise this is enabled if a
 Whitening matrix is provided. See \code{\link{estimateWhiteningMatrix}} for
 the function to estimate the Whitening matrix.}
 
@@ -60,7 +60,7 @@ default is \code{FALSE}.}
 The estimated synthetic (log) likelihood value.
 }
 \description{
-This function estimates the Gaussian synthetic likelihood
+This function estimates the Gaussian synthetic log-likelihood
   \insertCite{@see @Wood2010 and @Price2018}{BSL}. Several extensions are
   provided in this function: \code{shrinkage} enables shrinkage estimation of
   the covariance matrix and is helpful to bring down the number of model

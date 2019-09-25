@@ -71,7 +71,7 @@ skewness and kurtosis of the summary statistics can be controlled via the
 \ifelse{html}{\out{&#949}}{\eqn{\epsilon}} and
 \ifelse{html}{\out{&#950}}{\eqn{\delta}} parameters. This is the
 sinh-arcsinnh transformation of \insertCite{Jones2009;textual}{BSL}. By default,
-the sumamry statistics function simply returns the raw data. Otherwise, the
+the summary statistics function simply returns the raw data. Otherwise, the
 transformation is introduced to motivate the ``semiBSL'' method.
 
 \item \code{ma2_prior}: Evaluates the (unnormalised) log prior, which is uniform

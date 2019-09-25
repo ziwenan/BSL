@@ -18,3 +18,4 @@ A random sample from the zero-centered stable distribution.
 Draw a sample from a symmetric, zero-centered stable distribution with
 given scale and stability (alpha) parameters, using the CMS algorithm.
 }
+\keyword{internal}

@@ -9,16 +9,18 @@ gmmScores(X, gmm, lag)
 \arguments{
 \item{X}{The observation matrix.}
 
-\item{gmm}{A matrix containing the parameters for a Gaussian mixture model. The first row should be component proportion. 
-The second row should be mean. The last row should be Variance.}
+\item{gmm}{A matrix containing the parameters for a Gaussian mixture model.
+The first row should be component proportions. The second row should be
+component means. The last row should be component Variances.}
 
 \item{lag}{The lag of days to compute the displacements.}
 }
 \value{
-A list of the following vectors: return frequencies, scores of component proportion, scores of mean and scores of variance.
+A list of the following vectors: return frequencies, scores of
+component proportion, scores of mean and scores of variance.
 }
 \description{
-The summary statistics for the toad example is taken to be the 
-scores of Gaussian mixture model fitted to the displacement distribution. The 
-displacements is computed with a given day lag.
+The summary statistics for the toad example is taken to be the
+scores of Gaussian mixture model fitted to the displacement distribution. The
+displacements are computed with a given day lag.
 }
