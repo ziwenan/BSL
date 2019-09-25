@@ -290,7 +290,7 @@ ma2_sim_vec <- function(n, theta, T) {
 #'   \ifelse{html}{\out{&#949}}{\eqn{\epsilon}} and
 #'   \ifelse{html}{\out{&#950}}{\eqn{\delta}} parameters. This is the
 #'   sinh-arcsinnh transformation of \insertCite{Jones2009;textual}{BSL}. By default,
-#'   the sumamry statistics function simply returns the raw data. Otherwise, the
+#'   the summary statistics function simply returns the raw data. Otherwise, the
 #'   transformation is introduced to motivate the ``semiBSL'' method.
 #' @export
 ma2_sum <- function(x, epsilon = 0, delta = 1) {

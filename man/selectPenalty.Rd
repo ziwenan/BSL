@@ -58,8 +58,8 @@ computing should be used to computing the graphical lasso function. Default
 is \code{FALSE}.}
 
 \item{verbose}{An integer indicating the verbose style. 0L
-means no verbose messages will be printed. 1L use a custom progress bar to
-track the progress. 2L print the iteration numbers (\code{1:M}) to track
+means no verbose messages will be printed. 1L uses a custom progress bar to
+track the progress. 2L prints the iteration numbers (\code{1:M}) to track
 the progress. The default is 1L.}
 
 \item{...}{Other arguments to pass to \code{\link{gaussianSynLike}} (``BSL''

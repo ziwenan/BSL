@@ -24,7 +24,7 @@
 #'
 #'  Shrinkage estimators are designed particularly to reduce the number of
 #'  simulations if method is BSL or semiBSL: (1) graphical lasso
-#'  \insertCite{Friedman2008}{BSL} finds a sparse precision matrix with a
+#'  \insertCite{Friedman2008}{BSL} finds a sparse precision matrix with an
 #'  L1-regularised log-likelihood. \insertCite{An2019;textual}{BSL} use
 #'  graphical lasso within BSL to bring down the number of simulations
 #'  significantly when the dimension of the summary statistic is high; and (2)

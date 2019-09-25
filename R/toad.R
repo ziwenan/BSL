@@ -11,8 +11,8 @@
 #'   \ifelse{html}{\out{<i>&#947</i>}}{\eqn{\gamma}} and
 #'   \ifelse{html}{\out{p<sub>0</sub>}}{\eqn{p_0}}.
 #' @param ntoads The number of toads to simulate in the observation.
-#' @param ndays The number of days lasted of the observation.
-#' @param model Which model to be used. 1 for the random return model, 2 for the
+#' @param ndays The number of days observed.
+#' @param model Which model to be used: 1 for the random return model, 2 for the
 #'   nearest return model, and 3 for the distance-based return probability
 #'   model. The default is 1.
 #' @param d0 Characteristic distance for model 3. Only used if \code{model} is
@@ -31,15 +31,15 @@
 #' @details The example includes the three different returning model from
 #'   \insertCite{Marchand2017;textual}{BSL}. Please see
 #'   \insertCite{Marchand2017;textual}{BSL} for a full description of the toad
-#'   model, and also \insertCite{An2018;textual}{BSL} for a Bayesian inference
-#'   with semi-BSL method.
+#'   model, and also \insertCite{An2018;textual}{BSL} for Bayesian inference
+#'   with the semi-BSL method.
 #'
 #' @usage data(toad)
 #'
 #' @section datasets (simulated and real):
 #'
 #'   A simulated dataset and a real dataset are provided in this example. Both
-#'   datasets contains observations from 66 toads for 63 days. The simulated
+#'   datasets contain observations from 66 toads for 63 days. The simulated
 #'   dataset is simulated with parameter
 #'   \ifelse{html}{\out{<i>&#952=(1.7,35,0.6)</i>}}{\eqn{\theta = (1.7, 35,
 #'   0.6)}}. This is the data used in \insertCite{An2018;textual}{BSL}. The real
@@ -68,7 +68,7 @@
 #'
 #'   \itemize{
 #'
-#'   \item \code{ndays}: The number of days lasted of the observation.
+#'   \item \code{ndays}: The number of days observed.
 #'
 #'   \item \code{ntoads}: The total number of toads being observed.
 #'

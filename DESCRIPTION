@@ -20,7 +20,7 @@ Description: Bayesian synthetic likelihood (BSL, Price et al. (2018) <doi:10.108
 	to non-normal summary statistics. BSLmisspec (Frazier et al. 2019 
 	<arXiv:1904.04551>) estimates the Gaussian synthetic likelihood whilst 
 	acknowledging that there may be incompatibility between the model and the 
-	observed summary statistic. Shrinkage estimations can help to bring down the
+	observed summary statistic. Shrinkage estimation can help to decrease the
 	number of model simulations when the dimension of the summary statistic is 
 	high (e.g., BSLasso, An et al. (2019) <doi:10.1080/10618600.2018.1537928>). 
 	Extensions to this package are planned.

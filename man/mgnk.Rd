@@ -134,15 +134,15 @@ plot(resultMgnkSemiBSL, which = 2, thin = 20)
 # plot using the R default plot function
 par(mar = c(4, 4, 1, 1), oma = c(0, 1, 2, 0))
 combinePlotsBSL(list(resultMgnkBSL, resultMgnkuBSL, resultMgnkBSLasso, resultMgnkSemiBSL),
-                which = 1, thin = 20, label = c("bsl", "bslasso", "semiBSL"),
-                col = c("red", "blue", "green"), lty = 2:4, lwd = 1)
+                which = 1, thin = 20, label = c("bsl", "ubsl", "bslasso", "semiBSL"),
+                col = c("red", "yellow", "blue", "green"), lty = 2:5, lwd = 1)
 mtext("Approximate Univariate Posteriors", outer = TRUE, line = 0.75, cex = 1.2)
 
 # plot using the ggplot2 package
 combinePlotsBSL(list(resultMgnkBSL, resultMgnkuBSL, resultMgnkBSLasso, resultMgnkSemiBSL),
-    which = 2, thin = 20, label=c("bsl","bslasso","semiBSL"),
-    options.color=list(values=c("red","blue","green")),
-    options.linetype = list(values = 2:4), options.size = list(values = rep(1, 3)),
+    which = 2, thin = 20, label=c("bsl","ubsl","bslasso","semiBSL"),
+    options.color=list(values=c("red","yellow","blue","green")),
+    options.linetype = list(values = 2:5), options.size = list(values = rep(1, 4)),
     options.theme = list(plot.margin = grid::unit(rep(0.03,4),"npc"),
         axis.title = ggplot2::element_text(size=12), axis.text = ggplot2::element_text(size = 8),
         legend.text = ggplot2::element_text(size = 12)))

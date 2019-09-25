@@ -23,6 +23,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rstable
+double rstable(double scale, double alpha);
+RcppExport SEXP _BSL_rstable(SEXP scaleSEXP, SEXP alphaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type scale(scaleSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(rstable(scale, alpha));
+    return rcpp_result_gen;
+END_RCPP
+}
 // sim_toad
 NumericMatrix sim_toad(NumericVector params, int ntoad, int nday, int model, double d0);
 RcppExport SEXP _BSL_sim_toad(SEXP paramsSEXP, SEXP ntoadSEXP, SEXP ndaySEXP, SEXP modelSEXP, SEXP d0SEXP) {
@@ -66,6 +78,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_BSL_simulate_cell", (DL_FUNC) &_BSL_simulate_cell, 7},
+    {"_BSL_rstable", (DL_FUNC) &_BSL_rstable, 2},
     {"_BSL_sim_toad", (DL_FUNC) &_BSL_sim_toad, 5},
     {"_BSL_obsMat2deltaxR", (DL_FUNC) &_BSL_obsMat2deltaxR, 2},
     {"_BSL_gmmScores", (DL_FUNC) &_BSL_gmmScores, 3},

@@ -57,7 +57,7 @@ default is \code{FALSE}.}
   matrix in ``BSL'' method. The default is \code{FALSE}, which uses the
   sample covariance by default.
 
-  \item \code{whitening} Available for method ``BSL''. An argument determines
+  \item \code{whitening} Available for method ``BSL''. This argument determines
   whether Whitening transformation should be used in ``BSL'' method with
   Warton's shrinkage. Whitening transformation helps decorrelate the summary
   statistics, thus encourages sparsity of the synthetic likelihood covariance
@@ -94,7 +94,7 @@ The estimated synthetic (log) likelihood value.
 \description{
 This function computes the estimated synthetic (log) likelihood
   using one of the four methods (``BSL'', ``uBSL'', ``semiBSL'' and
-  ``BSLmisspec''). Please find the links below in the seealso section for
+  ``BSLmisspec''). Please find the links below in the see also section for
   more details.
 }
 \examples{

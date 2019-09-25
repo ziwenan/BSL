@@ -41,6 +41,7 @@ double dnormal(double x, double mu, double sigma) {
 //' @param alpha The stability parameter.
 //' @return  A random sample from the zero-centered stable distribution.
 //' @keywords internal
+// [[Rcpp::export]]
 double rstable(double scale, double alpha) {
     double x;
     if (alpha == 1) {

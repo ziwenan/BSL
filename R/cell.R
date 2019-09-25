@@ -148,12 +148,8 @@
 #' # Opening up the parallel pools using doParallel
 #' cl <- makeCluster(detectCores() - 1)
 #' registerDoParallel(cl)
-#' resultCellBSLasso <- bsl(cell$data, n = 1500, M = 10000, theta0 = cell$start,
-#'                          covRandWalk = cell$cov, fnSim = cell_sim, fnSum = cell_sum,
-#'                          shrinkage = "glasso", penalty = 1.3, fnPrior = cell_prior,
-#'                          simArgs = cell$sim_args, sumArgs = cell$sum_args,
-#'                          parallel = TRUE, parallelArgs = list(.packages = "BSL"),
-#'                          thetaNames = expression(P[m], P[p]), verbose = 1L)
+#' resultCellBSLasso <- bsl(cell$data, n = 1500, M = 10000, model = model, covRandWalk = cell$cov, 
+#'                          shrinkage = "glasso", penalty = 1.3, parallel = TRUE, verbose = 1L)
 #' stopCluster(cl)
 #' registerDoSEQ()
 #' show(resultCellBSLasso)
@@ -164,12 +160,8 @@
 #' # Opening up the parallel pools using doParallel
 #' cl <- makeCluster(detectCores() - 1)
 #' registerDoParallel(cl)
-#' resultCellSemiBSL <- bsl(cell$data, n = 5000, M = 10000, theta0 = cell$start,
-#'                          covRandWalk = cell$cov, fnSim = cell_sim, fnSum = cell_sum,
-#'                          method = "semiBSL", fnPrior = cell_prior,
-#'                          simArgs = cell$sim_args, sumArgs = cell$sum_args,
-#'                          parallel = TRUE, parallelArgs = list(.packages = "BSL"),
-#'                          thetaNames = expression(P[m], P[p]), verbose = 1L)
+#' resultCellSemiBSL <- bsl(cell$data, n = 5000, M = 10000, model = model, covRandWalk = cell$cov, 
+#'                          method = "semiBSL", parallel = TRUE, verbose = 1L)
 #' stopCluster(cl)
 #' registerDoSEQ()
 #' show(resultCellSemiBSL)
@@ -212,17 +204,17 @@ cell_sim <-function(theta, Yinit, rows, cols, sim_iters, num_obs) {
 cell_sum <- function(Y, Yinit) {
     num_obs = dim(Y)[3]
     summ_stat = numeric(num_obs+1)
-
+    
     # Hamming distances between cell locations across time
     summ_stat[1] = sum(abs(Yinit-Y[, , 1]))
     for (i in 2:num_obs) {
         summ_stat[i] = sum(abs(Y[, , i-1]-Y[, , i]))
     }
-
+    
     # Total number of cells in the final time period
     summ_stat[num_obs + 1] = sum(Y[, , num_obs])
-
-	return(summ_stat)
+    
+    return(summ_stat)
 }
 
 #' @describeIn cell The function \code{cell_prior(theta)} evaluates the log

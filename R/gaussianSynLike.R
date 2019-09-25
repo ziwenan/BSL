@@ -58,114 +58,114 @@
 #' @export
 gaussianSynLike <- function(ssy, ssx, shrinkage = NULL, penalty = NULL, standardise = FALSE, GRC = FALSE,
                             whitening = NULL, ssyTilde = NULL, log = TRUE, verbose = FALSE) {
-	if (!is.null(shrinkage)) {
-	    flagShrinkage <- TRUE
-	    shrinkage <- match.arg(shrinkage, c("glasso", "Warton"))
-	} else {
-	    flagShrinkage <- FALSE
-	}
-	if (is.null(whitening)) {
-	    flagWhitening <- FALSE
-		ssyTilde <- NULL
-	} else if (is.atomic(whitening) & is.matrix(whitening)) {
-	    ns <- length(ssy)
-	    if (all(dim(whitening) == c(ns, ns))) {
-		    flagWhitening <- TRUE
-		} else {
-		    stop(paste("The Whitening matrix must be of dimension", ns, "by", ns))
-		}
-	} else {
-	   stop("invalid argument \"whitening\"")
-	}
-    if (!flagShrinkage && !is.null(penalty)) {
-        warning('"penalty" will be ignored because no shrinkage method is specified')
+  if (!is.null(shrinkage)) {
+    flagShrinkage <- TRUE
+    shrinkage <- match.arg(shrinkage, c("glasso", "Warton"))
+  } else {
+    flagShrinkage <- FALSE
+  }
+  if (is.null(whitening)) {
+    flagWhitening <- FALSE
+    ssyTilde <- NULL
+  } else if (is.atomic(whitening) & is.matrix(whitening)) {
+    ns <- length(ssy)
+    if (all(dim(whitening) == c(ns, ns))) {
+      flagWhitening <- TRUE
+    } else {
+      stop(paste("The Whitening matrix must be of dimension", ns, "by", ns))
     }
-    if (flagShrinkage && is.null(penalty)) {
-        stop('a penalty value must be specified to enable shrinkage estimation')
+  } else {
+    stop("invalid argument \"whitening\"")
+  }
+  if (!flagShrinkage && !is.null(penalty)) {
+    warning('"penalty" will be ignored because no shrinkage method is specified')
+  }
+  if (flagShrinkage && is.null(penalty)) {
+    stop('a penalty value must be specified to enable shrinkage estimation')
+  }
+  if (!flagShrinkage && standardise) {
+    warning('"standardise" will be ignored because shrinkage method is not "glasso"')
+  }
+  if (!flagShrinkage && flagWhitening) {
+    warning('"whitening" will be ignored because shrinkage method is not "Warton"')
+  }
+  if (flagShrinkage) {
+    if (shrinkage != 'glasso' && standardise) {
+      warning("standardisation is only supported if shrinkage is \"glasso\"")
     }
-	if (!flagShrinkage && standardise) {
-        warning('"standardise" will be ignored because shrinkage method is not "glasso"')
+    if (shrinkage != 'Warton' && flagWhitening) {
+      warning("Whitening is only supported if shrinkage is \"Warton\"")
     }
-	if (!flagShrinkage && flagWhitening) {
-        warning('"whitening" will be ignored because shrinkage method is not "Warton"')
+  }
+  
+  
+  if (!flagShrinkage) { # BSL if no shrinkage
+    mu <- colMeans(ssx)
+    if (GRC) {
+      std <- apply(ssx, MARGIN = 2, FUN = sd)
+      corr <- gaussianRankCorr(ssx)
+      Sigma <- cor2cov(corr, std)
+    } else {
+      Sigma <- cov(ssx)
     }
-	if (flagShrinkage) {
-	    if (shrinkage != 'glasso' && standardise) {
-            warning("standardisation is only supported if shrinkage is \"glasso\"")
+  } else { # BSL with shrinkage (glasso or Warton)
+    mu <- colMeans(ssx)
+    
+    if (shrinkage == 'glasso') {
+      if (!standardise) { # use graphical lasso without standardisation
+        if (GRC) {
+          std <- apply(ssx, MARGIN = 2, FUN = sd)
+          corr <- gaussianRankCorr(ssx)
+          S <- cor2cov(corr, std)
+        } else {
+          S <- cov(ssx)
         }
-	    if (shrinkage != 'Warton' && flagWhitening) {
-            warning("Whitening is only supported if shrinkage is \"Warton\"")
+        gl <- glasso(S, rho = penalty)
+        Sigma <- gl$w
+      } else { # standardise the summary statistics before passing into the graphical lasso function
+        n <- nrow(ssx)
+        ns <- ncol(ssx)
+        std <- apply(ssx, MARGIN = 2, FUN = sd)
+        ssx_std <- (ssx - matrix(mu, n, ns, byrow = TRUE)) / matrix(std, n, ns, byrow = TRUE)
+        if (GRC) {
+          corr <- gaussianRankCorr(ssx_std)
+          S <- cor2cov(corr, apply(ssx_std, MARGIN = 2, FUN = sd))
+        } else {
+          S <- cov(ssx_std)
         }
-	}
-
-
-    if (!flagShrinkage) { # BSL if no shrinkage
-        mu <- colMeans(ssx)
-		if (GRC) {
-		    std <- apply(ssx, MARGIN = 2, FUN = sd)
-		    corr <- gaussianRankCorr(ssx)
-			Sigma <- cor2cov(corr, std)
-		} else {
-		    Sigma <- cov(ssx)
-		}
-    } else { # BSL with shrinkage (glasso or Warton)
-        mu <- colMeans(ssx)
-
-        if (shrinkage == 'glasso') {
-            if (!standardise) { # use graphical lasso without standardisation
-			    if (GRC) {
-				    std <- apply(ssx, MARGIN = 2, FUN = sd)
-		            corr <- gaussianRankCorr(ssx)
-			        S <- cor2cov(corr, std)
-				} else {
-				    S <- cov(ssx)
-				}
-                gl <- glasso(S, rho = penalty)
-                Sigma <- gl$w
-            } else { # standardise the summary statistics before passing into the graphical lasso function
-                n <- nrow(ssx)
-                ns <- ncol(ssx)
-                std <- apply(ssx, MARGIN = 2, FUN = sd)
-                ssx_std <- (ssx - matrix(mu, n, ns, byrow = TRUE)) / matrix(std, n, ns, byrow = TRUE)
-				if (GRC) {
-		            corr <- gaussianRankCorr(ssx_std)
-			        S <- cor2cov(corr, apply(ssx_std, MARGIN = 2, FUN = sd))
-				} else {
-				    S <- cov(ssx_std)
-				}
-                gl <- glasso(S, rho = penalty, penalize.diagonal = FALSE) # do not penalise the diagonal entries since we want the correlation matrix
-                corr <- gl$w
-                Sigma <- outer(std, std) * corr
-            }
-        }
-
-		if (shrinkage == 'Warton') {
-		    if (flagWhitening) { # Whitening transformation
-			    if (is.null(ssyTilde)) {
-				    ssy <- c(tcrossprod(ssy, whitening))
-				} else { # inherit ssy to save computation
-				    ssy <- ssyTilde
-				}
-				ssx <- tcrossprod(ssx, whitening)
-				mu <- c(tcrossprod(mu, whitening))
-			}
-		    if (GRC) {
-			    std <- apply(ssx, MARGIN = 2, FUN = sd)
-		        corr <- gaussianRankCorr(ssx)
-			    S <- cor2cov(corr, std)
-			} else {
-			    S <- cov(ssx)
-			}
-            Sigma <- covWarton(S, penalty)
-        }
+        gl <- glasso(S, rho = penalty, penalize.diagonal = FALSE) # do not penalise the diagonal entries since we want the correlation matrix
+        corr <- gl$w
+        Sigma <- outer(std, std) * corr
+      }
     }
-
-    loglike <- try(mvtnorm::dmvnorm(ssy, mean = mu, sigma = Sigma, log = log))
-    if (inherits(loglike, 'try-error')) {
-        if (verbose) {
-            cat('*** reject (probably singular covariance matrix) ***\n')
+    
+    if (shrinkage == 'Warton') {
+      if (flagWhitening) { # Whitening transformation
+        if (is.null(ssyTilde)) {
+          ssy <- c(tcrossprod(ssy, whitening))
+        } else { # inherit ssy to save computation
+          ssy <- ssyTilde
         }
-        return (-Inf)
+        ssx <- tcrossprod(ssx, whitening)
+        mu <- c(tcrossprod(mu, whitening))
+      }
+      if (GRC) {
+        std <- apply(ssx, MARGIN = 2, FUN = sd)
+        corr <- gaussianRankCorr(ssx)
+        S <- cor2cov(corr, std)
+      } else {
+        S <- cov(ssx)
+      }
+      Sigma <- covWarton(S, penalty)
     }
-    return (loglike)
+  }
+  
+  loglike <- try(mvtnorm::dmvnorm(ssy, mean = mu, sigma = Sigma, log = log))
+  if (inherits(loglike, 'try-error')) {
+    if (verbose) {
+      cat('*** reject (probably singular covariance matrix) ***\n')
+    }
+    return (-Inf)
+  }
+  return (loglike)
 }

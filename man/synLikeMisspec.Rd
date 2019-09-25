@@ -37,9 +37,9 @@ The estimated synthetic (log) likelihood value.
 \description{
 This function estimates the Gaussian synthetic likelihood whilst
   acknowledging that there may be incompatibility between the model and the
-  observed summary statistic. The method has has two different ways to
+  observed summary statistic. The method has two different ways to
   account for and detect incompatibility (mean adjustment and variance
-  inflation). Additional free parameter \code{gamma} is employed to account for the
+  inflation). An additional free parameter \code{gamma} is employed to account for the
   model misspecification. See the R-BSL methods of
   \insertCite{Frazier2019;textual}{BSL} for more details. Note this function
   is mainly designed for interal use as the latent variable \code{gamma} need

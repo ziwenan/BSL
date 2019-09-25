@@ -36,13 +36,13 @@ NULL
 #'   method. Must be between zero and one if the shrinkage method is ``Warton''.
 #'
 #' @param logitTransformBound A \eqn{p} by \eqn{2} numeric matrix indicating the
-#'   upper and lower bound of parameters if a logit transformation is used on
+#'   upper and lower bounds of parameters if a logit transformation is used on
 #'   the parameter space, where \eqn{p} is the number of parameters. The default
 #'   is \code{NULL}, which means no logit transformation is used. It is also
 #'   possible to define other transformations within the simulation and prior
 #'   function from \code{model}. The first column contains the lower bound of
 #'   each parameter and the second column contains the upper bound. Infinite
-#'   lower or upper bound is also supported, eg.
+#'   lower or upper bounds are also supported, eg.
 #'   \code{matrix(c(1,Inf,0,10,-Inf,0.5),3,2,byrow=TRUE)}.
 #' @param standardise	A logical argument that determines whether to standardise
 #'   the summary statistics before applying the graphical lasso. This is only
@@ -53,7 +53,7 @@ NULL
 #'   correlation matrix \insertCite{Boudt2012}{BSL} should be used to estimate
 #'   the covariance matrix in ``BSL'' method. The default is \code{FALSE}, which
 #'   uses the sample covariance by default.
-#' @param whitening     An argument determines whether Whitening transformation
+#' @param whitening     This argument determines whether Whitening transformation
 #'   should be used in ``BSL'' method with Warton's shrinkage. Whitening
 #'   transformation helps decorrelate the summary statistics, thus encouraging
 #'   sparsity of the synthetic likelihood covariance matrix. This might allow
@@ -83,11 +83,11 @@ NULL
 #' @param plotOnTheFly  A logical or numeric argument defining whether or by how
 #'   many iterations a posterior figure will be plotted during running. If
 #'   \code{TRUE}, a plot of approximate univariate posteriors based on the
-#'   current accepted samples will be shown by every one thousand iterations.
+#'   current accepted samples will be shown every one thousand iterations.
 #'   The default is \code{FALSE}.
 #' @param verbose               An integer indicating the verbose style. 0L
-#'   means no verbose messages will be printed. 1L use a custom progress bar to
-#'   track the progress. 2L print the iteration numbers (\code{1:M}) to track
+#'   means no verbose messages will be printed. 1L uses a custom progress bar to
+#'   track the progress. 2L prints the iteration numbers (\code{1:M}) to track
 #'   the progress. The default is 1L.
 #'
 #' @param theta0		Deprecated, will be removed in the future, use \code{model}
@@ -163,393 +163,393 @@ NULL
 #'   related to visualisation.
 #' @export
 bsl <- function(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("BSL", "uBSL",
-    "semiBSL", "BSLmisspec"), shrinkage = NULL, penalty = NULL, fnPrior = NULL, simArgs = NULL,
-    sumArgs = NULL, logitTransformBound = NULL, standardise = FALSE, GRC = FALSE, whitening = NULL,
-	misspecType = NULL, tau = 1, parallel = FALSE, parallelArgs = NULL,
-	thetaNames = NULL, plotOnTheFly = FALSE, verbose = 1L) {
-
-    method <- match.arg(method)
-	if (is.null(misspecType)) {
-	    flagType <- FALSE
-	} else {
-	    flagType <- TRUE
-	    misspecType <- match.arg(misspecType, c("mean", "variance"))
-	}
-	if (method != "BSLmisspec" && flagType) {
-	    warning("\"misspecType\" will be ignored because method is not \"BSLmisspec\"")
-	}
-	if (method == "BSLmisspec" && !flagType) {
-	    stop("\"misspecType\" must be provided to enable \"BSLmisspec\" method")
-	}
-    if (!parallel & !is.null(parallelArgs)) {
-        warning("\"parallelArgs\" is omitted in serial computing")
+                                                                              "semiBSL", "BSLmisspec"), shrinkage = NULL, penalty = NULL, fnPrior = NULL, simArgs = NULL,
+                sumArgs = NULL, logitTransformBound = NULL, standardise = FALSE, GRC = FALSE, whitening = NULL,
+                misspecType = NULL, tau = 1, parallel = FALSE, parallelArgs = NULL,
+                thetaNames = NULL, plotOnTheFly = FALSE, verbose = 1L) {
+  
+  method <- match.arg(method)
+  if (is.null(misspecType)) {
+    flagType <- FALSE
+  } else {
+    flagType <- TRUE
+    misspecType <- match.arg(misspecType, c("mean", "variance"))
+  }
+  if (method != "BSLmisspec" && flagType) {
+    warning("\"misspecType\" will be ignored because method is not \"BSLmisspec\"")
+  }
+  if (method == "BSLmisspec" && !flagType) {
+    stop("\"misspecType\" must be provided to enable \"BSLmisspec\" method")
+  }
+  if (!parallel & !is.null(parallelArgs)) {
+    warning("\"parallelArgs\" is omitted in serial computing")
+  }
+  if (!is.null(shrinkage)) {
+    flagShrinkage <- TRUE
+    shrinkage <- match.arg(shrinkage, c("glasso", "Warton"))
+  } else {
+    flagShrinkage <- FALSE
+  }
+  if (!flagShrinkage && !is.null(penalty)) {
+    warning("\"penalty\" will be ignored because no shrinkage method is specified")
+  }
+  if (flagShrinkage && is.null(penalty)) {
+    stop("a penalty value must be specified to enable shrinkage estimation")
+  }
+  if (!flagShrinkage && standardise) {
+    warning("\"standardise\" will be ignored because shrinkage method is not \"glasso\"")
+  }
+  
+  # deprecated arguments
+  if (!missing(theta0)) {
+    warning("theta0 will be deprecated in the future, use model instead, see \"?model\"")
+  }
+  if (!missing(fnSim)) {
+    warning("fnSim will be deprecated in the future, use model instead, see \"?model\"")
+  }
+  if (!missing(fnSum)) {
+    warning("fnSum will be deprecated in the future, use model instead, see \"?model\"")
+  }
+  if (!is.null(simArgs)) {
+    warning("simArgs will be deprecated in the future, use model instead, see \"?model\"")
+  }
+  if (!is.null(sumArgs)) {
+    warning("sumArgs will be deprecated in the future, use model instead, see \"?model\"")
+  }
+  if (!is.null(fnPrior)) {
+    warning("fnPrior will be deprecated in the future, use model instead, see \"?model\"")
+  }
+  if (!is.null(thetaNames)) {
+    warning("thetaNames will be deprecated in the future, use model instead, see \"?model\"")
+  }
+  
+  if (missing(model)) {
+    if (is.null(fnPrior)) {
+      fnLogPrior <- NULL
+    } else {
+      fnLogPrior <- function(...) log(fnPrior(...))
     }
-	if (!is.null(shrinkage)) {
-	    flagShrinkage <- TRUE
-	    shrinkage <- match.arg(shrinkage, c("glasso", "Warton"))
-	} else {
-	    flagShrinkage <- FALSE
-	}
-    if (!flagShrinkage && !is.null(penalty)) {
-        warning("\"penalty\" will be ignored because no shrinkage method is specified")
+    model <- model(fnSim = fnSim, fnSum = fnSum, simArgs = simArgs, sumArgs = sumArgs,
+                   fnLogPrior = fnLogPrior, theta0 = theta0, thetaNames = thetaNames)
+  } else {
+    stopifnot(inherits(model, "MODEL"))
+  }
+  
+  ns <- model@ns
+  if (method == "semiBSL" && ns < 2) {
+    stop("The dimension of summary statistic must be at least 2 to use method \"semiBSL\"")
+  }
+  if (is.null(whitening)) {
+    flagWhitening <- FALSE
+    ssyTilde <- NULL
+  } else if (is.atomic(whitening) & is.matrix(whitening)) {
+    if (all(dim(whitening) == c(ns, ns))) {
+      flagWhitening <- TRUE
+    } else {
+      stop(paste("The Whitening matrix must be of dimension", ns, "by", ns))
     }
-    if (flagShrinkage && is.null(penalty)) {
-        stop("a penalty value must be specified to enable shrinkage estimation")
-    }
-	if (!flagShrinkage && standardise) {
-        warning("\"standardise\" will be ignored because shrinkage method is not \"glasso\"")
-    }
-
-	# deprecated arguments
-	if (!missing(theta0)) {
-	    warning("theta0 will be deprecated in the future, use model instead, see \"?model\"")
-	}
-	if (!missing(fnSim)) {
-	    warning("fnSim will be deprecated in the future, use model instead, see \"?model\"")
-	}
-	if (!missing(fnSum)) {
-	    warning("fnSum will be deprecated in the future, use model instead, see \"?model\"")
-	}
-	if (!is.null(simArgs)) {
-	    warning("simArgs will be deprecated in the future, use model instead, see \"?model\"")
-	}
-	if (!is.null(sumArgs)) {
-	    warning("sumArgs will be deprecated in the future, use model instead, see \"?model\"")
-	}
-	if (!is.null(fnPrior)) {
-	    warning("fnPrior will be deprecated in the future, use model instead, see \"?model\"")
-	}
-	if (!is.null(thetaNames)) {
-	    warning("thetaNames will be deprecated in the future, use model instead, see \"?model\"")
-	}
-
-	if (missing(model)) {
-	    if (is.null(fnPrior)) {
-		    fnLogPrior <- NULL
-		} else {
-		    fnLogPrior <- function(...) log(fnPrior(...))
-		}
-	    model <- model(fnSim = fnSim, fnSum = fnSum, simArgs = simArgs, sumArgs = sumArgs,
-		             fnLogPrior = fnLogPrior, theta0 = theta0, thetaNames = thetaNames)
-	} else {
-	    stopifnot(inherits(model, "MODEL"))
-	}
-
-    ns <- model@ns
-	if (method == "semiBSL" && ns < 2) {
-	    stop("The dimension of summary statistic must be at least 2 to use method \"semiBSL\"")
-	}
-	if (is.null(whitening)) {
-	    flagWhitening <- FALSE
-		ssyTilde <- NULL
-	} else if (is.atomic(whitening) & is.matrix(whitening)) {
-	    if (all(dim(whitening) == c(ns, ns))) {
-		    flagWhitening <- TRUE
-		} else {
-		    stop(paste("The Whitening matrix must be of dimension", ns, "by", ns))
-		}
-	} else if (is.atomic(whitening) & length(whitening) == 1) {
-	    flagWhitening <- as.logical(whitening)
-		if (flagWhitening) {
-			if (verbose) cat("estimating the Whitening matrix ... ")
-		    whitening <- estimateWhiteningMatrix(n = 1e3, model = model)
-			if (verbose) cat("finish\n")
-		} else {
-		    whitening <- ssyTilde <- NULL
-		}
-	} else {
-	   stop("invalid argument \"whitening\"")
-	}
-
-	if (!flagShrinkage && flagWhitening) {
-        warning("\"whitening\" will be ignored because shrinkage method is not \"Warton\"")
-    }
-	if (flagShrinkage) {
-	    if (shrinkage != "glasso" && standardise) {
-            warning("standardisation is only supported if shrinkage is \"glasso\"")
-        }
-	    if (shrinkage != "Warton" && flagWhitening) {
-            warning("Whitening is only supported if shrinkage is \"Warton\"")
-        }
-	}
-
-	if (verbose) {
-	    if (flagType) typeText <- switch(misspecType,
-		                                 "mean"     = "mean-adjusted",
-										 "variance" = "variance-inflated")
-	    methodText <- switch(method,
-		                     "BSL"        = "standard BSL",
-							 "uBSL"       = "unbiased BSL",
-							 "semiBSL"    = "semi-BSL",
-							 "BSLmisspec" = paste("BSL with", typeText, "model misspecification")
-							)
-        shrinkageText <- paste("shrinkage:", ifelse(flagShrinkage, shrinkage, "disabled"))
-		whiteningText <- paste("whitening:", ifelse(flagWhitening, "enabled", "disabled"))
-	    cat("*** runnning ", methodText, ", ", shrinkageText, ", ", whiteningText, " *** \n", sep = "")
-		# cat(shrinkageText, ", ", whiteningText, "\n", sep = "")
-	}
-
-    p <- length(model@theta0)
-	fnLogPrior <- model@fnLogPrior
-    logitTransform <- !is.null(logitTransformBound)
-    if (logitTransform) {
-        if (any(dim(logitTransformBound) != c(p, 2))) {
-            stop("\"logitTransformBound\" must be a p by 2 matrix, where p is the length of parameter")
-        }
-    }
-
-    cl <- match.call()
-    startTime <- Sys.time()
-
-	# initialise parameters
-    ssy <- do.call(model@fnSum, c(list(y), model@sumArgs))
-	stopifnot(length(ssy) == ns)
-    thetaCurr <- model@theta0
-    loglikeCurr <- Inf
-    if (logitTransform) {
-        thetaTildeCurr <- paraLogitTransform(thetaCurr, logitTransformBound)
-    }
-    theta <- array(0, c(M, p), dimnames = list(NULL, thetaNames))
-    loglike <- numeric(M) # ignore if method is not "BSLmisspec"
-	gamma <- array(0, c(M, ns))
-    countAcc <- countEar <- countErr <- 0
-
+  } else if (is.atomic(whitening) & length(whitening) == 1) {
+    flagWhitening <- as.logical(whitening)
     if (flagWhitening) {
-	    ssyTilde <- c(tcrossprod(ssy, whitening))
-	}
-	if (method == "BSLmisspec") {
-		gammaCurr <- switch(misspecType,
-		                    mean = numeric(ns),
-							variance = rep(tau, ns))
-	}
-
-    # map the simulation function
-	if (parallel) {
-	    myFnSimSum <- function(n, theta) fn(model)$fnPar(n, theta, parallelArgs)
-	} else {
-	    myFnSimSum <- fn(model)$fn
-	}
-
-    # plot-on-the-fly
-    if (plotOnTheFly) {
-	    if (plotOnTheFly == 1) {
-		    plotOnTheFly  <- 1000
-		}
-        oldPar <- par()$mfrow
-        a <- floor(sqrt(p))
-        b <- ceiling(p/a)
-        par(mfrow = c(a, b))
+      if (verbose) cat("estimating the Whitening matrix ... ")
+      whitening <- estimateWhiteningMatrix(n = 1e3, model = model)
+      if (verbose) cat("finish\n")
+    } else {
+      whitening <- ssyTilde <- NULL
     }
-
-    # if (verbose) cat("initialising parameters ... ")
-    while (is.infinite(loglikeCurr)) {
-        # simulate with thetaProp and calculate the summary statistics
-		ssx <- myFnSimSum(n, thetaCurr)
-        if (any(is.infinite(ssx))) {
-		    stop("Inf detected in the summary statistics vector, this will cause an error in likelihood evaluation")
-        }
-
-        # compute the loglikelihood
-        loglikeCurr <- switch(method,
-		    BSL = gaussianSynLike(ssy, ssx, shrinkage, penalty, standardise, GRC, whitening, ssyTilde, log = TRUE, verbose = verbose),
-            uBSL = gaussianSynLikeGhuryeOlkin(ssy, ssx, log = TRUE, verbose = verbose),
-			semiBSL = semiparaKernelEstimate(ssy, ssx, shrinkage = shrinkage, penalty = penalty),
-			BSLmisspec = synLikeMisspec(ssy, ssx, type = misspecType, gamma = gammaCurr, log = TRUE, verbose = verbose)
-			)
-
-		if (method == "BSLmisspec") {
-	        ssxCurr <- ssx
-			stdCurr <- attr(loglikeCurr, "std")
-	    }
+  } else {
+    stop("invalid argument \"whitening\"")
+  }
+  
+  if (!flagShrinkage && flagWhitening) {
+    warning("\"whitening\" will be ignored because shrinkage method is not \"Warton\"")
+  }
+  if (flagShrinkage) {
+    if (shrinkage != "glasso" && standardise) {
+      warning("standardisation is only supported if shrinkage is \"glasso\"")
     }
-	# if (verbose) cat("finish\n")
-
-    if (verbose == 1L) timeStart <- Sys.time()
-    for (i in 1:M) {
-
-        flush.console()
-		if (verbose == 2L)  {
-		    cat("i =", i, "\n")
-		}
-
-		if (method == "BSLmisspec") {
-		    gammaCurr <- switch(misspecType,
-			                    mean = sliceGammaMean(ssy, ssxCurr, loglikeCurr, gammaCurr, tau, std = stdCurr),
-								variance = sliceGammaVariance(ssy, ssxCurr, loglikeCurr, gammaCurr, tau, std = stdCurr)
-							    )
-			loglikeCurr <- attr(gammaCurr, "loglike")
-		}
-
-        # multivariate normal random walk to the proposed value of theta
-        if (!logitTransform) {
-            thetaProp <- c(mvtnorm::rmvnorm(1, mean = thetaCurr, sigma = covRandWalk))
-            logp2 <- 0
-        } else {
-            thetaTildeCurr <- paraLogitTransform(thetaCurr, logitTransformBound)
-            # thetaTildeProp <- mvrnorm(1, thetaTildeCurr, covRandWalk)
-            thetaTildeProp <- mvtnorm::rmvnorm(1, mean = thetaTildeCurr, sigma = covRandWalk)
-            thetaProp <- paraLogitBackTransform(thetaTildeProp, logitTransformBound)
-            logp2 <- jacobianLogitTransform(thetaTildeProp, logitTransformBound, TRUE) -
-			      jacobianLogitTransform(thetaTildeCurr, logitTransformBound, TRUE)
+    if (shrinkage != "Warton" && flagWhitening) {
+      warning("Whitening is only supported if shrinkage is \"Warton\"")
+    }
+  }
+  
+  if (verbose) {
+    if (flagType) typeText <- switch(misspecType,
+                                     "mean"     = "mean-adjusted",
+                                     "variance" = "variance-inflated")
+    methodText <- switch(method,
+                         "BSL"        = "standard BSL",
+                         "uBSL"       = "unbiased BSL",
+                         "semiBSL"    = "semi-BSL",
+                         "BSLmisspec" = paste("BSL with", typeText, "model misspecification")
+    )
+    shrinkageText <- paste("shrinkage:", ifelse(flagShrinkage, shrinkage, "disabled"))
+    whiteningText <- paste("whitening:", ifelse(flagWhitening, "enabled", "disabled"))
+    cat("*** running ", methodText, ", ", shrinkageText, ", ", whiteningText, " *** \n", sep = "")
+    # cat(shrinkageText, ", ", whiteningText, "\n", sep = "")
+  }
+  
+  p <- length(model@theta0)
+  fnLogPrior <- model@fnLogPrior
+  logitTransform <- !is.null(logitTransformBound)
+  if (logitTransform) {
+    if (any(dim(logitTransformBound) != c(p, 2))) {
+      stop("\"logitTransformBound\" must be a p by 2 matrix, where p is the length of parameter")
+    }
+  }
+  
+  cl <- match.call()
+  startTime <- Sys.time()
+  
+  # initialise parameters
+  ssy <- do.call(model@fnSum, c(list(y), model@sumArgs))
+  stopifnot(length(ssy) == ns)
+  thetaCurr <- model@theta0
+  loglikeCurr <- Inf
+  if (logitTransform) {
+    thetaTildeCurr <- paraLogitTransform(thetaCurr, logitTransformBound)
+  }
+  theta <- array(0, c(M, p), dimnames = list(NULL, thetaNames))
+  loglike <- numeric(M) # ignore if method is not "BSLmisspec"
+  gamma <- array(0, c(M, ns))
+  countAcc <- countEar <- countErr <- 0
+  
+  if (flagWhitening) {
+    ssyTilde <- c(tcrossprod(ssy, whitening))
+  }
+  if (method == "BSLmisspec") {
+    gammaCurr <- switch(misspecType,
+                        mean = numeric(ns),
+                        variance = rep(tau, ns))
+  }
+  
+  # map the simulation function
+  if (parallel) {
+    myFnSimSum <- function(n, theta) fn(model)$fnPar(n, theta, parallelArgs)
+  } else {
+    myFnSimSum <- fn(model)$fn
+  }
+  
+  # plot-on-the-fly
+  if (plotOnTheFly) {
+    if (plotOnTheFly == 1) {
+      plotOnTheFly  <- 1000
+    }
+    oldPar <- par()$mfrow
+    a <- floor(sqrt(p))
+    b <- ceiling(p/a)
+    par(mfrow = c(a, b))
+  }
+  
+  # if (verbose) cat("initialising parameters ... ")
+  while (is.infinite(loglikeCurr)) {
+    # simulate with thetaProp and calculate the summary statistics
+    ssx <- myFnSimSum(n, thetaCurr)
+    if (any(is.infinite(ssx))) {
+      stop("Inf detected in the summary statistics vector, this will cause an error in likelihood evaluation")
+    }
+    
+    # compute the loglikelihood
+    loglikeCurr <- switch(method,
+                          BSL = gaussianSynLike(ssy, ssx, shrinkage, penalty, standardise, GRC, whitening, ssyTilde, log = TRUE, verbose = verbose),
+                          uBSL = gaussianSynLikeGhuryeOlkin(ssy, ssx, log = TRUE, verbose = verbose),
+                          semiBSL = semiparaKernelEstimate(ssy, ssx, shrinkage = shrinkage, penalty = penalty),
+                          BSLmisspec = synLikeMisspec(ssy, ssx, type = misspecType, gamma = gammaCurr, log = TRUE, verbose = verbose)
+    )
+    
+    if (method == "BSLmisspec") {
+      ssxCurr <- ssx
+      stdCurr <- attr(loglikeCurr, "std")
+    }
+  }
+  # if (verbose) cat("finish\n")
+  
+  if (verbose == 1L) timeStart <- Sys.time()
+  for (i in 1:M) {
+    
+    flush.console()
+    if (verbose == 2L)  {
+      cat("i =", i, "\n")
+    }
+    
+    if (method == "BSLmisspec") {
+      gammaCurr <- switch(misspecType,
+                          mean = sliceGammaMean(ssy, ssxCurr, loglikeCurr, gammaCurr, tau, std = stdCurr),
+                          variance = sliceGammaVariance(ssy, ssxCurr, loglikeCurr, gammaCurr, tau, std = stdCurr)
+      )
+      loglikeCurr <- attr(gammaCurr, "loglike")
+    }
+    
+    # multivariate normal random walk to the proposed value of theta
+    if (!logitTransform) {
+      thetaProp <- c(mvtnorm::rmvnorm(1, mean = thetaCurr, sigma = covRandWalk))
+      logp2 <- 0
+    } else {
+      thetaTildeCurr <- paraLogitTransform(thetaCurr, logitTransformBound)
+      # thetaTildeProp <- mvrnorm(1, thetaTildeCurr, covRandWalk)
+      thetaTildeProp <- mvtnorm::rmvnorm(1, mean = thetaTildeCurr, sigma = covRandWalk)
+      thetaProp <- paraLogitBackTransform(thetaTildeProp, logitTransformBound)
+      logp2 <- jacobianLogitTransform(thetaTildeProp, logitTransformBound, TRUE) -
+        jacobianLogitTransform(thetaTildeCurr, logitTransformBound, TRUE)
+    }
+    
+    # early rejection if the proposed theta falls outside of prior coverage
+    # / feasible region
+    if (!is.null(fnLogPrior)) {
+      logp1 <- fnLogPrior(thetaProp) - fnLogPrior(thetaCurr)
+      if (logp1 == -Inf) {
+        if (verbose == 2L) {
+          cat("*** early rejection ***\n")
+        } else if (verbose == 1L){
+          timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
+          timeLeft <- timeElapsed / i * (M - i)
+          elapsed <- myTimeStr(timeElapsed)
+          left <- myTimeStr(timeLeft)
+          acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
+          myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i, "*** early rejection ***"),
+                            txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
+                            style = 3, label = c("=", ".", ""))
+          flush.console()
         }
-
-        # early rejection if the proposed theta falls outside of prior coverage
-        # / feasible region
-        if (!is.null(fnLogPrior)) {
-            logp1 <- fnLogPrior(thetaProp) - fnLogPrior(thetaCurr)
-            if (logp1 == -Inf) {
-                if (verbose == 2L) {
-                  cat("*** early rejection ***\n")
-                } else if (verbose == 1L){
-		            timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
-                    timeLeft <- timeElapsed / i * (M - i)
-                    elapsed <- myTimeStr(timeElapsed)
-                    left <- myTimeStr(timeLeft)
-					acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
-		            myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i, "*** early rejection ***"),
-									  txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
-                                      style = 3, label = c("=", ".", ""))
-                    flush.console()
-		        }
-                theta[i, ] <- thetaCurr
-                loglike[i] <- loglikeCurr
-				if (method == "BSLmisspec") {
-		            gamma[i, ] <- gammaCurr
-		        }
-                countEar <- countEar + 1
-                next
-            }
-        } else {
-            logp1 <- 0
-        }
-        prob <- exp(logp1 + logp2)
-
-        # simulate with thetaProp and calculate the summary statistics
-		ssx <- myFnSimSum(n, thetaProp)
-
-        # reject if inifite value is detected in ssx
-        if (any(is.infinite(ssx))) {
-            if (verbose == 2L) {
-                cat("*** reject (infinite ssx) ***\n")
-            } else if (verbose == 1L){
-		        timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
-                timeLeft <- timeElapsed / i * (M - i)
-                elapsed <- myTimeStr(timeElapsed)
-                left <- myTimeStr(timeLeft)
-				acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
-		        myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i, "*** reject (infinite ssx) ***"),
-                                  txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
-                                  style = 3, label = c("=", ".", ""))
-                flush.console()
-		    }
-            theta[i, ] <- thetaCurr
-            loglike[i] <- loglikeCurr
-			if (method == "BSLmisspec") {
-		        gamma[i, ] <- gammaCurr
-		    }
-            countErr <- countErr + 1
-            next
-        }
-
-        # compute the loglikelihood
-        loglikeProp <- switch(method,
-		    BSL = gaussianSynLike(ssy, ssx, shrinkage, penalty, standardise, GRC, whitening, ssyTilde, log = TRUE, verbose = verbose),
-			uBSL = gaussianSynLikeGhuryeOlkin(ssy, ssx, log = TRUE, verbose = verbose),
-			semiBSL = semiparaKernelEstimate(ssy, ssx, shrinkage = shrinkage, penalty = penalty),
-			BSLmisspec = synLikeMisspec(ssy, ssx, type = misspecType, gamma = gammaCurr, log = TRUE, verbose = verbose)
-			)
-
-        if (loglikeProp == Inf) {
-            if (verbose == 2L) {
-                cat("*** reject (positive infinite loglike) ***\n")
-            } else if (verbose == 1L){
-		        timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
-                timeLeft <- timeElapsed / i * (M - i)
-                elapsed <- myTimeStr(timeElapsed)
-                left <- myTimeStr(timeLeft)
-				acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
-		        myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i, "*** reject (positive infinite loglike) ***"),
-                                  txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
-                                  style = 3, label = c("=", ".", ""))
-                flush.console()
-		    }
-            theta[i, ] <- thetaCurr
-            loglike[i] <- loglikeCurr
-			if (method == "BSLmisspec") {
-		        gamma[i, ] <- gammaCurr
-		    }
-            countErr <- countErr + 1
-            next
-        }
-
-        rloglike <- exp(loglikeProp - loglikeCurr)
-        if (runif(1) < prob * rloglike) {
-            if (verbose == 2L) {
-                cat("*** accept ***\n")
-            } else if (verbose == 1L){
-		        timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
-                timeLeft <- timeElapsed / i * (M - i)
-                elapsed <- myTimeStr(timeElapsed)
-                left <- myTimeStr(timeLeft)
-				acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
-		        myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i, "*** accept ***"),
-								  txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
-                                  style = 3, label = c("=", ".", ""))
-                flush.console()
-		    }
-            thetaCurr <- thetaProp
-            loglikeCurr <- loglikeProp
-			if (method == "BSLmisspec") {
-		        ssxCurr <- ssx
-				stdCurr <- attr(loglikeProp, "std")
-		    }
-            countAcc <- countAcc + 1
-        } else {
-		    if (verbose == 1L){
-		        timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
-                timeLeft <- timeElapsed / i * (M - i)
-                elapsed <- myTimeStr(timeElapsed)
-                left <- myTimeStr(timeLeft)
-				acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
-		        myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i),
-								  txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
-                                  style = 3, label = c("=", ".", ""))
-                flush.console()
-		    }
-		}
-
         theta[i, ] <- thetaCurr
         loglike[i] <- loglikeCurr
-		if (method == "BSLmisspec") {
-		    gamma[i, ] <- gammaCurr
-		}
-
-        if (plotOnTheFly) {
-            if (i %% plotOnTheFly == 0) {
-                for (k in 1:p) {
-                  plot(density(theta[1:i, k]), main = NA, xlab = thetaNames[k],
-                    col = 1, lty = 1)
-                }
-            }
+        if (method == "BSLmisspec") {
+          gamma[i, ] <- gammaCurr
         }
+        countEar <- countEar + 1
+        next
+      }
+    } else {
+      logp1 <- 0
     }
-	if (verbose == 1L) cat('\n')
-
-    accRate <- countAcc/M
-    earRate <- countEar/M
-    errRate <- countErr/M
-    time <- difftime(Sys.time(), startTime)
-
+    log_prob <- logp1 + logp2
+    
+    # simulate with thetaProp and calculate the summary statistics
+    ssx <- myFnSimSum(n, thetaProp)
+    
+    # reject if inifite value is detected in ssx
+    if (any(is.infinite(ssx))) {
+      if (verbose == 2L) {
+        cat("*** reject (infinite ssx) ***\n")
+      } else if (verbose == 1L){
+        timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
+        timeLeft <- timeElapsed / i * (M - i)
+        elapsed <- myTimeStr(timeElapsed)
+        left <- myTimeStr(timeLeft)
+        acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
+        myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i, "*** reject (infinite ssx) ***"),
+                          txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
+                          style = 3, label = c("=", ".", ""))
+        flush.console()
+      }
+      theta[i, ] <- thetaCurr
+      loglike[i] <- loglikeCurr
+      if (method == "BSLmisspec") {
+        gamma[i, ] <- gammaCurr
+      }
+      countErr <- countErr + 1
+      next
+    }
+    
+    # compute the loglikelihood
+    loglikeProp <- switch(method,
+                          BSL = gaussianSynLike(ssy, ssx, shrinkage, penalty, standardise, GRC, whitening, ssyTilde, log = TRUE, verbose = verbose),
+                          uBSL = gaussianSynLikeGhuryeOlkin(ssy, ssx, log = TRUE, verbose = verbose),
+                          semiBSL = semiparaKernelEstimate(ssy, ssx, shrinkage = shrinkage, penalty = penalty),
+                          BSLmisspec = synLikeMisspec(ssy, ssx, type = misspecType, gamma = gammaCurr, log = TRUE, verbose = verbose)
+    )
+    
+    if (loglikeProp == Inf) {
+      if (verbose == 2L) {
+        cat("*** reject (positive infinite loglike) ***\n")
+      } else if (verbose == 1L){
+        timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
+        timeLeft <- timeElapsed / i * (M - i)
+        elapsed <- myTimeStr(timeElapsed)
+        left <- myTimeStr(timeLeft)
+        acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
+        myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i, "*** reject (positive infinite loglike) ***"),
+                          txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
+                          style = 3, label = c("=", ".", ""))
+        flush.console()
+      }
+      theta[i, ] <- thetaCurr
+      loglike[i] <- loglikeCurr
+      if (method == "BSLmisspec") {
+        gamma[i, ] <- gammaCurr
+      }
+      countErr <- countErr + 1
+      next
+    }
+    
+    log_rloglike <- loglikeProp - loglikeCurr
+    if (runif(1) < exp(log_prob + log_rloglike) ) {
+      if (verbose == 2L) {
+        cat("*** accept ***\n")
+      } else if (verbose == 1L){
+        timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
+        timeLeft <- timeElapsed / i * (M - i)
+        elapsed <- myTimeStr(timeElapsed)
+        left <- myTimeStr(timeLeft)
+        acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
+        myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i, "*** accept ***"),
+                          txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
+                          style = 3, label = c("=", ".", ""))
+        flush.console()
+      }
+      thetaCurr <- thetaProp
+      loglikeCurr <- loglikeProp
+      if (method == "BSLmisspec") {
+        ssxCurr <- ssx
+        stdCurr <- attr(loglikeProp, "std")
+      }
+      countAcc <- countAcc + 1
+    } else {
+      if (verbose == 1L){
+        timeElapsed <- difftime(Sys.time(), timeStart, units = "secs")
+        timeLeft <- timeElapsed / i * (M - i)
+        elapsed <- myTimeStr(timeElapsed)
+        left <- myTimeStr(timeLeft)
+        acc <- paste0(formatC(100 * countAcc / i, format = "f", digits = 2), "%")
+        myMiniProgressBar(i / M, txt1 = paste(sprintf("%-2.1f%% finished,", 100 * i / M), "i =", i),
+                          txt2 = paste0("acceptance rate = ", acc, ", elapsed = ", elapsed, ", remaining = ", left),
+                          style = 3, label = c("=", ".", ""))
+        flush.console()
+      }
+    }
+    
+    theta[i, ] <- thetaCurr
+    loglike[i] <- loglikeCurr
+    if (method == "BSLmisspec") {
+      gamma[i, ] <- gammaCurr
+    }
+    
     if (plotOnTheFly) {
-        par(mfrow = oldPar)
+      if (i %% plotOnTheFly == 0) {
+        for (k in 1:p) {
+          plot(density(theta[1:i, k]), main = NA, xlab = thetaNames[k],
+               col = 1, lty = 1)
+        }
+      }
     }
-
-	result <- new("BSL", theta = theta, loglike = loglike, call = cl, model = model,
-	    acceptanceRate = accRate, earlyRejectionRate = earRate, errorRate = errRate,
-		y = y, n = n, M = M, covRandWalk = covRandWalk, method = method,
-		shrinkage = shrinkage, penalty = penalty, standardise = standardise, GRC = GRC,
-		logitTransform = logitTransform, logitTransformBound = logitTransformBound,
-		parallel = parallel, parallelArgs = parallelArgs, time = time,
-		gamma = gamma, misspecType = misspecType, tau = tau, whitening = whitening)
-    return(result)
+  }
+  if (verbose == 1L) cat('\n')
+  
+  accRate <- countAcc/M
+  earRate <- countEar/M
+  errRate <- countErr/M
+  time <- difftime(Sys.time(), startTime)
+  
+  if (plotOnTheFly) {
+    par(mfrow = oldPar)
+  }
+  
+  result <- new("BSL", theta = theta, loglike = loglike, call = cl, model = model,
+                acceptanceRate = accRate, earlyRejectionRate = earRate, errorRate = errRate,
+                y = y, n = n, M = M, covRandWalk = covRandWalk, method = method,
+                shrinkage = shrinkage, penalty = penalty, standardise = standardise, GRC = GRC,
+                logitTransform = logitTransform, logitTransformBound = logitTransformBound,
+                parallel = parallel, parallelArgs = parallelArgs, time = time,
+                gamma = gamma, misspecType = misspecType, tau = tau, whitening = whitening)
+  return(result)
 }

@@ -27,7 +27,9 @@ simulate_cell <- function(x, rows, cols, Pm, Pp, sim_iters, num_obs) {
 #' @param alpha The stability parameter.
 #' @return  A random sample from the zero-centered stable distribution.
 #' @keywords internal
-NULL
+rstable <- function(scale, alpha) {
+    .Call(`_BSL_rstable`, scale, alpha)
+}
 
 #' The simulation function for the toad example
 #'

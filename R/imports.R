@@ -1,5 +1,5 @@
 .onUnload <- function (libpath) {
-    library.dynam.unload("BSL", libpath)
+  library.dynam.unload("BSL", libpath)
 }
 
 #' @importFrom stats runif cov sd pnorm rnorm qnorm density approx dexp rexp

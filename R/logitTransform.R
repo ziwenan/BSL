@@ -53,9 +53,9 @@ jacobianLogitTransform <- function(thetaTilde, bound, log = TRUE) {
                           '3' = 0
         )
     }
-	J = sum(logJ)
-	if (!log) {
-	    J <- exp(J)
-	}    
+    J = sum(logJ)
+    if (!log) {
+        J <- exp(J)
+    }    
     return(J)
 }

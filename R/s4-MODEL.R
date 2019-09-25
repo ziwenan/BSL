@@ -43,17 +43,17 @@ setClassUnion("listOrNULL", c("list", "NULL"))
 #' @export
 MODEL <- setClass("MODEL",
                   slots = c(fnSim = "functionOrNULL",
-                             fnSimVec = "functionOrNULL",
-                             fnSum = "functionOrNULL",
-                             fnLogPrior = "functionOrNULL",
-                             simArgs = "listOrNULL",
-                             sumArgs = "listOrNULL",
-                             theta0 = "numeric",
-                             thetaNames = "expression",
-                             ns = "integer",
-                             test = "logical",
-                             verbose = "logical")
-                 )
+                            fnSimVec = "functionOrNULL",
+                            fnSum = "functionOrNULL",
+                            fnLogPrior = "functionOrNULL",
+                            simArgs = "listOrNULL",
+                            sumArgs = "listOrNULL",
+                            theta0 = "numeric",
+                            thetaNames = "expression",
+                            ns = "integer",
+                            test = "logical",
+                            verbose = "logical")
+)
 
 #' Constructor for class ``MODEL''
 #' @description \code{newModel} is the constructor function for a \code{MODEL}
@@ -106,124 +106,124 @@ MODEL <- setClass("MODEL",
 #' @rdname MODEL-class
 #' @export
 newModel <- function(fnSim, fnSimVec, fnSum, fnLogPrior, simArgs, sumArgs, theta0, thetaNames, test = TRUE, verbose = TRUE) {
-    new(Class = "MODEL", fnSim = fnSim, fnSimVec = fnSimVec, fnSum = fnSum, fnLogPrior = fnLogPrior,
-        simArgs = simArgs, sumArgs = sumArgs, theta0 = theta0, thetaNames = thetaNames, test = test, verbose = verbose)
+  new(Class = "MODEL", fnSim = fnSim, fnSimVec = fnSimVec, fnSum = fnSum, fnLogPrior = fnLogPrior,
+      simArgs = simArgs, sumArgs = sumArgs, theta0 = theta0, thetaNames = thetaNames, test = test, verbose = verbose)
 }
 
 setMethod("initialize",
           signature = "MODEL",
           definition = function(.Object, fnSim, fnSimVec, simArgs, fnSum, sumArgs, fnLogPrior, theta0, thetaNames,
-              test = TRUE, verbose = TRUE) {
-              if (verbose) cat("*** initialize \"MODEL\" ***\n")
-              has.fnSim <- !missing(fnSim) || !missing(fnSimVec)
-              if (verbose) cat(paste("has simulation function:", has.fnSim, "\n"))
-              has.fnSum <- !missing(fnSum)
-              if (verbose) cat(paste("has summary statistics function:", has.fnSum, "\n"))
-              has.theta0 <- !missing(theta0)
-              if (verbose) cat(paste("has initial guess / point estimate of the parameter:", has.theta0, "\n"))
-              if (has.fnSim && has.fnSum && has.theta0) {
-                  if (!missing(fnSim)) .Object@fnSim <- fnSim
-                  if (!missing(fnSimVec)) .Object@fnSimVec <- fnSimVec
-                  if (!missing(simArgs)) .Object@simArgs <- simArgs
-                  .Object@fnSum <- fnSum
-                  if (!missing(sumArgs)) .Object@sumArgs <- sumArgs
-                  if (!missing(fnLogPrior)) .Object@fnLogPrior <- fnLogPrior
-                  if (is.null(.Object@fnLogPrior)) {
-                      .Object@fnLogPrior <- function(theta) 0
-                      if (verbose) cat("No prior has been defined in the model, use the default improper flat prior\n")
-                  }
-                  .Object@theta0 <- theta0
-                  .Object@test <- test
-                  .Object@verbose <- verbose
-                  validObject(.Object)
-                  .Object@ns <- getns(.Object)
-
-                  if (missing(thetaNames)) { # missing
-                      if (!is.null(names(theta0))) { # use the name of theta0
-                          .Object@thetaNames <- as.expression(names(theta0))
-                      } else { # use default theta names
-                          thetaNames <- vector("expression", length(theta0))
-                          for (i in 1 : length(theta0)) {
-                              thetaNames[i] <- as.expression(substitute(theta[j], list(j = i)))
-                          }
-                          .Object@thetaNames <- thetaNames
-                      }
-                  } else { # !missing
-                      if (is.null(thetaNames)) { # use default theta names
-                          thetaNames <- vector("expression", length(theta0))
-                          for (i in 1 : length(theta0)) {
-                              thetaNames[i] <- as.expression(substitute(theta[j], list(j = i)))
-                          }
-                          .Object@thetaNames <- thetaNames
-                      } else { # has thetaNames
-                          if (length(thetaNames) != length(theta0)) {
-                              if (verbose) cat(paste("The length of thetaNames does not match the length of theta0,", length(theta0), "\n"))
-                          } else {
-                              .Object@thetaNames <- as.expression(thetaNames)
-                          }
-                      }
-                  }
-              } else {
-                  if (verbose) cat("an empty (invalid) MODEL object has been created due to one or more missing slots\n")
+                                test = TRUE, verbose = TRUE) {
+            if (verbose) cat("*** initialize \"MODEL\" ***\n")
+            has.fnSim <- !missing(fnSim) || !missing(fnSimVec)
+            if (verbose) cat(paste("has simulation function:", has.fnSim, "\n"))
+            has.fnSum <- !missing(fnSum)
+            if (verbose) cat(paste("has summary statistics function:", has.fnSum, "\n"))
+            has.theta0 <- !missing(theta0)
+            if (verbose) cat(paste("has initial guess / point estimate of the parameter:", has.theta0, "\n"))
+            if (has.fnSim && has.fnSum && has.theta0) {
+              if (!missing(fnSim)) .Object@fnSim <- fnSim
+              if (!missing(fnSimVec)) .Object@fnSimVec <- fnSimVec
+              if (!missing(simArgs)) .Object@simArgs <- simArgs
+              .Object@fnSum <- fnSum
+              if (!missing(sumArgs)) .Object@sumArgs <- sumArgs
+              if (!missing(fnLogPrior)) .Object@fnLogPrior <- fnLogPrior
+              if (is.null(.Object@fnLogPrior)) {
+                .Object@fnLogPrior <- function(theta) 0
+                if (verbose) cat("No prior has been defined in the model, use the default improper flat prior\n")
               }
-              if (verbose) cat("*** end initialize ***\n")
-              return (.Object)
+              .Object@theta0 <- theta0
+              .Object@test <- test
+              .Object@verbose <- verbose
+              validObject(.Object)
+              .Object@ns <- getns(.Object)
+              
+              if (missing(thetaNames)) { # missing
+                if (!is.null(names(theta0))) { # use the name of theta0
+                  .Object@thetaNames <- as.expression(names(theta0))
+                } else { # use default theta names
+                  thetaNames <- vector("expression", length(theta0))
+                  for (i in 1 : length(theta0)) {
+                    thetaNames[i] <- as.expression(substitute(theta[j], list(j = i)))
+                  }
+                  .Object@thetaNames <- thetaNames
+                }
+              } else { # !missing
+                if (is.null(thetaNames)) { # use default theta names
+                  thetaNames <- vector("expression", length(theta0))
+                  for (i in 1 : length(theta0)) {
+                    thetaNames[i] <- as.expression(substitute(theta[j], list(j = i)))
+                  }
+                  .Object@thetaNames <- thetaNames
+                } else { # has thetaNames
+                  if (length(thetaNames) != length(theta0)) {
+                    if (verbose) cat(paste("The length of thetaNames does not match the length of theta0,", length(theta0), "\n"))
+                  } else {
+                    .Object@thetaNames <- as.expression(thetaNames)
+                  }
+                }
+              }
+            } else {
+              if (verbose) cat("an empty (invalid) MODEL object has been created due to one or more missing slots\n")
+            }
+            if (verbose) cat("*** end initialize ***\n")
+            return (.Object)
           }
-          )
+)
 
 setValidity("MODEL",
             method = function(object) {
-                if (is.null(object@fnSim) && is.null(object@fnSimVec)) {
-                    return("No available simulation function is provided")
-                }
-
-                if (object@test) {
-                    if (object@verbose) cat("running a short simulation test ... ")
-                    # test the simulation function
-                    if (!is.null(object@fnSimVec)) {
-                        x <- try(do.call(object@fnSimVec, c(list(10, object@theta0), object@simArgs)))
-                        if (inherits(x, "try-error")) {
-                            return("Fail to run simulations with the given vectorised simulation function")
-                        }
-                        if (!(is.matrix(x) && nrow(x) == 10) && !(is.list(x) && length(x) == 10)) {
-                            return("Output from the vectorised simulation function must be either a matrix
+              if (is.null(object@fnSim) && is.null(object@fnSimVec)) {
+                return("No available simulation function is provided")
+              }
+              
+              if (object@test) {
+                if (object@verbose) cat("running a short simulation test ... ")
+                # test the simulation function
+                if (!is.null(object@fnSimVec)) {
+                  x <- try(do.call(object@fnSimVec, c(list(10, object@theta0), object@simArgs)))
+                  if (inherits(x, "try-error")) {
+                    return("Fail to run simulations with the given vectorised simulation function")
+                  }
+                  if (!(is.matrix(x) && nrow(x) == 10) && !(is.list(x) && length(x) == 10)) {
+                    return("Output from the vectorised simulation function must be either a matrix
                             (each row corresponds to a simulation) or a list")
-                        }
-                    } else {
-                        x <- list()
-                        for (i in 1 : 10) {
-                            temp <- try(do.call(object@fnSim, c(list(object@theta0), object@simArgs)))
-                            if (inherits(temp, "try-error")) {
-                                return("Fail to run simulations with the given simulation function")
-                            }
-                            x[[i]] <- temp
-                        }
+                  }
+                } else {
+                  x <- list()
+                  for (i in 1 : 10) {
+                    temp <- try(do.call(object@fnSim, c(list(object@theta0), object@simArgs)))
+                    if (inherits(temp, "try-error")) {
+                      return("Fail to run simulations with the given simulation function")
                     }
-
-                    # test the summary statistics function
-                    if (is.matrix(x)) {
-                        ssx <- try(do.call(object@fnSum, c(list(x[1, ]), object@sumArgs)))
-                    } else {
-                        ssx <- try(do.call(object@fnSum, c(list(x[[1]]), object@sumArgs)))
-                    }
-                    if (inherits(ssx, "try-error")) {
-                        return("Fail to get summary statistics with the given summary statistics function")
-                    }
-                    if (!is.numeric(ssx)) {
-                        return("The output of the summary statistics function must be numeric")
-                    }
-                    if (object@verbose) cat("success\n")
+                    x[[i]] <- temp
+                  }
                 }
-
-                # prior
-                if (object@fnLogPrior(object@theta0) == -Inf) {
-                    return("The given parameter value theta0 has no prior support\n")
+                
+                # test the summary statistics function
+                if (is.matrix(x)) {
+                  ssx <- try(do.call(object@fnSum, c(list(x[1, ]), object@sumArgs)))
+                } else {
+                  ssx <- try(do.call(object@fnSum, c(list(x[[1]]), object@sumArgs)))
                 }
-
-                # pass all checks
-                TRUE
+                if (inherits(ssx, "try-error")) {
+                  return("Fail to get summary statistics with the given summary statistics function")
+                }
+                if (!is.numeric(ssx)) {
+                  return("The output of the summary statistics function must be numeric")
+                }
+                if (object@verbose) cat("success\n")
+              }
+              
+              # prior
+              if (object@fnLogPrior(object@theta0) == -Inf) {
+                return("The given parameter value theta0 has no prior support\n")
+              }
+              
+              # pass all checks
+              TRUE
             }
-           )
+)
 
 #' Run simulations with a give "MODEL" object
 #' @description see \code{\link{MODEL}}
@@ -250,93 +250,93 @@ setGeneric("simulation", function(model, ...) standardGeneric("simulation"))
 setMethod("simulation",
           signature(model = "MODEL"),
           definition = function(model, n = 1, theta = model@theta0, summStat = TRUE, parallel = FALSE, parallelArgs = NULL, seed = NULL) {
-              if (!is.null(seed)) set.seed(seed)
-              flagVec <- !is.null(model@fnSimVec)
-              if (flagVec && parallel) {
-                  parallel <- FALSE
-                  warning("Parallel computation is disabled for vecotised simulations")
+            if (!is.null(seed)) set.seed(seed)
+            flagVec <- !is.null(model@fnSimVec)
+            if (flagVec && parallel) {
+              parallel <- FALSE
+              warning("Parallel computation is disabled for vecotised simulations")
+            }
+            if (!parallel & !is.null(parallelArgs)) {
+              warning("\"parallelArgs\" is omitted in serial computing")
+            }
+            if (model@fnLogPrior(theta) == -Inf) {
+              warning("The given parameter has no prior support")
+            }
+            if (n == 1 && parallel) {
+              parallel <- FALSE
+              warning("Parallel computation is disabled for n = 1")
+            }
+            
+            ssx <- NULL
+            if (parallel) { # parallel
+              parallelArgs$.export <- c(parallelArgs$.export, "model")
+              x <- do.call(foreach, c(list(j = 1:n), parallelArgs)) %dopar% {
+                do.call(model@fnSim, c(list(theta), model@simArgs))
               }
-              if (!parallel & !is.null(parallelArgs)) {
-                  warning("\"parallelArgs\" is omitted in serial computing")
+              if (summStat) {
+                ssx <- do.call(foreach, c(list(j = 1:n, .combine = rbind), parallelArgs)) %dopar% {
+                  do.call(model@fnSum, c(x[j], model@sumArgs))
+                }
               }
-              if (model@fnLogPrior(theta) == -Inf) {
-                  warning("The given parameter has no prior support")
+              if (is.atomic(x[[1]]) && is.vector(x[[1]])) { # reduce to matrix
+                if (length(unique(sapply(x, FUN = length))) == 1) {
+                  x <- matrix(unlist(x), ncol = length(x[[1]]), byrow = TRUE)
+                }
               }
-			  if (n == 1 && parallel) {
-			      parallel <- FALSE
-				  warning("Parallel computation is disabled for n = 1")
-			  }
               
-              ssx <- NULL
-              if (parallel) { # parallel
-                  parallelArgs$.export <- c(parallelArgs$.export, "model")
-                  x <- do.call(foreach, c(list(j = 1:n), parallelArgs)) %dopar% {
-                      do.call(model@fnSim, c(list(theta), model@simArgs))
+            } else { # not parallel
+              if (flagVec) { # vectorised
+                if (n == 1) {
+                  x <- do.call(model@fnSimVec, c(list(1, theta), model@simArgs))
+                  if (is.matrix(x)) {
+                    x <- as.vector(x)
+                    if (summStat) ssx <- do.call(model@fnSum, c(list(x), model@sumArgs))
+                  } else {
+                    if (summStat) ssx <- do.call(model@fnSum, c(x, model@sumArgs))
                   }
+                } else {
+                  x <- do.call(model@fnSimVec, c(list(n, theta), model@simArgs))
                   if (summStat) {
-                      ssx <- do.call(foreach, c(list(j = 1:n, .combine = rbind), parallelArgs)) %dopar% {
-                          do.call(model@fnSum, c(x[j], model@sumArgs))
-                      }
+                    ns <- ifelse(length(model@ns) == 0, getns(model), model@ns)
+                    if (is.matrix(x)) {
+                      temp <- apply(x, FUN = function(y) do.call(model@fnSum, c(list(y), model@sumArgs)), MARGIN = 1)
+                      ssx <- matrix(temp, nrow = n, ncol = ns, byrow = TRUE)
+                    } else {
+                      temp <- sapply(x, FUN = function(y) do.call(model@fnSum, c(list(y), model@sumArgs)))
+                      ssx <- matrix(temp, nrow = n, ncol = ns, byrow = TRUE)
+                    }
+                    # if (!is.vector(ssx)) {
+                    #     ssx <- t(ssx)
+                    # }
+                  }
+                }
+                
+              } else { # serial
+                if (n == 1) {
+                  x <- do.call(model@fnSim, c(list(theta), model@simArgs))
+                  if (summStat) ssx <- do.call(model@fnSum, c(list(x), model@sumArgs))
+                } else {
+                  x <- vector("list", n)
+                  ns <- ifelse(length(model@ns) == 0, getns(model), model@ns)
+                  if (summStat) ssx <- array(0, c(n, ns))
+                  for (j in 1 : n) {
+                    x[[j]] <- do.call(model@fnSim, c(list(theta), model@simArgs))
+                    if (summStat) {
+                      ssx[j, ] <- do.call(model@fnSum, c(x[j], model@sumArgs))
+                    }
                   }
                   if (is.atomic(x[[1]]) && is.vector(x[[1]])) { # reduce to matrix
-                      if (length(unique(sapply(x, FUN = length))) == 1) {
-                                x <- matrix(unlist(x), ncol = length(x[[1]]), byrow = TRUE)
-                            }
+                    if (length(unique(sapply(x, FUN = length))) == 1) {
+                      x <- matrix(unlist(x), ncol = length(x[[1]]), byrow = TRUE)
+                    }
                   }
-                  
-              } else { # not parallel
-                  if (flagVec) { # vectorised
-				      if (n == 1) {
-					      x <- do.call(model@fnSimVec, c(list(1, theta), model@simArgs))
-						  if (is.matrix(x)) {
-						      x <- as.vector(x)
-							  if (summStat) ssx <- do.call(model@fnSum, c(list(x), model@sumArgs))
-						  } else {
-						      if (summStat) ssx <- do.call(model@fnSum, c(x, model@sumArgs))
-						  }
-					  } else {
-					      x <- do.call(model@fnSimVec, c(list(n, theta), model@simArgs))
-                          if (summStat) {
-						      ns <- ifelse(length(model@ns) == 0, getns(model), model@ns)
-                              if (is.matrix(x)) {
-                                  temp <- apply(x, FUN = function(y) do.call(model@fnSum, c(list(y), model@sumArgs)), MARGIN = 1)
-								  ssx <- matrix(temp, nrow = n, ncol = ns, byrow = TRUE)
-                              } else {
-                                  temp <- sapply(x, FUN = function(y) do.call(model@fnSum, c(list(y), model@sumArgs)))
-								  ssx <- matrix(temp, nrow = n, ncol = ns, byrow = TRUE)
-                              }
-                              # if (!is.vector(ssx)) {
-                              #     ssx <- t(ssx)
-                              # }
-                          }
-					  }
-					  
-                  } else { # serial
-				      if (n == 1) {
-					      x <- do.call(model@fnSim, c(list(theta), model@simArgs))
-						  if (summStat) ssx <- do.call(model@fnSum, c(list(x), model@sumArgs))
-					  } else {
-					      x <- vector("list", n)
-                          ns <- ifelse(length(model@ns) == 0, getns(model), model@ns)
-                          if (summStat) ssx <- array(0, c(n, ns))
-                          for (j in 1 : n) {
-                              x[[j]] <- do.call(model@fnSim, c(list(theta), model@simArgs))
-						      if (summStat) {
-						          ssx[j, ] <- do.call(model@fnSum, c(x[j], model@sumArgs))
-						      }
-                          }
-                          if (is.atomic(x[[1]]) && is.vector(x[[1]])) { # reduce to matrix
-                              if (length(unique(sapply(x, FUN = length))) == 1) {
-                                  x <- matrix(unlist(x), ncol = length(x[[1]]), byrow = TRUE)
-                              }
-                          }
-					  }
-                  }
+                }
               }
-              return (list(x = x, ssx = ssx))
+            }
+            return (list(x = x, ssx = ssx))
           }
-         )
-          
+)
+
 #' Compute the summary statistics with the given data
 #' @description see \code{\link{MODEL}}
 #' @param x The data to pass to the summary statistics function.
@@ -353,69 +353,69 @@ setGeneric("summStat", function(x, model) standardGeneric("summStat"))
 setMethod("summStat",
           signature(model = "MODEL"),
           definition = function(x, model) {
-              stopifnot(!is.null(x))
-              do.call(model@fnSum, c(list(x), model@sumArgs))
+            stopifnot(!is.null(x))
+            do.call(model@fnSum, c(list(x), model@sumArgs))
           }
-          )
+)
 
 setGeneric("fn", function(.Object) standardGeneric("fn"))
 setMethod("fn",
           signature = c(.Object = "MODEL"),
           definition = function(.Object) {
-              if (!is.null(.Object@fnSimVec)) { # use vectorised simulation function
-                  fn <- function(n, theta) {
-                      x <- do.call(.Object@fnSimVec, c(list(n, theta), .Object@simArgs))
-                        if (is.matrix(x)) {
-                            ssx <- apply(x, FUN = function(y) do.call(.Object@fnSum, c(list(y), .Object@sumArgs)), MARGIN = 1)
-                        } else {
-                            ssx <- sapply(x, FUN = function(y) do.call(.Object@fnSum, c(list(y), .Object@sumArgs)))
-                        }
-                      if (is.vector(ssx)) {
-                          return(as.matrix(ssx))
-                      }
-                      return(t(ssx))
-                  }
-                  fnPar <- NULL
-              } else { # non-vectorised simulation function
-                  fnPar <- function(n, theta, parallelArgs = list()) {
-                      j <- NULL
-                      parallelArgs$.export <- c(parallelArgs$.export, ".Object")
-                      do.call(foreach, c(list(j = 1:n, .combine = rbind), parallelArgs)) %dopar% {
-                          x <- do.call(.Object@fnSim, c(list(theta), .Object@simArgs))
-                          do.call(.Object@fnSum, c(list(x), .Object@sumArgs))
-                      }
-                  }
-
-                  fn <- function(n, theta) {
-                      ns <- ifelse(length(.Object@ns) == 0, getns(.Object), .Object@ns)
-                      ssx <- array(0, c(n, ns))
-                      for (j in 1:n) {
-                          x <- do.call(.Object@fnSim, c(list(theta), .Object@simArgs))
-                          ssx[j, ] <- do.call(.Object@fnSum, c(list(x), .Object@sumArgs))
-                      }
-                      ssx
-                  }
+            if (!is.null(.Object@fnSimVec)) { # use vectorised simulation function
+              fn <- function(n, theta) {
+                x <- do.call(.Object@fnSimVec, c(list(n, theta), .Object@simArgs))
+                if (is.matrix(x)) {
+                  ssx <- apply(x, FUN = function(y) do.call(.Object@fnSum, c(list(y), .Object@sumArgs)), MARGIN = 1)
+                } else {
+                  ssx <- sapply(x, FUN = function(y) do.call(.Object@fnSum, c(list(y), .Object@sumArgs)))
+                }
+                if (is.vector(ssx)) {
+                  return(as.matrix(ssx))
+                }
+                return(t(ssx))
               }
-              return(list(fn = fn, fnPar = fnPar))
+              fnPar <- NULL
+            } else { # non-vectorised simulation function
+              fnPar <- function(n, theta, parallelArgs = list()) {
+                j <- NULL
+                parallelArgs$.export <- c(parallelArgs$.export, ".Object")
+                do.call(foreach, c(list(j = 1:n, .combine = rbind), parallelArgs)) %dopar% {
+                  x <- do.call(.Object@fnSim, c(list(theta), .Object@simArgs))
+                  do.call(.Object@fnSum, c(list(x), .Object@sumArgs))
+                }
+              }
+              
+              fn <- function(n, theta) {
+                ns <- ifelse(length(.Object@ns) == 0, getns(.Object), .Object@ns)
+                ssx <- array(0, c(n, ns))
+                for (j in 1:n) {
+                  x <- do.call(.Object@fnSim, c(list(theta), .Object@simArgs))
+                  ssx[j, ] <- do.call(.Object@fnSum, c(list(x), .Object@sumArgs))
+                }
+                ssx
+              }
+            }
+            return(list(fn = fn, fnPar = fnPar))
           }
-         )
-          
+)
+
 setGeneric("getns", valueClass = "integer", function(model) standardGeneric("getns"))
 setMethod("getns",
           signature = c(model = "MODEL"),
           definition = function(model) {
-              if (!is.null(model@fnSimVec)) {
-                  x <- do.call(model@fnSimVec, c(list(2, model@theta0), model@simArgs))
-              } else {
-                  x <- list()
-                  x[[1]] <- do.call(model@fnSim, c(list(model@theta0), model@simArgs))
-              }
-			  if (is.matrix(x)) {
-			      y <- x[1, ]
-			  } else {
-			      y <- x[[1]]
-			  }
-              ns <- length(do.call(model@fnSum, c(list(y), model@sumArgs)))
-              return(as.integer(ns))
+            if (!is.null(model@fnSimVec)) {
+              x <- do.call(model@fnSimVec, c(list(2, model@theta0), model@simArgs))
+            } else {
+              x <- list()
+              x[[1]] <- do.call(model@fnSim, c(list(model@theta0), model@simArgs))
+            }
+            if (is.matrix(x)) {
+              y <- x[1, ]
+            } else {
+              y <- x[[1]]
+            }
+            ns <- length(do.call(model@fnSum, c(list(y), model@sumArgs)))
+            return(as.integer(ns))
           }
-         )
+)

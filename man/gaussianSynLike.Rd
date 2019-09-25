@@ -35,7 +35,7 @@ correlation matrix \insertCite{Boudt2012}{BSL} should be used to estimate
 the covariance matrix in ``BSL'' method. The default is \code{FALSE}, which
 uses the sample covariance by default.}
 
-\item{whitening}{An argument determines whether Whitening transformation
+\item{whitening}{This argument determines whether Whitening transformation
 should be used in ``BSL'' method with Warton's shrinkage. Whitening
 transformation helps decorrelate the summary statistics, thus encouraging
 sparsity of the synthetic likelihood covariance matrix. This might allow

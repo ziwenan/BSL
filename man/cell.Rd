@@ -188,12 +188,8 @@ plot(sp_cell)
 # Opening up the parallel pools using doParallel
 cl <- makeCluster(detectCores() - 1)
 registerDoParallel(cl)
-resultCellBSLasso <- bsl(cell$data, n = 1500, M = 10000, theta0 = cell$start,
-                         covRandWalk = cell$cov, fnSim = cell_sim, fnSum = cell_sum,
-                         shrinkage = "glasso", penalty = 1.3, fnPrior = cell_prior,
-                         simArgs = cell$sim_args, sumArgs = cell$sum_args,
-                         parallel = TRUE, parallelArgs = list(.packages = "BSL"),
-                         thetaNames = expression(P[m], P[p]), verbose = 1L)
+resultCellBSLasso <- bsl(cell$data, n = 1500, M = 10000, model = model, covRandWalk = cell$cov, 
+                         shrinkage = "glasso", penalty = 1.3, parallel = TRUE, verbose = 1L)
 stopCluster(cl)
 registerDoSEQ()
 show(resultCellBSLasso)
@@ -204,12 +200,8 @@ plot(resultCellBSLasso, thetaTrue = thetaExact, thin = 20)
 # Opening up the parallel pools using doParallel
 cl <- makeCluster(detectCores() - 1)
 registerDoParallel(cl)
-resultCellSemiBSL <- bsl(cell$data, n = 5000, M = 10000, theta0 = cell$start,
-                         covRandWalk = cell$cov, fnSim = cell_sim, fnSum = cell_sum,
-                         method = "semiBSL", fnPrior = cell_prior,
-                         simArgs = cell$sim_args, sumArgs = cell$sum_args,
-                         parallel = TRUE, parallelArgs = list(.packages = "BSL"),
-                         thetaNames = expression(P[m], P[p]), verbose = 1L)
+resultCellSemiBSL <- bsl(cell$data, n = 5000, M = 10000, model = model, covRandWalk = cell$cov, 
+                         method = "semiBSL", parallel = TRUE, verbose = 1L)
 stopCluster(cl)
 registerDoSEQ()
 show(resultCellSemiBSL)

@@ -42,54 +42,54 @@ PENALTY <- setClass("PENALTY",
                               idxClosest = "integer",
                               result = "data.frame",
                               call = "call")
-                   )
+)
 
 setMethod("initialize",
           signature = "PENALTY",
           definition = function(.Object, loglike, n, lambda, sigma, model, call) {
-              .Object@loglike <- loglike
-              .Object@M <- nrow(loglike[[1]])
-              if (missing(sigma)) {
-                  .Object@sigma <- 1.5
-                  cat("Set the target sigma value as 1.5 by default\n")
-              } else {
-                  .Object@sigma <- sigma
-              }
-              .Object@n <- n
-              .Object@lambda <- lambda
-              if (!missing(model)) .Object@model <- model
-              if (!missing(call)) .Object@call <- call
-              validObject(.Object)
-
-              .Object <- findOptimalPenalty(.Object)
-              .Object <- computePenaltyResult(.Object)
-              return(.Object)
+            .Object@loglike <- loglike
+            .Object@M <- nrow(loglike[[1]])
+            if (missing(sigma)) {
+              .Object@sigma <- 1.5
+              cat("Set the target sigma value as 1.5 by default\n")
+            } else {
+              .Object@sigma <- sigma
+            }
+            .Object@n <- n
+            .Object@lambda <- lambda
+            if (!missing(model)) .Object@model <- model
+            if (!missing(call)) .Object@call <- call
+            validObject(.Object)
+            
+            .Object <- findOptimalPenalty(.Object)
+            .Object <- computePenaltyResult(.Object)
+            return(.Object)
           }
-         )
+)
 
 setValidity("PENALTY",
             method = function(object) {
-                if (!is.list(object@loglike)) {
-                    return("No loglike list found")
-                }
-                if (length(object@n) != length(object@lambda)) {
-                    return("Length of n mismatch the length of lambda")
-                }
-                if (length(object@loglike) != length(object@n)) {
-                    return("Length of the loglike list mismatch the length of n")
-                }
-                if (any(sapply(object@loglike, FUN = nrow) != object@M)) {
-                    return("M mismatch the loglike list")
-                }
-                if (any(sapply(object@loglike, FUN = ncol) != sapply(object@lambda, FUN = length))) {
-                    return("lambda mismatch the loglike list")
-                }
-                if (object@sigma <= 0) {
-                   return("The target sigma value must be positive, a value between 0 and 1 is recommended")
-                }
-                TRUE
+              if (!is.list(object@loglike)) {
+                return("No loglike list found")
+              }
+              if (length(object@n) != length(object@lambda)) {
+                return("Length of n mismatch the length of lambda")
+              }
+              if (length(object@loglike) != length(object@n)) {
+                return("Length of the loglike list mismatch the length of n")
+              }
+              if (any(sapply(object@loglike, FUN = nrow) != object@M)) {
+                return("M mismatch the loglike list")
+              }
+              if (any(sapply(object@loglike, FUN = ncol) != sapply(object@lambda, FUN = length))) {
+                return("lambda mismatch the loglike list")
+              }
+              if (object@sigma <= 0) {
+                return("The target sigma value must be positive, a value between 0 and 1 is recommended")
+              }
+              TRUE
             }
-           )
+)
 
 # #' @description Find the closest penalty value to the target sigma.
 setGeneric("findOptimalPenalty", function(object) standardGeneric("findOptimalPenalty"))
@@ -97,19 +97,19 @@ setGeneric("findOptimalPenalty", function(object) standardGeneric("findOptimalPe
 setMethod("findOptimalPenalty",
           signature = c("PENALTY"),
           definition = function(object) {
-              N <- length(object@n)
-              stdLoglike <- vector("list", N)
-              idxClosest <- integer(N)
-               for (i in 1 : N) {
-                   temp <- apply(object@loglike[[i]], FUN = sd, MARGIN = 2)
-                   stdLoglike[[i]] <- temp
-                   idxClosest[i] <- which.min(abs(temp - object@sigma))
-               }
-               object@stdLoglike <- stdLoglike
-               object@idxClosest <- idxClosest
-               return(object)
+            N <- length(object@n)
+            stdLoglike <- vector("list", N)
+            idxClosest <- integer(N)
+            for (i in 1 : N) {
+              temp <- apply(object@loglike[[i]], FUN = sd, MARGIN = 2)
+              stdLoglike[[i]] <- temp
+              idxClosest[i] <- which.min(abs(temp - object@sigma))
+            }
+            object@stdLoglike <- stdLoglike
+            object@idxClosest <- idxClosest
+            return(object)
           }
-         )
+)
 
 # #' @description Compute and reform the result into a data frame.
 setGeneric("computePenaltyResult", function(object) standardGeneric("computePenaltyResult"))
@@ -117,19 +117,19 @@ setGeneric("computePenaltyResult", function(object) standardGeneric("computePena
 setMethod("computePenaltyResult",
           signature = c("PENALTY"),
           definition = function(object) {
-              N <- length(object@n)
-              result <- vector("list", N)
-              for (i in 1 : N) {
-                  isClosest <- logical(length(object@stdLoglike[[i]]))
-                  isClosest[object@idxClosest[i]] <- TRUE
-                  result[[i]] <- data.frame(n = object@n[i], penalty = object@lambda[[i]], logPenalty = log(object@lambda[[i]]),
-                                            stdLoglike = object@stdLoglike[[i]], isClosest = isClosest)
-              }
-              result <- Reduce(rbind, result)
-              object@result <- result
-              return(object)
+            N <- length(object@n)
+            result <- vector("list", N)
+            for (i in 1 : N) {
+              isClosest <- logical(length(object@stdLoglike[[i]]))
+              isClosest[object@idxClosest[i]] <- TRUE
+              result[[i]] <- data.frame(n = object@n[i], penalty = object@lambda[[i]], logPenalty = log(object@lambda[[i]]),
+                                        stdLoglike = object@stdLoglike[[i]], isClosest = isClosest)
+            }
+            result <- Reduce(rbind, result)
+            object@result <- result
+            return(object)
           }
-         )
+)
 
 #' @param object The S4 object of class ``PENALTY'' to show.
 #' @rdname PENALTY-class
@@ -137,19 +137,19 @@ setMethod("computePenaltyResult",
 setMethod("show",
           signature = c(object = "PENALTY"),
           definition = function(object) {
-              digits = max(3L, getOption("digits") - 4L)
-              cat("\nCall:\n", paste(deparse(object@call), sep = "\n", collapse = "\n"),
-                  "\n\n", sep = "")
-              if (length(object@result)) {
-                  r1 <- object@result[object@result$isClosest, c("n", "penalty", "stdLoglike")]
-                  cat("Penalty selected based on the standard deviation of the loglikelihood:\n")
-                  print(format(r1, digits = digits))
-              } else {
-                  cat("No result to show\n")
-              }
-              return(invisible(r1))
+            digits = max(3L, getOption("digits") - 4L)
+            cat("\nCall:\n", paste(deparse(object@call), sep = "\n", collapse = "\n"),
+                "\n\n", sep = "")
+            if (length(object@result)) {
+              r1 <- object@result[object@result$isClosest, c("n", "penalty", "stdLoglike")]
+              cat("Penalty selected based on the standard deviation of the loglikelihood:\n")
+              print(format(r1, digits = digits))
+            } else {
+              cat("No result to show\n")
+            }
+            return(invisible(r1))
           }
-         )
+)
 
 #' @param x The S4 object of class ``PENALTY'' to plot.
 #' @param logscale A logical argument whether the x-axis (penalty) should be log transformed. The
@@ -158,38 +158,38 @@ setMethod("show",
 setMethod("plot",
           signature = c(x = "PENALTY"),
           definition = function(x, logscale = TRUE) {
-              penalty <- logPenalty <- stdLoglike <- isClosest <- NULL
-              result <- x@result
-              n <- x@n
-              a <- floor(sqrt(length(n)))
-              b <- ceiling(length(n) / a)
-              nRepeats <- sapply(x@lambda, length)
-              yPosSigma <- sapply(n, FUN = function(xx) mean(range(result[result$n == xx, "stdLoglike"])))
-              textYSigma <- c(unlist(mapply(yPosSigma, nRepeats, FUN = rep)))
-              result$isClosest[!result$isClosest] <- NA
-
-              if (logscale) {
-                  ggplot(data = result, aes(x = logPenalty, y = stdLoglike)) +
-                      geom_line(color = "darkblue", linetype = "dashed", size = 1) +
-                      facet_wrap( ~ n, scales = "free", nrow = a, ncol = b, labeller = label_both) +
-                      geom_vline(aes(xintercept = logPenalty * isClosest), na.rm = TRUE, color = "forestgreen", linetype = 4) +
-                      geom_label(aes(x = logPenalty * isClosest, y = textYSigma, label = paste("penalty == ", round(penalty, 3))),
-                                 hjust = 0.5, vjust = "inward", parse = TRUE, color = "white", fill = "#FE66A9", size = 2.7,
-                                 alpha = 0.8, na.rm = TRUE) +
-                      labs(x = "log penalty", y = "standard deviation of log-likelihood", title = "Penalty Selection") +
-                      theme(plot.title = element_text(size = 14, hjust = 0.5)) +
-                      theme(strip.text.x = element_text(size = 12, face = "bold"), axis.title = element_text(size = 12))
-              } else {
-                  ggplot(data = result, aes(x = penalty, y = stdLoglike)) +
-                      geom_line(color = "darkblue", linetype = "dashed", size = 1) +
-                      facet_wrap( ~ n, scales = "free", nrow = a, ncol = b, labeller = label_both) +
-                      geom_vline(aes(xintercept = penalty * isClosest), na.rm = TRUE, color = "forestgreen", linetype = 4) +
-                      geom_label(aes(x = penalty * isClosest, y = textYSigma, label = paste("penalty == ", round(penalty, 3))),
-                                 hjust = 0.5, vjust = "inward", parse = TRUE, color = "white", fill = "#FE66A9", size = 2.7,
-                                 alpha = 0.8, na.rm = TRUE) +
-                      labs(x = "penalty", y = "standard deviation of log-likelihood", title = "Penalty Selection") +
-                      theme(plot.title = element_text(size = 14, hjust = 0.5)) +
-                      theme(strip.text.x = element_text(size = 12, face = "bold"), axis.title = element_text(size = 12))
-              }
+            penalty <- logPenalty <- stdLoglike <- isClosest <- NULL
+            result <- x@result
+            n <- x@n
+            a <- floor(sqrt(length(n)))
+            b <- ceiling(length(n) / a)
+            nRepeats <- sapply(x@lambda, length)
+            yPosSigma <- sapply(n, FUN = function(xx) mean(range(result[result$n == xx, "stdLoglike"])))
+            textYSigma <- c(unlist(mapply(yPosSigma, nRepeats, FUN = rep)))
+            result$isClosest[!result$isClosest] <- NA
+            
+            if (logscale) {
+              ggplot(data = result, aes(x = logPenalty, y = stdLoglike)) +
+                geom_line(color = "darkblue", linetype = "dashed", size = 1) +
+                facet_wrap( ~ n, scales = "free", nrow = a, ncol = b, labeller = label_both) +
+                geom_vline(aes(xintercept = logPenalty * isClosest), na.rm = TRUE, color = "forestgreen", linetype = 4) +
+                geom_label(aes(x = logPenalty * isClosest, y = textYSigma, label = paste("penalty == ", round(penalty, 3))),
+                           hjust = 0.5, vjust = "inward", parse = TRUE, color = "white", fill = "#FE66A9", size = 2.7,
+                           alpha = 0.8, na.rm = TRUE) +
+                labs(x = "log penalty", y = "standard deviation of log-likelihood", title = "Penalty Selection") +
+                theme(plot.title = element_text(size = 14, hjust = 0.5)) +
+                theme(strip.text.x = element_text(size = 12, face = "bold"), axis.title = element_text(size = 12))
+            } else {
+              ggplot(data = result, aes(x = penalty, y = stdLoglike)) +
+                geom_line(color = "darkblue", linetype = "dashed", size = 1) +
+                facet_wrap( ~ n, scales = "free", nrow = a, ncol = b, labeller = label_both) +
+                geom_vline(aes(xintercept = penalty * isClosest), na.rm = TRUE, color = "forestgreen", linetype = 4) +
+                geom_label(aes(x = penalty * isClosest, y = textYSigma, label = paste("penalty == ", round(penalty, 3))),
+                           hjust = 0.5, vjust = "inward", parse = TRUE, color = "white", fill = "#FE66A9", size = 2.7,
+                           alpha = 0.8, na.rm = TRUE) +
+                labs(x = "penalty", y = "standard deviation of log-likelihood", title = "Penalty Selection") +
+                theme(plot.title = element_text(size = 14, hjust = 0.5)) +
+                theme(strip.text.x = element_text(size = 12, face = "bold"), axis.title = element_text(size = 12))
+            }
           }
-         )
+)

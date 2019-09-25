@@ -41,7 +41,7 @@ This function computes the semi-parametric synthetic likelihood
   statistics. Kernel density estimation is used for modelling each univariate
   marginal distribution, and the dependence structure between summaries are
   captured using a Gaussian copula. Shrinkage on the correlation matrix
-  parameter of the Gaussian copula is helpful to bring down the number of
+  parameter of the Gaussian copula is helpful in decreasing the number of
   simulations.
 }
 \examples{

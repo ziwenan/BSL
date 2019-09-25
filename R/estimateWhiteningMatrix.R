@@ -26,17 +26,17 @@
 #' @export
 estimateWhiteningMatrix <- function(n, model, method = c("PCA", "ZCA", "Cholesky", "ZCA-cor", "PCA-cor"),
                                     thetaPoint = NULL, parallel = FALSE, parallelArgs = NULL) {
-    method <- match.arg(method)
-	if (parallel) {
-	    myFnSimSum <- function(n, theta) fn(model)$fnPar(n, theta, parallelArgs)
-	} else {
-	    myFnSimSum <- fn(model)$fn
-	}
-	if (is.null(thetaPoint)) {
-	    thetaPoint <- model@theta0
-	}
-	ssx <- myFnSimSum(n, thetaPoint)
-	S <- cov(ssx)
-	W <- whitening::whiteningMatrix(S, method = method)
-	return(W)
+  method <- match.arg(method)
+  if (parallel) {
+    myFnSimSum <- function(n, theta) fn(model)$fnPar(n, theta, parallelArgs)
+  } else {
+    myFnSimSum <- fn(model)$fn
+  }
+  if (is.null(thetaPoint)) {
+    thetaPoint <- model@theta0
+  }
+  ssx <- myFnSimSum(n, thetaPoint)
+  S <- cov(ssx)
+  W <- whitening::whiteningMatrix(S, method = method)
+  return(W)
 }

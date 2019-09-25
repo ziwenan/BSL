@@ -76,13 +76,13 @@ summary statistics function. Only use when the input \code{fnSum} requires
 additional arguments. The default is \code{NULL}.}
 
 \item{logitTransformBound}{A \eqn{p} by \eqn{2} numeric matrix indicating the
-upper and lower bound of parameters if a logit transformation is used on
+upper and lower bounds of parameters if a logit transformation is used on
 the parameter space, where \eqn{p} is the number of parameters. The default
 is \code{NULL}, which means no logit transformation is used. It is also
 possible to define other transformations within the simulation and prior
 function from \code{model}. The first column contains the lower bound of
 each parameter and the second column contains the upper bound. Infinite
-lower or upper bound is also supported, eg.
+lower or upper bounds are also supported, eg.
 \code{matrix(c(1,Inf,0,10,-Inf,0.5),3,2,byrow=TRUE)}.}
 
 \item{standardise}{A logical argument that determines whether to standardise
@@ -96,7 +96,7 @@ correlation matrix \insertCite{Boudt2012}{BSL} should be used to estimate
 the covariance matrix in ``BSL'' method. The default is \code{FALSE}, which
 uses the sample covariance by default.}
 
-\item{whitening}{An argument determines whether Whitening transformation
+\item{whitening}{This argument determines whether Whitening transformation
 should be used in ``BSL'' method with Warton's shrinkage. Whitening
 transformation helps decorrelate the summary statistics, thus encouraging
 sparsity of the synthetic likelihood covariance matrix. This might allow
@@ -135,12 +135,12 @@ length as the parameter vector. The default is \code{NULL}.}
 \item{plotOnTheFly}{A logical or numeric argument defining whether or by how
 many iterations a posterior figure will be plotted during running. If
 \code{TRUE}, a plot of approximate univariate posteriors based on the
-current accepted samples will be shown by every one thousand iterations.
+current accepted samples will be shown every one thousand iterations.
 The default is \code{FALSE}.}
 
 \item{verbose}{An integer indicating the verbose style. 0L
-means no verbose messages will be printed. 1L use a custom progress bar to
-track the progress. 2L print the iteration numbers (\code{1:M}) to track
+means no verbose messages will be printed. 1L uses a custom progress bar to
+track the progress. 2L prints the iteration numbers (\code{1:M}) to track
 the progress. The default is 1L.}
 }
 \value{
