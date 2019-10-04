@@ -286,7 +286,7 @@ setMethod("plot",
 # Plot the univariate marginal posterior plot of a bsl class object using the R
 # default plot function.
 marginalPostDefault <- function(x, thin = 1, burnin = 0, thetaTrue = NULL, options.plot = NULL) {
-    theta <- getTheta(x, burnin = burnin)
+    theta <- getTheta(x, burnin = burnin, thin = thin)
     n <- nrow(theta)
     p <- ncol(theta)
     a <- floor(sqrt(p))
@@ -297,8 +297,7 @@ marginalPostDefault <- function(x, thin = 1, burnin = 0, thetaTrue = NULL, optio
     thetaNames <- x@model@thetaNames
     par(mfrow = c(a, b))
     for(k in 1:p) {
-        idx <- seq(1, n, thin)
-        d <- density(theta[idx, k])
+        d <- density(theta[, k])
         if ('main' %in% names(options.plot)) {
             do.call(plot, c(list(d, xlab = thetaNames[k]), options.plot))
         } else {
@@ -314,7 +313,7 @@ marginalPostDefault <- function(x, thin = 1, burnin = 0, thetaTrue = NULL, optio
 # Plot the univariate marginal posterior plot of a bsl class object using the
 # ggplot2 package.
 marginalPostGgplot <- function(x, thin = 1, burnin = 0, thetaTrue = NULL, top = 'Approximate Univariate Posteriors', options.density = list(), options.theme = list()) {
-    theta <- getTheta(x, burnin = burnin)
+    theta <- getTheta(x, burnin = burnin, thin = thin)
     n <- nrow(theta)
     p <- ncol(theta)
     a <- floor(sqrt(p))
@@ -322,7 +321,7 @@ marginalPostGgplot <- function(x, thin = 1, burnin = 0, thetaTrue = NULL, top = 
     if (!is.null(thetaTrue) & length(thetaTrue) != p) {
         stop('Length of thetaTrue does not match the number of parameters.')
     }
-    samples <- data.frame(theta[seq(1, n, by = thin), ])
+    samples <- data.frame(theta)
     thetaNames <- x@model@thetaNames
     plist <- list()
     for (i in 1 : p) {
@@ -349,8 +348,8 @@ setGeneric("getTheta", function(object, ...) standardGeneric("getTheta"))
 #' @export
 setMethod("getTheta",
           signature = c(object = "BSL"),
-          definition = function(object, burnin = 0) {
-              as.matrix(object@theta[(burnin + 1) : nrow(object@theta), ])
+          definition = function(object, burnin = 0, thin = 1) {
+              as.matrix(object@theta[seq((burnin + 1) : nrow(object@theta), by = thin), ])
           }
 )
 
@@ -364,8 +363,8 @@ setGeneric("getLoglike", function(object, ...) standardGeneric("getLoglike"))
 #' @export
 setMethod("getLoglike",
           signature = c(object = "BSL"),
-          definition = function(object, burnin = 0) {
-              object@loglike[(burnin + 1) : length(object@loglike)]
+          definition = function(object, burnin = 0, thin = 1) {
+              object@loglike[seq((burnin + 1) : nrow(object@loglike), by = thin)]
           }
 )
 
@@ -380,7 +379,7 @@ setGeneric("getGamma", function(object, ...) standardGeneric("getGamma"))
 #' @export
 setMethod("getGamma",
           signature = c(object = "BSL"),
-          definition = function(object, burnin = 0) {
-              as.matrix(object@gamma[(burnin + 1) : nrow(object@gamma), ])
+          definition = function(object, burnin = 0, thin = 1) {
+              as.matrix(object@gamma[seq((burnin + 1) : nrow(object@gamma), by = thin), ])
           }
 )
