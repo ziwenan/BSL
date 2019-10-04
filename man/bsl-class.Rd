@@ -21,11 +21,11 @@
   top = "Approximate Univariate Posteriors", options.density = list(),
   options.theme = list())
 
-\S4method{getTheta}{BSL}(object, burnin = 0)
+\S4method{getTheta}{BSL}(object, burnin = 0, thin = 1)
 
-\S4method{getLoglike}{BSL}(object, burnin = 0)
+\S4method{getLoglike}{BSL}(object, burnin = 0, thin = 1)
 
-\S4method{getGamma}{BSL}(object, burnin = 0)
+\S4method{getGamma}{BSL}(object, burnin = 0, thin = 1)
 }
 \arguments{
 \item{object}{A ``BSL'' class object to be displayed.}

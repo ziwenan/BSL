@@ -59,8 +59,6 @@ m <- newModel(fnSim = function(theta) rnorm(50, theta), fnSum = function(x) c(me
 ssx <- simulation(m, n = 300, theta = 1, seed = 10)$ssx
 
 # gamma is updated with a slice sampler
-loglike <- synLikeMisspec(ssy, ssx, type = "variance")
-# gamma <- BSL::sliceGammaVariance(ssy, ssx, loglike = loglike)
 gamma <- rep(0.1, length(ssy))
 synLikeMisspec(ssy, ssx, type = "variance", gamma = gamma)
 

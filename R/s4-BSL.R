@@ -349,7 +349,7 @@ setGeneric("getTheta", function(object, ...) standardGeneric("getTheta"))
 setMethod("getTheta",
           signature = c(object = "BSL"),
           definition = function(object, burnin = 0, thin = 1) {
-              as.matrix(object@theta[seq((burnin + 1) : nrow(object@theta), by = thin), ])
+              as.matrix(object@theta[seq((burnin + 1), nrow(object@theta), by = thin), ])
           }
 )
 
@@ -364,7 +364,7 @@ setGeneric("getLoglike", function(object, ...) standardGeneric("getLoglike"))
 setMethod("getLoglike",
           signature = c(object = "BSL"),
           definition = function(object, burnin = 0, thin = 1) {
-              object@loglike[seq((burnin + 1) : nrow(object@loglike), by = thin)]
+              object@loglike[seq((burnin + 1), nrow(object@loglike), by = thin)]
           }
 )
 
@@ -380,6 +380,6 @@ setGeneric("getGamma", function(object, ...) standardGeneric("getGamma"))
 setMethod("getGamma",
           signature = c(object = "BSL"),
           definition = function(object, burnin = 0, thin = 1) {
-              as.matrix(object@gamma[seq((burnin + 1) : nrow(object@gamma), by = thin), ])
+              as.matrix(object@gamma[seq((burnin + 1), nrow(object@gamma), by = thin), ])
           }
 )
