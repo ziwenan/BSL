@@ -364,7 +364,7 @@ setGeneric("getLoglike", function(object, ...) standardGeneric("getLoglike"))
 setMethod("getLoglike",
           signature = c(object = "BSL"),
           definition = function(object, burnin = 0, thin = 1) {
-              object@loglike[seq((burnin + 1), nrow(object@loglike), by = thin)]
+              object@loglike[seq((burnin + 1), length(object@loglike), by = thin)]
           }
 )
 
