@@ -49,7 +49,7 @@
 #' # the semi-parametric synthetic likelihood estimator is more robust to non-normality
 #' semiparaKernelEstimate(ssy, ssx)
 #' # using shrinkage on the correlation matrix of the Gaussian copula is also possible
-#' semiparaKernelEstimate(ssy, ssx, shrinkage = 'Warton', penalty = 0.8)
+#' semiparaKernelEstimate(ssy, ssx, shrinkage = "Warton", penalty = 0.8)
 #'
 #' @seealso    Other available synthetic likelihood estimators:
 #'   \code{\link{gaussianSynLike}} for the standard synthetic likelihood
@@ -58,7 +58,7 @@
 #'   Gaussian synthetic likelihood estimator for model misspecification.
 #'
 #' @export
-semiparaKernelEstimate <- function (ssy, ssx, kernel = 'gaussian', shrinkage = NULL,
+semiparaKernelEstimate <- function (ssy, ssx, kernel = "gaussian", shrinkage = NULL,
                                     penalty = NULL, log = TRUE) {
   if (!is.null(shrinkage)) {
     flagShrinkage <- TRUE
@@ -67,10 +67,10 @@ semiparaKernelEstimate <- function (ssy, ssx, kernel = 'gaussian', shrinkage = N
     flagShrinkage <- FALSE
   }
   if (!flagShrinkage && !is.null(penalty)) {
-    warning('"penalty" will be ignored since no shrinkage method is specified')
+    warning("\"penalty\" will be ignored since no shrinkage method is specified")
   }
   if (flagShrinkage && is.null(penalty)) {
-    stop('a penalty value must be specified to enable shrinkage estimation')
+    stop("a penalty value must be specified to enable shrinkage estimation")
   }
   
   n <- nrow(ssx)
@@ -93,13 +93,13 @@ semiparaKernelEstimate <- function (ssy, ssx, kernel = 'gaussian', shrinkage = N
   if (!is.null(shrinkage)) {
     RHOHAT <- p2P(rhohat)
     Sigma <- switch(shrinkage,
-                    'glasso' = glasso(RHOHAT, rho = penalty, penalize.diagonal = FALSE)$w,
-                    'Warton' = corrWarton(RHOHAT, penalty))
+                    "glasso" = glasso(RHOHAT, rho = penalty, penalize.diagonal = FALSE)$w,
+                    "Warton" = corrWarton(RHOHAT, penalty))
     rhohat <- P2p(Sigma)
   }
   
   # density
-  copula <- normalCopula(rhohat, dim = ns, dispstr = 'un')
+  copula <- normalCopula(rhohat, dim = ns, dispstr = "un")
   if (log) {
     f <- dCopula(yu, copula, log = TRUE) + sum(log(pdfy))
   } else {

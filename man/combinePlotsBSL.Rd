@@ -4,10 +4,10 @@
 \alias{combinePlotsBSL}
 \title{Plot the densities of multiple ``bsl'' class objects.}
 \usage{
-combinePlotsBSL(objectList, which = 1L, thin = 1, thetaTrue = NULL,
-  label = NULL, legendPosition = c("auto", "right", "bottom")[1],
-  legendNcol = NULL, col = NULL, lty = NULL, lwd = NULL,
-  cex.lab = 1, cex.axis = 1, cex.legend = 0.75,
+combinePlotsBSL(objectList, which = 1L, thin = 1, burnin = 0,
+  thetaTrue = NULL, label = NULL, legendPosition = c("auto", "right",
+  "bottom")[1], legendNcol = NULL, col = NULL, lty = NULL,
+  lwd = NULL, cex.lab = 1, cex.axis = 1, cex.legend = 0.75,
   top = "Approximate Marginal Posteriors", options.color = list(),
   options.linetype = list(), options.size = list(),
   options.theme = list())
@@ -22,6 +22,8 @@ result. \code{2L} uses ggplot2 to draw the plot.}
 \item{thin}{A numeric argument indicating the gap between samples to
 be taken when thinning the MCMC draws. The default is \code{1}, which means
 no thinning is used.}
+
+\item{burnin}{the number of MCMC burn-in steps to be taken.}
 
 \item{thetaTrue}{A set of true parameter values to be included on the plots
 as a reference line. The default is \code{NULL}.}

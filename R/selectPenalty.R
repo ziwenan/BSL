@@ -88,10 +88,10 @@ selectPenalty <- function(ssy, n, lambda, M, sigma = 1.5, model, theta = NULL,
     theta <- model@theta0
   }
   n <- as.vector(n)
-  if (!is.list(lambda)) {
-    lambda <- list(lambda)
-  }
   N <- length(n)
+  if (is.atomic(lambda) && is.vector(lambda)) {
+      lambda <- rep(list(lambda), N)
+  }
   if (length(lambda) != N) {
     stop("lambda must be a list with the same length as n")
   }

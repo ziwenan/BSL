@@ -1,1 +1,2 @@
 - Speed up the Gaussian rank correlation function.
+- Fix the progress bar (the line width sometimes doesn't fit well).

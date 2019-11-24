@@ -59,7 +59,7 @@ gaussianSynLike(ssy, ssx)
 # the semi-parametric synthetic likelihood estimator is more robust to non-normality
 semiparaKernelEstimate(ssy, ssx)
 # using shrinkage on the correlation matrix of the Gaussian copula is also possible
-semiparaKernelEstimate(ssy, ssx, shrinkage = 'Warton', penalty = 0.8)
+semiparaKernelEstimate(ssy, ssx, shrinkage = "Warton", penalty = 0.8)
 
 }
 \references{

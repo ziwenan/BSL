@@ -1,3 +1,11 @@
+# BSL 3.1.0 (Release date: 2019-11)
+
+* Added a new method ("BSLmisspec") in the main function "bsl", which considers model misspecification when running BSL.
+* Added an option "whitening" in the main function "bsl", which allows greater shrinkage when using the Warton's shrinkage estimator.
+* Re-designed S4 classes "BSL", "MODEL", and "PENALTY". More methods are supported in the classes.
+* The package now uses a progress bar to track running progress in the "bsl" function (verbose = 1L).
+* Other minor changes and bug fixes.
+
 # BSL 3.0.0 (Release date: 2019-07-01)
 
 * Added a new method ("uBSL") in the main function "bsl".

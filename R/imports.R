@@ -2,7 +2,7 @@
   library.dynam.unload("BSL", libpath)
 }
 
-#' @importFrom stats runif cov sd pnorm rnorm qnorm density approx dexp rexp
+#' @importFrom stats runif cov sd pnorm rnorm qnorm density approx dexp rexp median quantile
 #' @importFrom graphics par lines abline layout legend
 #' @importFrom utils flush.console capture.output head tail
 #' @importFrom MASS mvrnorm

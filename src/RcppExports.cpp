@@ -50,28 +50,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// obsMat2deltaxR
-NumericVector obsMat2deltaxR(Rcpp::NumericMatrix X, unsigned int lag);
-RcppExport SEXP _BSL_obsMat2deltaxR(SEXP XSEXP, SEXP lagSEXP) {
+// obsMat2deltax
+NumericVector obsMat2deltax(Rcpp::NumericMatrix X, unsigned int lag);
+RcppExport SEXP _BSL_obsMat2deltax(SEXP XSEXP, SEXP lagSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type X(XSEXP);
     Rcpp::traits::input_parameter< unsigned int >::type lag(lagSEXP);
-    rcpp_result_gen = Rcpp::wrap(obsMat2deltaxR(X, lag));
-    return rcpp_result_gen;
-END_RCPP
-}
-// gmmScores
-Rcpp::List gmmScores(Rcpp::NumericMatrix X, NumericMatrix gmm, unsigned int lag);
-RcppExport SEXP _BSL_gmmScores(SEXP XSEXP, SEXP gmmSEXP, SEXP lagSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type X(XSEXP);
-    Rcpp::traits::input_parameter< NumericMatrix >::type gmm(gmmSEXP);
-    Rcpp::traits::input_parameter< unsigned int >::type lag(lagSEXP);
-    rcpp_result_gen = Rcpp::wrap(gmmScores(X, gmm, lag));
+    rcpp_result_gen = Rcpp::wrap(obsMat2deltax(X, lag));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -80,8 +67,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_BSL_simulate_cell", (DL_FUNC) &_BSL_simulate_cell, 7},
     {"_BSL_rstable", (DL_FUNC) &_BSL_rstable, 2},
     {"_BSL_sim_toad", (DL_FUNC) &_BSL_sim_toad, 5},
-    {"_BSL_obsMat2deltaxR", (DL_FUNC) &_BSL_obsMat2deltaxR, 2},
-    {"_BSL_gmmScores", (DL_FUNC) &_BSL_gmmScores, 3},
+    {"_BSL_obsMat2deltax", (DL_FUNC) &_BSL_obsMat2deltax, 2},
     {NULL, NULL, 0}
 };
 

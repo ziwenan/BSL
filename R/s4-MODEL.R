@@ -93,7 +93,7 @@ MODEL <- setClass("MODEL",
 #' m <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args,
 #'                   theta0 = ma2$start, fnLogPrior = ma2_prior, verbose = FALSE)
 #' validObject(m)
-#' 
+#'
 #' # benchmark the serial and vectorised simulation function (require the rbenchmark package)
 #' m1 <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args,
 #'             theta0 = ma2$start, fnLogPrior = ma2_prior)
@@ -137,7 +137,7 @@ setMethod("initialize",
               .Object@verbose <- verbose
               validObject(.Object)
               .Object@ns <- getns(.Object)
-              
+
               if (missing(thetaNames)) { # missing
                 if (!is.null(names(theta0))) { # use the name of theta0
                   .Object@thetaNames <- as.expression(names(theta0))
@@ -176,7 +176,7 @@ setValidity("MODEL",
               if (is.null(object@fnSim) && is.null(object@fnSimVec)) {
                 return("No available simulation function is provided")
               }
-              
+
               if (object@test) {
                 if (object@verbose) cat("running a short simulation test ... ")
                 # test the simulation function
@@ -199,7 +199,7 @@ setValidity("MODEL",
                     x[[i]] <- temp
                   }
                 }
-                
+
                 # test the summary statistics function
                 if (is.matrix(x)) {
                   ssx <- try(do.call(object@fnSum, c(list(x[1, ]), object@sumArgs)))
@@ -214,12 +214,12 @@ setValidity("MODEL",
                 }
                 if (object@verbose) cat("success\n")
               }
-              
+
               # prior
               if (object@fnLogPrior(object@theta0) == -Inf) {
                 return("The given parameter value theta0 has no prior support\n")
               }
-              
+
               # pass all checks
               TRUE
             }
@@ -235,7 +235,7 @@ setGeneric("simulation", function(model, ...) standardGeneric("simulation"))
 #' @param model         A ``MODEL'' class object.
 #' @param n The number of simulations to run.
 #' @param theta The parameter value.
-#' @param summStat Logical indicator whether the correpsonding summary statistics 
+#' @param summStat Logical indicator whether the correpsonding summary statistics
 #'   should be returned or not. The default is \code{TRUE}.
 #' @param seed A seed number to pass to the \code{set.seed} function. The
 #'   default is \code{NULL}, when no seed number is specified. Please note
@@ -266,24 +266,28 @@ setMethod("simulation",
               parallel <- FALSE
               warning("Parallel computation is disabled for n = 1")
             }
-            
+
             ssx <- NULL
             if (parallel) { # parallel
               parallelArgs$.export <- c(parallelArgs$.export, "model")
-              x <- do.call(foreach, c(list(j = 1:n), parallelArgs)) %dopar% {
-                do.call(model@fnSim, c(list(theta), model@simArgs))
-              }
-              if (summStat) {
-                ssx <- do.call(foreach, c(list(j = 1:n, .combine = rbind), parallelArgs)) %dopar% {
-                  do.call(model@fnSum, c(x[j], model@sumArgs))
+			  suppressWarnings(
+                x <- do.call(foreach, c(list(j = 1:n), parallelArgs)) %dopar% {
+                  do.call(model@fnSim, c(list(theta), model@simArgs))
                 }
+			  )
+              if (summStat) {
+			    suppressWarnings(
+                  ssx <- do.call(foreach, c(list(j = 1:n, .combine = rbind), parallelArgs)) %dopar% {
+                    do.call(model@fnSum, c(x[j], model@sumArgs))
+                  }
+				)
               }
               if (is.atomic(x[[1]]) && is.vector(x[[1]])) { # reduce to matrix
                 if (length(unique(sapply(x, FUN = length))) == 1) {
                   x <- matrix(unlist(x), ncol = length(x[[1]]), byrow = TRUE)
                 }
               }
-              
+
             } else { # not parallel
               if (flagVec) { # vectorised
                 if (n == 1) {
@@ -310,7 +314,7 @@ setMethod("simulation",
                     # }
                   }
                 }
-                
+
               } else { # serial
                 if (n == 1) {
                   x <- do.call(model@fnSim, c(list(theta), model@simArgs))
@@ -385,7 +389,7 @@ setMethod("fn",
                   do.call(.Object@fnSum, c(list(x), .Object@sumArgs))
                 }
               }
-              
+
               fn <- function(n, theta) {
                 ns <- ifelse(length(.Object@ns) == 0, getns(.Object), .Object@ns)
                 ssx <- array(0, c(n, ns))

@@ -49,9 +49,9 @@
 #' \dontshow{
 #' toy_sim <- function(n, theta) matrix(rnorm(2*n, theta), nrow = n)
 #' toy_sum <- ma2_sum
-#' 
+#'
 #' model <- newModel(fnSimVec = toy_sim, fnSum = toy_sum, sumArgs = list(epsilon = 2), theta0 = 0)
-#' 
+#'
 #' result1 <- bsl(y = 1:2, n = 100, M = 100, model = model, covRandWalk = matrix(1),
 #'                method = "BSL")
 #' result2 <- bsl(y = 1:2, n = 100, M = 100, model = model, covRandWalk = matrix(1),
@@ -63,9 +63,9 @@
 #' \dontrun{
 #' toy_sim <- function(n, theta) matrix(rnorm(2*n, theta), nrow = n)
 #' toy_sum <- ma2_sum
-#' 
+#'
 #' model <- newModel(fnSimVec = toy_sim, fnSum = toy_sum, sumArgs = list(epsilon = 2), theta0 = 0)
-#' 
+#'
 #' result1 <- bsl(y = 1:2, n = 100, M = 5e3, model = model, covRandWalk = matrix(1),
 #'                method = "BSL", plotOnTheFly = TRUE)
 #' result2 <- bsl(y = 1:2, n = 100, M = 5e3, model = model, covRandWalk = matrix(1),
@@ -78,7 +78,8 @@
 #' @seealso \code{\link{ma2}}, \code{\link{cell}}, \code{\link{mgnk}} and
 #'   \code{\link{toad}} for examples.
 #' @export
-combinePlotsBSL <- function(objectList, which = 1L, thin = 1, thetaTrue = NULL, label = NULL, legendPosition = c('auto','right','bottom')[1],
+combinePlotsBSL <- function(objectList, which = 1L, thin = 1, burnin = 0, thetaTrue = NULL, label = NULL,
+                            legendPosition = c('auto','right','bottom')[1],
                             legendNcol = NULL, col = NULL, lty = NULL, lwd = NULL, cex.lab = 1, cex.axis = 1, cex.legend = 0.75,
                             top = 'Approximate Marginal Posteriors', options.color = list(), options.linetype = list(),
                             options.size = list(), options.theme = list()) {
@@ -86,21 +87,21 @@ combinePlotsBSL <- function(objectList, which = 1L, thin = 1, thetaTrue = NULL, 
     if (length(options.color) != 0 || length(options.linetype) != 0 || length(options.size) != 0 || length(options.theme) != 0) {
       warning('"options.color", "options.linetype", "options.size" and "options.theme" are ignored when which = 1')
     }
-    multiPlotDefault(objectList, thin, thetaTrue, label, legendPosition, legendNcol, col, lty, lwd, cex.lab, cex.axis, cex.legend)
+    multiPlotDefault(objectList, thin, burnin, thetaTrue, label, legendPosition, legendNcol, col, lty, lwd, cex.lab, cex.axis, cex.legend)
   } else if (which == 2L) {
-    multiPlotGgplot(objectList, thin, thetaTrue, label, top, options.color, options.linetype, options.size, options.theme)
+    multiPlotGgplot(objectList, thin, burnin, thetaTrue, label, top, options.color, options.linetype, options.size, options.theme)
   } else {
     stop('Indicate a supported plot number, 1 for R default density plot or 2 for ggplot density plot')
   }
 }
 
-multiPlotDefault <- function(objectList, thin = 1, thetaTrue = NULL, label = NULL, legendPosition = c('auto','right','bottom')[1],
+multiPlotDefault <- function(objectList, thin = 1, burnin = 0, thetaTrue = NULL, label = NULL, legendPosition = c('auto','right','bottom')[1],
                              legendNcol = NULL, col = NULL, lty = NULL, lwd = NULL, cex.lab = 1, cex.axis = 1, cex.legend = 0.75) {
   nList <- length(objectList)
   p <- ncol(objectList[[1]]@theta)
   a <- floor(sqrt(p))
   b <- ceiling(p / a)
-  
+
   if (is.null(col)) {
     col <- 1 : nList
   } else {
@@ -122,12 +123,15 @@ multiPlotDefault <- function(objectList, thin = 1, thetaTrue = NULL, label = NUL
       stop ('length of "col" must match "objectList"')
     }
   }
-  
+
   thetaNames <- objectList[[1]]@model@thetaNames
   if (length(thin) == 1L) {
     thin <- rep(thin, nList)
   }
-  
+  if (length(burnin) == 1L) {
+    burnin <- rep(burnin, nList)
+  }
+
   if (legendPosition == 'auto') {
     if (a*b == p) { # legend at bottom
       layoutM <- matrix(c(1:p,rep(p+1,b)), nrow = a+1, ncol = b, byrow = TRUE)
@@ -168,12 +172,12 @@ multiPlotDefault <- function(objectList, thin = 1, thetaTrue = NULL, label = NUL
   } else {
     stop('"legendPosition" must be "auto" or "right" or "bottom"')
   }
-  
+
   if (is.null(legendNcol)) {
     legendNcol <- ifelse(legendHorz, nList, 1)
   }
-  
-  idx <- lapply(1:nList, FUN = function(i) seq(1, objectList[[i]]@M, thin[i]))
+
+  idx <- lapply(1:nList, FUN = function(i) seq((burnin[i] + 1), objectList[[i]]@M, thin[i]))
   theta <- d <- xRange <- yRange <- vector('list', p)
   for (k in 1:p) {
     theta[[k]] <- lapply(1:nList, FUN = function(i) objectList[[i]]@theta[idx[[i]], k])
@@ -181,7 +185,7 @@ multiPlotDefault <- function(objectList, thin = 1, thetaTrue = NULL, label = NUL
     xRange[[k]] <- range(sapply(1:nList, FUN = function(i) range(d[[k]][[i]]$x)))
     yRange[[k]] <- c(0, max(sapply(1:nList, FUN = function(i) max(d[[k]][[i]]$y))))
   }
-  
+
   for (k in 1:p) {
     # par(mar = c(5.1,5.1,2,2))
     plot(0, type = 'n', main = NA, xlab = thetaNames[k], ylab = 'density', cex.lab = cex.lab,
@@ -207,7 +211,7 @@ multiPlotDefault <- function(objectList, thin = 1, thetaTrue = NULL, label = NUL
 }
 
 
-multiPlotGgplot <- function(objectList, thin = 1, thetaTrue = NULL, label = NULL, top = 'Approximate Marginal Posteriors',
+multiPlotGgplot <- function(objectList, thin = 1, burnin = 0, thetaTrue = NULL, label = NULL, top = 'Approximate Marginal Posteriors',
                             options.color = list(), options.linetype = list(), options.size = list(), options.theme = list()) {
   nList <- length(objectList)
   p <- ncol(objectList[[1]]@theta)
@@ -226,11 +230,11 @@ multiPlotGgplot <- function(objectList, thin = 1, thetaTrue = NULL, label = NULL
   }
   samples <- array(list(), nList)
   for (i in 1 : nList) {
-    idx <- seq(1, objectList[[i]]@M, thin)
-    samples[[i]] <- data.frame(objectList[[i]]@theta[idx, ], label = label[i])
+    theta <- getTheta(objectList[[i]], burnin = burnin, thin = thin)
+    samples[[i]] <- data.frame(theta, label = label[i])
   }
   samples <- do.call('rbind', samples)
-  
+
   plist <- array(list(), p)
   for (i in 1 : p) {
     plist[[i]] <- ggplot(samples, aes_string(x = colnames(samples)[i])) +

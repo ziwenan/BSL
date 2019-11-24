@@ -64,7 +64,7 @@ initialising a ``MODEL'' object.}
 
 \item{theta}{The parameter value.}
 
-\item{summStat}{Logical indicator whether the correpsonding summary statistics 
+\item{summStat}{Logical indicator whether the correpsonding summary statistics
 should be returned or not. The default is \code{TRUE}.}
 
 \item{parallel}{A logical value indicating whether parallel computing should

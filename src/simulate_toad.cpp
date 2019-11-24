@@ -141,7 +141,7 @@ NumericMatrix sim_toad(NumericVector params, int ntoad, int nday, int model = 1,
 }
 
 // Convert an observation matrix to a vector of n-day displacements
-vector<double> obsMat2deltax(Rcpp::NumericMatrix X, unsigned int lag) {
+vector<double> obsMat2deltaxCpp(Rcpp::NumericMatrix X, unsigned int lag) {
     unsigned int ndays = X.nrow();
     unsigned int ntoads =  X.ncol();
     unsigned int i, j;
@@ -168,7 +168,7 @@ vector<double> obsMat2deltax(Rcpp::NumericMatrix X, unsigned int lag) {
 //' @return A vector of displacements.
 //' @export
 // [[Rcpp::export]]
-NumericVector obsMat2deltaxR(Rcpp::NumericMatrix X, unsigned int lag) {
+NumericVector obsMat2deltax(Rcpp::NumericMatrix X, unsigned int lag) {
     unsigned int ndays = X.nrow();
     unsigned int ntoads =  X.ncol();
     unsigned int i, j;
@@ -186,69 +186,67 @@ NumericVector obsMat2deltaxR(Rcpp::NumericMatrix X, unsigned int lag) {
     return (x);
 }
 
-//' This function computes the scores of Gaussian mixture models for the toad example
-//'
-//' @description The summary statistics for the toad example is taken to be the
-//' scores of Gaussian mixture model fitted to the displacement distribution. The
-//' displacements are computed with a given day lag.
-//' @param X The observation matrix.
-//' @param gmm A matrix containing the parameters for a Gaussian mixture model.
-//' The first row should be component proportions. The second row should be
-//' component means. The last row should be component Variances.
-//' @param lag The lag of days to compute the displacements.
-//' @return A list of the following vectors: return frequencies, scores of
-//' component proportion, scores of mean and scores of variance.
-//' @export
-// [[Rcpp::export]]
-Rcpp::List gmmScores(Rcpp::NumericMatrix X, NumericMatrix gmm, unsigned int lag) {
-    int n, i, j, k;
-    k = gmm.ncol();
-    double temp, freq_ret;
-    NumericVector sigma(k);
-    vector<double> deltax, x_ret, x_noret;
-
-    deltax = obsMat2deltax(X,lag);
-    for (i=0; i<(int) deltax.size(); i++) {
-        temp = deltax[i];
-        if (temp < 10) {
-            x_ret.push_back(temp);
-        } else {
-            x_noret.push_back(log(temp - 10));
-        }
-    }
-    freq_ret = (double) x_ret.size() / (double) deltax.size();
-    n = (int) x_noret.size();
-
-
-    NumericMatrix::Row p = gmm(0,_);
-    NumericMatrix::Row mu = gmm(1,_);
-    NumericMatrix::Row Sigma = gmm(2,_);
-    transform(Sigma.begin(),Sigma.end(),sigma.begin(),(double(*)(double)) sqrt);
-
-    NumericVector f(n), scorepi(k-1), scoremu(k), scoreSigma(k);
-    //  NumericVector scoresigma(k);
-    NumericMatrix phi(n,k), xmu(n,k), A(n,k), w(n,k);
-
-    for (i=0; i<n; i++) {
-        for (j=0; j<k; j++) {
-            phi(i,j) = dnormal(x_noret[i],mu[j],sigma[j]);
-            xmu(i,j) = x_noret[i] - mu[j];
-            A(i,j) = pow(xmu(i,j)/sigma[j],2) - 1;
-        }
-        f[i] = sum(phi(i,_) * p);
-        for (j=0; j<k; j++) {
-            w(i,j) = phi(i,j) / f[i];
-        }
-    }
-
-    for (j=0; j<k-1; j++) {
-        scorepi[j] = sum(w(_,j) - w(_,k-1));
-    }
-    for (j=0; j<k; j++) {
-        scoremu[j] = p[j] / Sigma[j] * sum(w(_,j) * xmu(_,j));
-        //  scoresigma[j] = p[j] / sigma[j] * sum(w(_,j) * A(_,j));
-        scoreSigma[j] = 0.5 * p[j] / Sigma[j] * sum(w(_,j) * A(_,j));
-    }
-
-    return (Rcpp::List::create(Named("freq_ret")=freq_ret,Named("scorepi")=scorepi,Named("scoremu")=scoremu,Named("scoreSigma")=scoreSigma));
-}
+// //' This function computes the scores of Gaussian mixture models for the toad example
+// //'
+// //' @description The summary statistics for the toad example is taken to be the
+// //' scores of Gaussian mixture model fitted to the displacement distribution. The
+// //' displacements are computed with a given day lag.
+// //' @param X The observation matrix.
+// //' @param gmm A matrix containing the parameters for a Gaussian mixture model.
+// //' The first row should be component proportions. The second row should be
+// //' component means. The last row should be component Variances.
+// //' @param lag The lag of days to compute the displacements.
+// //' @return A list of the following vectors: return frequencies, scores of
+// //' component proportion, scores of mean and scores of variance.
+// Rcpp::List gmmScores(Rcpp::NumericMatrix X, NumericMatrix gmm, unsigned int lag) {
+//     int n, i, j, k;
+//     k = gmm.ncol();
+//     double temp, freq_ret;
+//     NumericVector sigma(k);
+//     vector<double> deltax, x_ret, x_noret;
+// 
+//     deltax = obsMat2deltaxCpp(X,lag);
+//     for (i=0; i<(int) deltax.size(); i++) {
+//         temp = deltax[i];
+//         if (temp < 10) {
+//             x_ret.push_back(temp);
+//         } else {
+//             x_noret.push_back(log(temp - 10));
+//         }
+//     }
+//     freq_ret = (double) x_ret.size() / (double) deltax.size();
+//     n = (int) x_noret.size();
+// 
+// 
+//     NumericMatrix::Row p = gmm(0,_);
+//     NumericMatrix::Row mu = gmm(1,_);
+//     NumericMatrix::Row Sigma = gmm(2,_);
+//     transform(Sigma.begin(),Sigma.end(),sigma.begin(),(double(*)(double)) sqrt);
+// 
+//     NumericVector f(n), scorepi(k-1), scoremu(k), scoreSigma(k);
+//     //  NumericVector scoresigma(k);
+//     NumericMatrix phi(n,k), xmu(n,k), A(n,k), w(n,k);
+// 
+//     for (i=0; i<n; i++) {
+//         for (j=0; j<k; j++) {
+//             phi(i,j) = dnormal(x_noret[i],mu[j],sigma[j]);
+//             xmu(i,j) = x_noret[i] - mu[j];
+//             A(i,j) = pow(xmu(i,j)/sigma[j],2) - 1;
+//         }
+//         f[i] = sum(phi(i,_) * p);
+//         for (j=0; j<k; j++) {
+//             w(i,j) = phi(i,j) / f[i];
+//         }
+//     }
+// 
+//     for (j=0; j<k-1; j++) {
+//         scorepi[j] = sum(w(_,j) - w(_,k-1));
+//     }
+//     for (j=0; j<k; j++) {
+//         scoremu[j] = p[j] / Sigma[j] * sum(w(_,j) * xmu(_,j));
+//         //  scoresigma[j] = p[j] / sigma[j] * sum(w(_,j) * A(_,j));
+//         scoreSigma[j] = 0.5 * p[j] / Sigma[j] * sum(w(_,j) * A(_,j));
+//     }
+// 
+//     return (Rcpp::List::create(Named("freq_ret")=freq_ret,Named("scorepi")=scorepi,Named("scoremu")=scoremu,Named("scoreSigma")=scoreSigma));
+// }
