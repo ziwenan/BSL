@@ -5,8 +5,14 @@
 \title{Estimate the Gaussian synthetic (log) likelihood whilst acknowledging model
 incompatibility}
 \usage{
-synLikeMisspec(ssy, ssx, type = c("mean", "variance"),
-  gamma = numeric(length(ssy)), log = TRUE, verbose = FALSE)
+synLikeMisspec(
+  ssy,
+  ssx,
+  type = c("mean", "variance"),
+  gamma = numeric(length(ssy)),
+  log = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{ssy}{The observed summary statisic.}

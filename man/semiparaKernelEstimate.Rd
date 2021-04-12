@@ -4,8 +4,14 @@
 \alias{semiparaKernelEstimate}
 \title{Estimate the semi-parametric synthetic (log) likelihood}
 \usage{
-semiparaKernelEstimate(ssy, ssx, kernel = "gaussian", shrinkage = NULL,
-  penalty = NULL, log = TRUE)
+semiparaKernelEstimate(
+  ssy,
+  ssx,
+  kernel = "gaussian",
+  shrinkage = NULL,
+  penalty = NULL,
+  log = TRUE
+)
 }
 \arguments{
 \item{ssy}{The observed summary statisic.}

@@ -78,7 +78,7 @@
 #'   }
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' require(doParallel) # You can use a different package to set up the parallel backend
 #' 
 #' data(toad)

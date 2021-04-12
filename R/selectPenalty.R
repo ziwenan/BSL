@@ -23,7 +23,7 @@
 #'   likelihood estimator to aim for, usually a value between 1 and 2. This
 #'   parameter helps to control the mixing of a Markov chain.
 #' @param method                A string argument indicating the method to be
-#'   used. If the methd is ``BSL'', the shrinkage is applied to the Gaussian
+#'   used. If the method is ``BSL'', the shrinkage is applied to the Gaussian
 #'   covariance matrix. Otherwise if the method is ``semiBSL'', the shrinkage is
 #'   applied to the correlation matrix of the Gaussian copula.
 #' @param shrinkage     A string argument indicating which shrinkage method to
@@ -34,11 +34,12 @@
 #'   computing should be used for simulation and summary statistic evaluation.
 #'   Default is \code{FALSE}.
 #' @param parallelSimArgs       A list of additional arguments to pass into the
-#'   \code{foreach} function. Only used when parallelSim is \code{TRUE}, default
-#'   is \code{NULL}.
+#'   \code{foreach} function. Only used when \code{parallelSim} is \code{TRUE},
+#'   default is \code{NULL}.
 #' @param parallelMain          A logical value indicating whether parallel
-#'   computing should be used to computing the graphical lasso function. Default
-#'   is \code{FALSE}.
+#'   computing should be used to computing the graphical lasso function. Notice
+#'   that this should only be turned on when there are a lot of candidate values
+#'   in \code{lambda}. Default is \code{FALSE}.
 #' @param ... Other arguments to pass to \code{\link{gaussianSynLike}} (``BSL''
 #'   method) or \code{\link{semiparaKernelEstimate}} (``semiBSL'' method).
 #' @inheritParams bsl
@@ -47,6 +48,7 @@
 #'   \code{show} and \code{plot} methods are provided with the S4 class.
 #'
 #' @examples
+#' \dontrun{
 #' data(ma2)
 #' model <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args,
 #'                   theta0 = ma2$start, fnLogPrior = ma2_prior)
@@ -61,6 +63,7 @@
 #'     M = 100, sigma = 1.5, model = model, method = 'BSL', shrinkage = 'glasso')
 #' sp_ma2
 #' plot(sp_ma2)
+#' }
 #'
 #' @references
 #'
@@ -83,7 +86,7 @@ selectPenalty <- function(ssy, n, lambda, M, sigma = 1.5, model, theta = NULL,
     warning("\"parallelSimArgs\" is omitted in serial computing")
   }
   stopifnot(inherits(model, "MODEL"))
-  
+
   if (is.null(theta)) {
     theta <- model@theta0
   }
@@ -97,24 +100,24 @@ selectPenalty <- function(ssy, n, lambda, M, sigma = 1.5, model, theta = NULL,
   }
   ns <- length(ssy)
   call <- match.call()
-  
+
   if (verbose) {
     cat("*** selecting penalty with", method, "likelihood and", shrinkage, "shrinkage estimator ***\n")
   }
   nMax <- max(n)
   loglike <- vector("list", N)
   for (i in 1 : N) loglike[[i]] <- array(NA, c(M, length(lambda[[i]])))
-  
+
   # map the simulation function
   if (parallelSim) {
     myFnSimSum <- function(n, theta) fn(model)$fnPar(n, theta, parallelSimArgs)
   } else {
     myFnSimSum <- fn(model)$fn
   }
-  
+
   if (verbose == 1L) timeStart <- Sys.time()
   for (m in 1 : M) {
-    
+
     flush.console()
     if (verbose == 2L)  {
       cat("m =", m, "\n")
@@ -128,15 +131,15 @@ selectPenalty <- function(ssy, n, lambda, M, sigma = 1.5, model, theta = NULL,
                         style = 2, label = c("=", ".", "|"))
       flush.console()
     }
-    
+
     # simulate with theta_prop and calculate summaries
     ssx <- myFnSimSum(nMax, theta)
-    
+
     for (i in 1 : N) {
       nCurr <- n[i]
       nLambda <- length(lambda[[i]])
       ssxCurr <- ssx[sample(nMax, nCurr), ]
-      
+
       if (!parallelMain) {
         for (k in 1 : nLambda) {
           lambdaCurr = lambda[[i]][k]
@@ -156,8 +159,8 @@ selectPenalty <- function(ssy, n, lambda, M, sigma = 1.5, model, theta = NULL,
     }
   }
   if (verbose == 1L) cat("\n")
-  
+
   ret <- PENALTY(loglike = loglike, n = n, lambda = lambda, sigma = sigma, model = model, call = call)
-  
+
   return(ret)
 }

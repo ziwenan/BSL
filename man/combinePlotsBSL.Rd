@@ -4,13 +4,27 @@
 \alias{combinePlotsBSL}
 \title{Plot the densities of multiple ``bsl'' class objects.}
 \usage{
-combinePlotsBSL(objectList, which = 1L, thin = 1, burnin = 0,
-  thetaTrue = NULL, label = NULL, legendPosition = c("auto", "right",
-  "bottom")[1], legendNcol = NULL, col = NULL, lty = NULL,
-  lwd = NULL, cex.lab = 1, cex.axis = 1, cex.legend = 0.75,
-  top = "Approximate Marginal Posteriors", options.color = list(),
-  options.linetype = list(), options.size = list(),
-  options.theme = list())
+combinePlotsBSL(
+  objectList,
+  which = 1L,
+  thin = 1,
+  burnin = 0,
+  thetaTrue = NULL,
+  label = NULL,
+  legendPosition = c("auto", "right", "bottom")[1],
+  legendNcol = NULL,
+  col = NULL,
+  lty = NULL,
+  lwd = NULL,
+  cex.lab = 1,
+  cex.axis = 1,
+  cex.legend = 0.75,
+  top = "Approximate Marginal Posteriors",
+  options.color = list(),
+  options.linetype = list(),
+  options.size = list(),
+  options.theme = list()
+)
 }
 \arguments{
 \item{objectList}{A list of ``bsl'' class objects.}
@@ -95,13 +109,13 @@ toy_sum <- ma2_sum
 
 model <- newModel(fnSimVec = toy_sim, fnSum = toy_sum, sumArgs = list(epsilon = 2), theta0 = 0)
 
-result1 <- bsl(y = 1:2, n = 100, M = 100, model = model, covRandWalk = matrix(1),
+result1 <- bsl(y = 1:2, n = 50, M = 10, model = model, covRandWalk = matrix(1),
                method = "BSL")
-result2 <- bsl(y = 1:2, n = 100, M = 100, model = model, covRandWalk = matrix(1),
+result2 <- bsl(y = 1:2, n = 50, M = 10, model = model, covRandWalk = matrix(1),
                method = "uBSL")
-result3 <- bsl(y = 1:2, n = 100, M = 100, model = model, covRandWalk = matrix(1),
+result3 <- bsl(y = 1:2, n = 50, M = 10, model = model, covRandWalk = matrix(1),
                method = "semiBSL")
-combinePlotsBSL(list(result1, result2, result3), label = c("BSL","uBSL","semiBSL"), thin = 20)
+combinePlotsBSL(list(result1, result2, result3), label = c("BSL","uBSL","semiBSL"), thin = 2)
 }
 \dontrun{
 toy_sim <- function(n, theta) matrix(rnorm(2*n, theta), nrow = n)

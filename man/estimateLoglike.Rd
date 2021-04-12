@@ -4,8 +4,14 @@
 \alias{estimateLoglike}
 \title{Estimate the synthetic likelihood}
 \usage{
-estimateLoglike(ssy, ssx, method = c("BSL", "uBSL", "semiBSL",
-  "BSLmisspec"), log = TRUE, verbose = FALSE, ...)
+estimateLoglike(
+  ssy,
+  ssx,
+  method = c("BSL", "uBSL", "semiBSL", "BSLmisspec"),
+  log = TRUE,
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{ssy}{The observed summary statisic.}

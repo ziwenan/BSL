@@ -47,7 +47,7 @@ as in \insertCite{An2019;textual}{BSL}.
 }
 
 \examples{
-\donttest{
+\dontrun{
 require(doParallel) # You can use a different package to set up the parallel backend
 require(MASS)
 require(elliplot)
@@ -63,8 +63,7 @@ model <- newModel(fnSim = mgnk_sim, fnSum = mgnk_sum, simArgs = mgnk$sim_args, t
 cl <- makeCluster(detectCores() - 1)
 registerDoParallel(cl)
 resultMgnkBSL <- bsl(mgnk$data, n = 60, M = 80000, model = model, covRandWalk = mgnk$cov,
-    method = "BSL", parallel = TRUE, parallelArgs = list(.packages="MASS",.export="ninenum"),
-    verbose = 1L, plotOnTheFly = TRUE)
+    method = "BSL", parallel = FALSE, verbose = 1L, plotOnTheFly = TRUE)
 stopCluster(cl)
 registerDoSEQ()
 show(resultMgnkBSL)
@@ -76,8 +75,7 @@ plot(resultMgnkBSL, which = 2, thin = 20)
 cl <- makeCluster(detectCores() - 1)
 registerDoParallel(cl)
 resultMgnkuBSL <- bsl(mgnk$data, n = 60, M = 80000, model = model, covRandWalk = mgnk$cov,
-    method = "uBSL", parallel = TRUE, parallelArgs = list(.packages="MASS",.export="ninenum"),
-    verbose = 1L)
+    method = "uBSL", parallel = FALSE, verbose = 1L)
 stopCluster(cl)
 registerDoSEQ()
 show(resultMgnkuBSL)
@@ -108,8 +106,8 @@ plot(sp_mgnk)
 cl <- makeCluster(detectCores() - 1)
 registerDoParallel(cl)
 resultMgnkBSLasso <- bsl(mgnk$data, n = 20, M = 80000, model = model, covRandWalk = mgnk$cov,
-    method = "BSL", shrinkage = "glasso", penalty = 0.3, standardise = TRUE, parallel = TRUE,
-    parallelArgs = list(.packages = "MASS", .export = "ninenum"), verbose = 1L)
+    method = "BSL", shrinkage = "glasso", penalty = 0.3, standardise = TRUE, parallel = FALSE,
+    verbose = 1L)
 stopCluster(cl)
 registerDoSEQ()
 show(resultMgnkBSLasso)
@@ -122,8 +120,7 @@ plot(resultMgnkBSLasso, which = 2, thin = 20)
 cl <- makeCluster(detectCores() - 1)
 registerDoParallel(cl)
 resultMgnkSemiBSL <- bsl(mgnk$data, n = 60, M = 80000, model = model, covRandWalk = mgnk$cov,
-    method = "semiBSL", parallel = TRUE, parallelArgs = list(.packages="MASS",.export="ninenum"),
-    verbose = 1L)
+    method = "semiBSL", parallel = FALSE, verbose = 1L)
 stopCluster(cl)
 registerDoSEQ()
 show(resultMgnkSemiBSL)

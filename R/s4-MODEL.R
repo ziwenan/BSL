@@ -100,8 +100,14 @@ MODEL <- setClass("MODEL",
 #' m2 <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args,
 #'             theta0 = ma2$start, fnLogPrior = ma2_prior)
 #' require("rbenchmark")
+#' \dontshow{
+#' benchmark(serial  = simulation(m1, n = 50, theta = c(0.6, 0.2)),
+#'           vectorised  = simulation(m2, n = 50, theta = c(0.6, 0.2)))
+#' }
+#' \dontrun{
 #' benchmark(serial  = simulation(m1, n = 1000, theta = c(0.6, 0.2)),
 #'           vectorised  = simulation(m2, n = 1000, theta = c(0.6, 0.2)))
+#' }
 #'
 #' @rdname MODEL-class
 #' @export
@@ -250,7 +256,10 @@ setGeneric("simulation", function(model, ...) standardGeneric("simulation"))
 setMethod("simulation",
           signature(model = "MODEL"),
           definition = function(model, n = 1, theta = model@theta0, summStat = TRUE, parallel = FALSE, parallelArgs = NULL, seed = NULL) {
-            if (!is.null(seed)) set.seed(seed)
+            if (!is.null(seed)) {
+			  if (parallel) doRNG::registerDoRNG()
+		      set.seed(seed)
+			}
             flagVec <- !is.null(model@fnSimVec)
             if (flagVec && parallel) {
               parallel <- FALSE

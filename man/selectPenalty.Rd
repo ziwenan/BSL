@@ -4,10 +4,22 @@
 \alias{selectPenalty}
 \title{Selecting the Penalty Parameter}
 \usage{
-selectPenalty(ssy, n, lambda, M, sigma = 1.5, model, theta = NULL,
-  method = c("BSL", "semiBSL"), shrinkage = c("glasso", "Warton"),
-  parallelSim = FALSE, parallelSimArgs = NULL, parallelMain = FALSE,
-  verbose = 1L, ...)
+selectPenalty(
+  ssy,
+  n,
+  lambda,
+  M,
+  sigma = 1.5,
+  model,
+  theta = NULL,
+  method = c("BSL", "semiBSL"),
+  shrinkage = c("glasso", "Warton"),
+  parallelSim = FALSE,
+  parallelSimArgs = NULL,
+  parallelMain = FALSE,
+  verbose = 1L,
+  ...
+)
 }
 \arguments{
 \item{ssy}{A summary statistic vector for the observed
@@ -36,7 +48,7 @@ all of the simulations will be based on. By default, if \code{theta} is
 \code{model}.}
 
 \item{method}{A string argument indicating the method to be
-used. If the methd is ``BSL'', the shrinkage is applied to the Gaussian
+used. If the method is ``BSL'', the shrinkage is applied to the Gaussian
 covariance matrix. Otherwise if the method is ``semiBSL'', the shrinkage is
 applied to the correlation matrix of the Gaussian copula.}
 
@@ -50,12 +62,13 @@ computing should be used for simulation and summary statistic evaluation.
 Default is \code{FALSE}.}
 
 \item{parallelSimArgs}{A list of additional arguments to pass into the
-\code{foreach} function. Only used when parallelSim is \code{TRUE}, default
-is \code{NULL}.}
+\code{foreach} function. Only used when \code{parallelSim} is \code{TRUE},
+default is \code{NULL}.}
 
 \item{parallelMain}{A logical value indicating whether parallel
-computing should be used to computing the graphical lasso function. Default
-is \code{FALSE}.}
+computing should be used to computing the graphical lasso function. Notice
+that this should only be turned on when there are a lot of candidate values
+in \code{lambda}. Default is \code{FALSE}.}
 
 \item{verbose}{An integer indicating the verbose style. 0L
 means no verbose messages will be printed. 1L uses a custom progress bar to
@@ -77,6 +90,7 @@ This is the main function for selecting the shrinkage (graphical
   is outlined in \insertCite{An2019;textual}{BSL}.
 }
 \examples{
+\dontrun{
 data(ma2)
 model <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args,
                   theta0 = ma2$start, fnLogPrior = ma2_prior)
@@ -91,6 +105,7 @@ sp_ma2 <- selectPenalty(ssy = ssy, n = c(50, 150, 300, 500), lambda_all, theta =
     M = 100, sigma = 1.5, model = model, method = 'BSL', shrinkage = 'glasso')
 sp_ma2
 plot(sp_ma2)
+}
 
 }
 \references{

@@ -59,8 +59,9 @@ double rstable(double scale, double alpha) {
         double s = pow((cos((1 - alpha) * u) / v), ((1 - alpha) / alpha));
         x = scale * t * s;
         return (x);
-    }
-    cout << "rstable is not defined for alpha = " << alpha << endl;
+    }	
+	throw(Rcpp::exception("rstable is not defined for this value of alpha."));
+    //Rcpp::Rcout << "rstable is not defined for alpha = " << alpha << std::endl;
     return (0);
 }
 

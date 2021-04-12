@@ -4,13 +4,17 @@
 \name{PENALTY-class}
 \alias{PENALTY-class}
 \alias{PENALTY}
+\alias{PENALTYclass}
 \alias{show,PENALTY-method}
 \alias{plot,PENALTY,ANY-method}
+\alias{getPenalty,BSL-method}
 \title{S4 class ``PENALTY''}
 \usage{
 \S4method{show}{PENALTY}(object)
 
 \S4method{plot}{PENALTY,ANY}(x, logscale = TRUE)
+
+\S4method{getPenalty}{BSL}(object)
 }
 \arguments{
 \item{object}{The S4 object of class ``PENALTY'' to show.}
@@ -53,8 +57,10 @@ See \code{\link{newModel}}.}
 \item{\code{stdLoglike}}{A list contains the estimated standard deviations of
 log-likelihoods.}
 
-\item{\code{idxClosest}}{The index number of which the estimated standard deviation
-is the closest to the target sigma.}
+\item{\code{penalty}}{The vector stores the selected penalty values for each given
+\code{n} by choosing from the candidate \code{lambda} list. The selected
+values produce closest standard deviations \code{stdLoglike} to the target
+\code{sigma}.}
 
 \item{\code{result}}{The result data frame.}
 

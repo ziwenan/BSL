@@ -9,8 +9,14 @@
 \usage{
 data(toad)
 
-toad_sim(theta, ntoads, ndays, model = 1, d0 = 100,
-  na = matrix(FALSE, ndays, ntoads))
+toad_sim(
+  theta,
+  ntoads,
+  ndays,
+  model = 1,
+  d0 = 100,
+  na = matrix(FALSE, ndays, ntoads)
+)
 
 toad_sum(X, lag = c(1, 2, 4, 8), p = seq(0, 1, 0.1))
 
@@ -115,7 +121,7 @@ statistics are the log differences between adjacent quantiles and also the media
 }
 
 \examples{
-\donttest{
+\dontrun{
 require(doParallel) # You can use a different package to set up the parallel backend
 
 data(toad)

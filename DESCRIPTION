@@ -1,8 +1,8 @@
 Package: BSL
 Type: Package
 Title: Bayesian Synthetic Likelihood
-Version: 3.1.0
-Date: 2019-11-20
+Version: 3.2.1
+Date: 2021-03-09
 Authors@R: c(person("Ziwen","An",role=c("aut","cre"),email="ziwen.an@hdr.qut.edu.au",comment = c(ORCID = "0000-0002-9947-5182")),
             person("Leah F.","South",role=c("aut"),email="leah.south@hdr.qut.edu.au",comment = c(ORCID = "0000-0002-5646-2963")),
             person("Christopher C.","Drovandi",role=c("aut"),email="c.drovandi@qut.edu.au",comment = c(ORCID = "0000-0001-9222-8763")))
@@ -28,12 +28,12 @@ Depends: R (>= 3.3.0)
 License: GPL (>= 2)
 LazyLoad: yes
 Imports: glasso, ggplot2, MASS, mvtnorm, copula, whitening, graphics,
-        gridExtra, foreach, coda, Rcpp, methods, stringr, Rdpack (>=
-        0.7)
+        gridExtra, foreach, coda, Rcpp, doRNG, methods, stringr, Rdpack
+        (>= 0.7)
 Suggests: elliplot, doParallel, rbenchmark, mixtools
 LinkingTo: RcppArmadillo, Rcpp
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Encoding: UTF-8
 Collate: 'BSL-package.R' 'RcppExports.R' 's4-MODEL.R' 's4-BSL.R'
         'bsl.R' 'cell.R' 'combinePlotsBSL.R' 'covWarton.R'
@@ -46,7 +46,7 @@ Collate: 'BSL-package.R' 'RcppExports.R' 's4-MODEL.R' 's4-BSL.R'
         'toad.R'
 RdMacros: Rdpack
 NeedsCompilation: yes
-Packaged: 2019-10-10 10:03:53 UTC; n9790349
+Packaged: 2020-11-22 04:28:37 UTC; southl
 Author: Ziwen An [aut, cre] (<https://orcid.org/0000-0002-9947-5182>),
   Leah F. South [aut] (<https://orcid.org/0000-0002-5646-2963>),
   Christopher C. Drovandi [aut] (<https://orcid.org/0000-0001-9222-8763>)

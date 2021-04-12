@@ -16,10 +16,17 @@
 
 \S4method{summary}{BSL}(object, burnin = 0, thetaNames = NULL)
 
-\S4method{plot}{BSL,ANY}(x, which = 1L, thin = 1, burnin = 0,
-  thetaTrue = NULL, options.plot = NULL,
-  top = "Approximate Univariate Posteriors", options.density = list(),
-  options.theme = list())
+\S4method{plot}{BSL,ANY}(
+  x,
+  which = 1L,
+  thin = 1,
+  burnin = 0,
+  thetaTrue = NULL,
+  options.plot = NULL,
+  top = "Approximate Univariate Posteriors",
+  options.density = list(),
+  options.theme = list()
+)
 
 \S4method{getTheta}{BSL}(object, burnin = 0, thin = 1)
 
@@ -28,7 +35,7 @@
 \S4method{getGamma}{BSL}(object, burnin = 0, thin = 1)
 }
 \arguments{
-\item{object}{A ``BSL'' class object to be displayed.}
+\item{object}{A ``BSL'' class object.}
 
 \item{burnin}{the number of MCMC burn-in steps to be taken.}
 
@@ -155,7 +162,7 @@ Warton's shrinkage, or just the Whitening matrix used.}
 toy_simVec <- function(n, theta) matrix(rnorm(n, theta), nrow = n) # the simulation function
 toy_sum <- function(x) x # the summary statistic function
 model <- newModel(fnSimVec = toy_simVec, fnSum = toy_sum, theta0 = 0) # create the model object
-result_toy <- bsl(y = 1, n = 100, M = 1000, model = model, covRandWalk = matrix(1), verbose = 0)
+result_toy <- bsl(y = 1, n = 50, M = 100, model = model, covRandWalk = matrix(1), verbose = 0)
 summary(result_toy)
 plot(result_toy)
 }

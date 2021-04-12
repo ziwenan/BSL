@@ -9,12 +9,28 @@
 \alias{summStat,ANY,MODEL-method}
 \title{S4 class ``MODEL''}
 \usage{
-newModel(fnSim, fnSimVec, fnSum, fnLogPrior, simArgs, sumArgs, theta0,
-  thetaNames, test = TRUE, verbose = TRUE)
+newModel(
+  fnSim,
+  fnSimVec,
+  fnSum,
+  fnLogPrior,
+  simArgs,
+  sumArgs,
+  theta0,
+  thetaNames,
+  test = TRUE,
+  verbose = TRUE
+)
 
-\S4method{simulation}{MODEL}(model, n = 1, theta = model@theta0,
-  summStat = TRUE, parallel = FALSE, parallelArgs = NULL,
-  seed = NULL)
+\S4method{simulation}{MODEL}(
+  model,
+  n = 1,
+  theta = model@theta0,
+  summStat = TRUE,
+  parallel = FALSE,
+  parallelArgs = NULL,
+  seed = NULL
+)
 
 \S4method{summStat}{ANY,MODEL}(x, model)
 }
@@ -168,8 +184,14 @@ m1 <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args,
 m2 <- newModel(fnSimVec = ma2_sim_vec, fnSum = ma2_sum, simArgs = ma2$sim_args,
             theta0 = ma2$start, fnLogPrior = ma2_prior)
 require("rbenchmark")
+\dontshow{
+benchmark(serial  = simulation(m1, n = 50, theta = c(0.6, 0.2)),
+          vectorised  = simulation(m2, n = 50, theta = c(0.6, 0.2)))
+}
+\dontrun{
 benchmark(serial  = simulation(m1, n = 1000, theta = c(0.6, 0.2)),
           vectorised  = simulation(m2, n = 1000, theta = c(0.6, 0.2)))
+}
 
 }
 \Rdversion{1.1}

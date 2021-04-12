@@ -27,7 +27,7 @@
 #' }
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' require(doParallel) # You can use a different package to set up the parallel backend
 #' require(MASS)
 #' require(elliplot)
@@ -43,8 +43,7 @@
 #' cl <- makeCluster(detectCores() - 1)
 #' registerDoParallel(cl)
 #' resultMgnkBSL <- bsl(mgnk$data, n = 60, M = 80000, model = model, covRandWalk = mgnk$cov,
-#'     method = "BSL", parallel = TRUE, parallelArgs = list(.packages="MASS",.export="ninenum"),
-#'     verbose = 1L, plotOnTheFly = TRUE)
+#'     method = "BSL", parallel = FALSE, verbose = 1L, plotOnTheFly = TRUE)
 #' stopCluster(cl)
 #' registerDoSEQ()
 #' show(resultMgnkBSL)
@@ -56,8 +55,7 @@
 #' cl <- makeCluster(detectCores() - 1)
 #' registerDoParallel(cl)
 #' resultMgnkuBSL <- bsl(mgnk$data, n = 60, M = 80000, model = model, covRandWalk = mgnk$cov,
-#'     method = "uBSL", parallel = TRUE, parallelArgs = list(.packages="MASS",.export="ninenum"),
-#'     verbose = 1L)
+#'     method = "uBSL", parallel = FALSE, verbose = 1L)
 #' stopCluster(cl)
 #' registerDoSEQ()
 #' show(resultMgnkuBSL)
@@ -88,8 +86,8 @@
 #' cl <- makeCluster(detectCores() - 1)
 #' registerDoParallel(cl)
 #' resultMgnkBSLasso <- bsl(mgnk$data, n = 20, M = 80000, model = model, covRandWalk = mgnk$cov,
-#'     method = "BSL", shrinkage = "glasso", penalty = 0.3, standardise = TRUE, parallel = TRUE,
-#'     parallelArgs = list(.packages = "MASS", .export = "ninenum"), verbose = 1L)
+#'     method = "BSL", shrinkage = "glasso", penalty = 0.3, standardise = TRUE, parallel = FALSE,
+#'     verbose = 1L)
 #' stopCluster(cl)
 #' registerDoSEQ()
 #' show(resultMgnkBSLasso)
@@ -102,8 +100,7 @@
 #' cl <- makeCluster(detectCores() - 1)
 #' registerDoParallel(cl)
 #' resultMgnkSemiBSL <- bsl(mgnk$data, n = 60, M = 80000, model = model, covRandWalk = mgnk$cov,
-#'     method = "semiBSL", parallel = TRUE, parallelArgs = list(.packages="MASS",.export="ninenum"),
-#'     verbose = 1L)
+#'     method = "semiBSL", parallel = FALSE, verbose = 1L)
 #' stopCluster(cl)
 #' registerDoSEQ()
 #' show(resultMgnkSemiBSL)
@@ -291,10 +288,10 @@ summStatRobust <- function(x) {
     T <- length(x)
     ssx <- numeric(4)
     octile <- elliplot::ninenum(x)[2:8]
-    ssx[1] <- octile[2]
-    ssx[2] = octile[3] - octile[1]
-    ssx[3] = (octile[3] + octile[1] - 2*octile[2]) / ssx[2]
-    ssx[4] = (octile[7] - octile[5] + octile[3] - octile[1]) / ssx[2]
+    ssx[1] <- octile[4]
+    ssx[2] <- octile[6] - octile[2]
+    ssx[3] <- (octile[7] - octile[5] + octile[3] - octile[1]) / ssx[2]
+	ssx[4] <- (octile[6] + octile[2] - 2*octile[4]) / ssx[2]
     return(ssx)
 }
 
