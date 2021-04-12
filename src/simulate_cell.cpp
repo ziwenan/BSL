@@ -23,7 +23,8 @@ int sample_equal(int n) {
             return(i);
         }
     }
-    Rcpp::Rcout << "sample_equal finished without a successful sample" << std::endl;
+	throw(Rcpp::exception("sample_equal finished without a successful sample."));
+    //Rcpp::Rcout << "sample_equal finished without a successful sample" << std::endl;
     return n;
 }
 

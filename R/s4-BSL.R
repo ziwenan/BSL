@@ -76,7 +76,7 @@ setClassUnion("logicalOrMatrixOrNULL", c("logical", "matrix", "NULL"))
 #' toy_simVec <- function(n, theta) matrix(rnorm(n, theta), nrow = n) # the simulation function
 #' toy_sum <- function(x) x # the summary statistic function
 #' model <- newModel(fnSimVec = toy_simVec, fnSum = toy_sum, theta0 = 0) # create the model object
-#' result_toy <- bsl(y = 1, n = 100, M = 1000, model = model, covRandWalk = matrix(1), verbose = 0)
+#' result_toy <- bsl(y = 1, n = 50, M = 100, model = model, covRandWalk = matrix(1), verbose = 0)
 #' summary(result_toy)
 #' plot(result_toy)
 #' }
@@ -168,7 +168,7 @@ setValidity("BSL",
             }
 )
 
-#' @param object   A ``BSL'' class object to be displayed.
+#' @param object   A ``BSL'' class object.
 #' @rdname BSL-class
 #' @export
 setMethod("show",
@@ -208,10 +208,10 @@ setMethod("show",
           }
 )
 
+#' @param object   A ``BSL'' class object.
 #' @param burnin the number of MCMC burn-in steps to be taken.
 #' @param thetaNames Parameter names to be shown in the summary table. If not
 #'   given, parameter names of the ``BSL'' object will be used by default.
-#' @inheritParams BSL-class
 #' @rdname BSL-class
 #' @export
 setMethod("summary",
@@ -340,10 +340,9 @@ marginalPostGgplot <- function(x, thin = 1, burnin = 0, thetaTrue = NULL, top = 
 
 #' Obtain the samples from a "BSL" object
 #' @description see \code{\link{BSLclass}}
+#' @param object   A ``BSL'' class object.
 #' @param ... Other arguments.
-#' @inheritParams BSL-class
 setGeneric("getTheta", function(object, ...) standardGeneric("getTheta"))
-#' @inheritParams BSL-class
 #' @rdname BSL-class
 #' @export
 setMethod("getTheta",
@@ -355,10 +354,9 @@ setMethod("getTheta",
 
 #' Obtain the log-likelihoods from a "BSL" object
 #' @description see \code{\link{BSLclass}}
+#' @param object   A ``BSL'' class object.
 #' @param ... Other arguments.
-#' @inheritParams BSL-class
 setGeneric("getLoglike", function(object, ...) standardGeneric("getLoglike"))
-#' @inheritParams BSL-class
 #' @rdname BSL-class
 #' @export
 setMethod("getLoglike",
@@ -371,10 +369,9 @@ setMethod("getLoglike",
 #' Obtain the gamma samples (the latent parameters for BSLmisspec method) from a
 #' "BSL" object
 #' @description see \code{\link{BSLclass}}
+#' @param object   A ``BSL'' class object.
 #' @param ... Other arguments.
-#' @inheritParams BSL-class
 setGeneric("getGamma", function(object, ...) standardGeneric("getGamma"))
-#' @inheritParams BSL-class
 #' @rdname BSL-class
 #' @export
 setMethod("getGamma",

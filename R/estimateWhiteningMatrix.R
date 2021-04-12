@@ -19,9 +19,16 @@
 #' \insertAllCited{}
 #'
 #' @examples
+#' \dontshow{
+#' data(ma2)
+#' model <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args, theta0 = ma2$start)
+#' W <- estimateWhiteningMatrix(500, model, method = "PCA", thetaPoint = c(0.6, 0.2))
+#' }
+#' \dontrun{
 #' data(ma2)
 #' model <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args, theta0 = ma2$start)
 #' W <- estimateWhiteningMatrix(20000, model, method = "PCA", thetaPoint = c(0.6, 0.2))
+#' }
 #'
 #' @export
 estimateWhiteningMatrix <- function(n, model, method = c("PCA", "ZCA", "Cholesky", "ZCA-cor", "PCA-cor"),

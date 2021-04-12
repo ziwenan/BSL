@@ -134,7 +134,7 @@ prior density at the parameter value
 }
 
 \examples{
-\donttest{
+\dontrun{
 require(doParallel) # You can use a different package to set up the parallel backend
 
 # Loading the data for this example

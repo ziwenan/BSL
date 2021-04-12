@@ -4,9 +4,18 @@
 \alias{gaussianSynLike}
 \title{Estimate the Gaussian synthetic (log) likelihood}
 \usage{
-gaussianSynLike(ssy, ssx, shrinkage = NULL, penalty = NULL,
-  standardise = FALSE, GRC = FALSE, whitening = NULL,
-  ssyTilde = NULL, log = TRUE, verbose = FALSE)
+gaussianSynLike(
+  ssy,
+  ssx,
+  shrinkage = NULL,
+  penalty = NULL,
+  standardise = FALSE,
+  GRC = FALSE,
+  whitening = NULL,
+  ssyTilde = NULL,
+  log = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{ssy}{The observed summary statisic.}

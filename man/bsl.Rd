@@ -4,13 +4,33 @@
 \alias{bsl}
 \title{Performing BSL, uBSL, semiBSL and BSLmisspec}
 \usage{
-bsl(y, n, M, model, covRandWalk, theta0, fnSim, fnSum, method = c("BSL",
-  "uBSL", "semiBSL", "BSLmisspec"), shrinkage = NULL, penalty = NULL,
-  fnPrior = NULL, simArgs = NULL, sumArgs = NULL,
-  logitTransformBound = NULL, standardise = FALSE, GRC = FALSE,
-  whitening = NULL, misspecType = NULL, tau = 1, parallel = FALSE,
-  parallelArgs = NULL, thetaNames = NULL, plotOnTheFly = FALSE,
-  verbose = 1L)
+bsl(
+  y,
+  n,
+  M,
+  model,
+  covRandWalk,
+  theta0,
+  fnSim,
+  fnSum,
+  method = c("BSL", "uBSL", "semiBSL", "BSLmisspec"),
+  shrinkage = NULL,
+  penalty = NULL,
+  fnPrior = NULL,
+  simArgs = NULL,
+  sumArgs = NULL,
+  logitTransformBound = NULL,
+  standardise = FALSE,
+  GRC = FALSE,
+  whitening = NULL,
+  misspecType = NULL,
+  tau = 1,
+  parallel = FALSE,
+  parallelArgs = NULL,
+  thetaNames = NULL,
+  plotOnTheFly = FALSE,
+  verbose = 1L
+)
 }
 \arguments{
 \item{y}{The observed data. Note this should be the raw dataset NOT the

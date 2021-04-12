@@ -5,9 +5,14 @@
 \title{Estimate the Whitening matrix to be used in the ``wBSL'' method of
 \insertCite{Priddle2019;textual}{BSL}}
 \usage{
-estimateWhiteningMatrix(n, model, method = c("PCA", "ZCA", "Cholesky",
-  "ZCA-cor", "PCA-cor"), thetaPoint = NULL, parallel = FALSE,
-  parallelArgs = NULL)
+estimateWhiteningMatrix(
+  n,
+  model,
+  method = c("PCA", "ZCA", "Cholesky", "ZCA-cor", "PCA-cor"),
+  thetaPoint = NULL,
+  parallel = FALSE,
+  parallelArgs = NULL
+)
 }
 \arguments{
 \item{n}{The number of model simulations to estimate the Whitening matrix.}
@@ -43,9 +48,16 @@ This function estimates the Whitening matrix to be used in BSL
   decorrelation methods are detailed in \insertCite{Kessy2018;textual}{BSL}.
 }
 \examples{
+\dontshow{
+data(ma2)
+model <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args, theta0 = ma2$start)
+W <- estimateWhiteningMatrix(500, model, method = "PCA", thetaPoint = c(0.6, 0.2))
+}
+\dontrun{
 data(ma2)
 model <- newModel(fnSim = ma2_sim, fnSum = ma2_sum, simArgs = ma2$sim_args, theta0 = ma2$start)
 W <- estimateWhiteningMatrix(20000, model, method = "PCA", thetaPoint = c(0.6, 0.2))
+}
 
 }
 \references{

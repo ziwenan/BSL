@@ -7,7 +7,7 @@
 getTheta(object, ...)
 }
 \arguments{
-\item{object}{A ``BSL'' class object to be displayed.}
+\item{object}{A ``BSL'' class object.}
 
 \item{...}{Other arguments.}
 }

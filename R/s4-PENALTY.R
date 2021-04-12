@@ -24,12 +24,15 @@ NULL
 #'   See \code{\link{newModel}}.
 #' @slot stdLoglike A list contains the estimated standard deviations of
 #'   log-likelihoods.
-#' @slot idxClosest The index number of which the estimated standard deviation
-#'   is the closest to the target sigma.
+#' @slot penalty The vector stores the selected penalty values for each given
+#' \code{n} by choosing from the candidate \code{lambda} list. The selected
+#' values produce closest standard deviations \code{stdLoglike} to the target
+#' \code{sigma}.
 #' @slot result The result data frame.
 #' @slot call The original code used to run \code{\link{selectPenalty}}.
 #' @seealso \code{\link{selectPenalty}} for the function that selects the
 #'   penalty parameter.
+#' @aliases PENALTYclass
 #' @export
 PENALTY <- setClass("PENALTY",
                     slots = c(loglike = "list",
@@ -39,7 +42,7 @@ PENALTY <- setClass("PENALTY",
                               sigma = "numeric",
                               model = "MODEL",
                               stdLoglike = "list",
-                              idxClosest = "integer",
+							  penalty = "numeric",
                               result = "data.frame",
                               call = "call")
 )
@@ -60,8 +63,6 @@ setMethod("initialize",
             if (!missing(model)) .Object@model <- model
             if (!missing(call)) .Object@call <- call
             validObject(.Object)
-            
-            .Object <- findOptimalPenalty(.Object)
             .Object <- computePenaltyResult(.Object)
             return(.Object)
           }
@@ -91,37 +92,29 @@ setValidity("PENALTY",
             }
 )
 
-# #' @description Find the closest penalty value to the target sigma.
-setGeneric("findOptimalPenalty", function(object) standardGeneric("findOptimalPenalty"))
-
-setMethod("findOptimalPenalty",
-          signature = c("PENALTY"),
-          definition = function(object) {
-            N <- length(object@n)
-            stdLoglike <- vector("list", N)
-            idxClosest <- integer(N)
-            for (i in 1 : N) {
-              temp <- apply(object@loglike[[i]], FUN = sd, MARGIN = 2)
-              stdLoglike[[i]] <- temp
-              idxClosest[i] <- which.min(abs(temp - object@sigma))
-            }
-            object@stdLoglike <- stdLoglike
-            object@idxClosest <- idxClosest
-            return(object)
-          }
-)
-
-# #' @description Compute and reform the result into a data frame.
+# #' @description Find the closest penalty value to the target sigma and format
+# #' the result into a data frame. Notice that the closest value is not
+# #' necessarily a local minimum or maximum.
 setGeneric("computePenaltyResult", function(object) standardGeneric("computePenaltyResult"))
 
 setMethod("computePenaltyResult",
           signature = c("PENALTY"),
           definition = function(object) {
-            N <- length(object@n)
+		    N <- length(object@n)
+		    stdLoglike <- vector("list", N)
+            idxClosest <- integer(N)
+            for (i in 1 : N) {
+              temp <- apply(object@loglike[[i]], FUN = sd, MARGIN = 2)
+              stdLoglike[[i]] <- temp
+              idxClosest[i] <- which.min(abs(temp - object@sigma))[1]
+            }
+            object@stdLoglike <- stdLoglike
+			object@penalty <- sapply(object@lambda, min)
+
             result <- vector("list", N)
             for (i in 1 : N) {
               isClosest <- logical(length(object@stdLoglike[[i]]))
-              isClosest[object@idxClosest[i]] <- TRUE
+              isClosest[idxClosest[i]] <- TRUE
               result[[i]] <- data.frame(n = object@n[i], penalty = object@lambda[[i]], logPenalty = log(object@lambda[[i]]),
                                         stdLoglike = object@stdLoglike[[i]], isClosest = isClosest)
             }
@@ -167,7 +160,7 @@ setMethod("plot",
             yPosSigma <- sapply(n, FUN = function(xx) mean(range(result[result$n == xx, "stdLoglike"])))
             textYSigma <- c(unlist(mapply(yPosSigma, nRepeats, FUN = rep)))
             result$isClosest[!result$isClosest] <- NA
-            
+
             if (logscale) {
               ggplot(data = result, aes(x = logPenalty, y = stdLoglike)) +
                 geom_line(color = "darkblue", linetype = "dashed", size = 1) +
@@ -191,5 +184,19 @@ setMethod("plot",
                 theme(plot.title = element_text(size = 14, hjust = 0.5)) +
                 theme(strip.text.x = element_text(size = 12, face = "bold"), axis.title = element_text(size = 12))
             }
+          }
+)
+
+#' Obtain the selected penalty values from a "PENALTY" object
+#' @description see \code{\link{PENALTYclass}}
+#' @param object   A ``PENALTY'' class object.
+#' @param ... Other arguments.
+setGeneric("getPenalty", function(object, ...) standardGeneric("getPenalty"))
+#' @rdname PENALTY-class
+#' @export
+setMethod("getPenalty",
+          signature = c(object = "BSL"),
+          definition = function(object) {
+              object@penalty
           }
 )

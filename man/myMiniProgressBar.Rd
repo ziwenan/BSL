@@ -4,8 +4,7 @@
 \alias{myMiniProgressBar}
 \title{Progress Bar}
 \usage{
-myMiniProgressBar(p, txt1 = "", txt2 = "", style = 1,
-  label = c("=", "-", "|"))
+myMiniProgressBar(p, txt1 = "", txt2 = "", style = 1, label = c("=", "-", "|"))
 }
 \arguments{
 \item{p}{Numeric, percentage of finished progress, between 0 and 1.}

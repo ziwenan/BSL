@@ -18,6 +18,7 @@
 #' @importFrom copula normalCopula p2P P2p dCopula
 #' @importFrom whitening whiteningMatrix
 #' @importFrom Rdpack reprompt
+#' @importFrom doRNG registerDoRNG
 #' @import methods
 NULL
 

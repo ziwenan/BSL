@@ -5,8 +5,16 @@
 \title{Generate a random sample of gamma for the R-BSL-V method of
 \insertCite{Frazier2019;textual}{BSL} using slice sampling}
 \usage{
-sliceGammaVariance(ssy, ssx, loglike, gamma = numeric(length(ssy)),
-  tau = 1, w = 1, std = NULL, maxit = 1000)
+sliceGammaVariance(
+  ssy,
+  ssx,
+  loglike,
+  gamma = numeric(length(ssy)),
+  tau = 1,
+  w = 1,
+  std = NULL,
+  maxit = 1000
+)
 }
 \arguments{
 \item{ssy}{The observed summary statisic.}
