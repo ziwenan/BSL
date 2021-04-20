@@ -1,3 +1,9 @@
+# BSL 3.2.1 (Release date: 2021-04)
+
+* Added DBI to suggests.
+
+# BSL 3.2.0
+
 # BSL 3.1.0 (Release date: 2019-11)
 
 * Added a new method ("BSLmisspec") in the main function "bsl", which considers model misspecification when running BSL.
